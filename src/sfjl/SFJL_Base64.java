@@ -73,8 +73,6 @@ static public final byte[] base64_encode(Base64_Type base64_type, byte[] to_enco
         write_index += 4;
     }
 
-    assert write_index == length : write_index + "  " + length;
-    
     return result;
 }
 
@@ -108,25 +106,26 @@ static {
 }
 
 
-static public final byte[] base64_decode(String base64_str) {
+static public final byte[] base64_decode(byte[] base64) {
     
     //
     // check how much padding we have, regardless of if it was given or not
     //
     int padding = -1;
-    int length_with_steps_of_4 = base64_str.length() - (base64_str.length() % 4);
+    int length_with_steps_of_4 = base64.length - (base64.length % 4);
 
-    if (base64_str.charAt(base64_str.length()-2) == '=') {
+    
+    if (base64[base64.length-2] == '=') {
         padding = 2;
         length_with_steps_of_4 -= 4;
     }
-    else if (base64_str.charAt(base64_str.length()-1) == '=') {
+    else if (base64[base64.length-1] == '=') {
         padding = 1;
         length_with_steps_of_4 -= 4;
     }
 
     if (padding == -1) {
-        int remainder = base64_str.length() % 4;
+        int remainder = base64.length % 4;
         if (remainder == 3) {
             padding = 1;
         }
@@ -138,11 +137,12 @@ static public final byte[] base64_decode(String base64_str) {
             padding = 0;
         }
     }
+    
     // ---
-
+    
     int length = (length_with_steps_of_4 / 4) * 3;
     length += padding == 2 ? 1 : padding == 1 ? 2 : 0;
-
+    
     byte[] result = new byte[length];
     int index = 0;
 
@@ -151,10 +151,10 @@ static public final byte[] base64_decode(String base64_str) {
     //
     int i = 0;
     for (; i < length_with_steps_of_4; i += 4) {
-        byte c1 = (byte) base64_str.charAt(i+0);
-        byte c2 = (byte) base64_str.charAt(i+1);
-        byte c3 = (byte) base64_str.charAt(i+2);
-        byte c4 = (byte) base64_str.charAt(i+3);
+        byte c1 = (byte) base64[i+0];
+        byte c2 = (byte) base64[i+1];
+        byte c3 = (byte) base64[i+2];
+        byte c4 = (byte) base64[i+3];
         
         int r = 0;
         r |= char_to_base64_lookup[c1] << 18;
@@ -167,9 +167,9 @@ static public final byte[] base64_decode(String base64_str) {
         result[index++] = (byte) (r >> 0 & 0xff);
     }
     if (padding == 1) {
-        byte c1 = (byte) base64_str.charAt(i+0);
-        byte c2 = (byte) base64_str.charAt(i+1);
-        byte c3 = (byte) base64_str.charAt(i+2);
+        byte c1 = (byte) base64[i+0];
+        byte c2 = (byte) base64[i+1];
+        byte c3 = (byte) base64[i+2];
 
         int r = 0;
         r |= char_to_base64_lookup[c1] << 18;
@@ -180,8 +180,8 @@ static public final byte[] base64_decode(String base64_str) {
         result[index++] = (byte) (r >> 8 & 0xff);
     }
     else if (padding == 2) {
-        byte c1 = (byte) base64_str.charAt(i+0);
-        byte c2 = (byte) base64_str.charAt(i+1);
+        byte c1 = (byte) base64[i+0];
+        byte c2 = (byte) base64[i+1];
 
         int r = 0;
         r |= char_to_base64_lookup[c1] << 18;
