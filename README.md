@@ -8,9 +8,9 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 | **[SFJL_Tween][sfjl_tween_link]**             |                | utility  | 188 | tween functions                                  |
 | **[SFJL_Print][sfjl_print_link]**             |                | utility  | 164 | print and println without the need of System.out |
 | **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136 | base64 encoder and decoder functions             |
-| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 99  | [FNV hash][fnv_link] implementation              |
+| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 125 | [FNV hash][fnv_link] implementation              |
 | **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 180 | line based curve decimator for 2d and 3d         |
-|                                               |                | **sum**  | 767 |                                                  |
+|                                               |                | **sum**  | 793 |                                                  |
 
 
 [sfjl_tween_link]: src/sfjl/SFJL_Tween.java
