@@ -35,6 +35,7 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 ## Dependencies Libraries Examples
 
 > &#x26A0; The dependencies of the library itself are not repeated here
+> &#x26A0; The dependencies are included in the repository
 
 | example                                                       | dependencies                     |
 | ------------------------------------------------------------- | :------------------------------- |
