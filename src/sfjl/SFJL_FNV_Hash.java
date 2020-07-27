@@ -1,7 +1,8 @@
 package sfjl;
 
 /*
-sfjl_hash
+
+Fowler–Noll–Vo Hash
 
 http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -9,6 +10,8 @@ http://www.isthe.com/chongo/tech/comp/fnv/
 
 DEPENDENCIES:
 - none
+
+Note(Doeke): I don't trust the JITC to inline that well, that's why the usage of fnv_hash_64_builder is very litle.
 
 */
 public class SFJL_FNV_Hash {
@@ -22,97 +25,159 @@ public class SFJL_FNV_Hash {
 static public final int FNV_START_HASH_32 = 1083068131;
 static public final int FNV_START_HASH_64 = FNV_START_HASH_32;
 
+static public final long _FNV_64_MULTIPLIER = 1099511628211L;
+static public final int  _FNV_32_MULTIPLIER = 16777619;
 
+
+static public long fnv_hash_64b_to_n_bits(long hash_64, int n_bits) {
+    long MASK_X = (1L<<n_bits)-1;
+    return (hash_64>>>n_bits) ^ (hash_64 & MASK_X);
+}
+
+static public int fnv_hash_32b_to_n_bits(int hash_32, int n_bits) {
+    int MASK_X = (1<<n_bits)-1;
+    return (hash_32>>>n_bits) ^ (hash_32 & MASK_X);
+}
+
+// -----------------------------------------------------------------
+
+// start with anything but 0, START_HASH_64 is a good start
+static public long fnv_hash_64_builder(long h, long i) {
+    assert h != 0;
+    h = ( h ^ i ) * _FNV_64_MULTIPLIER;
+    return h;
+}
+
+// start with anything but 0, START_HASH_32 is a good start
+static public int fnv_hash_32_builder(int h, int i) {
+    assert h != 0;
+    h = ( h ^ i ) * _FNV_32_MULTIPLIER;
+    return h;
+}
+
+// -----------------------------------------------------------------
+
+//
+// 64
+//
 
 static public long fnv_hash_64(long[] p, int length) {
     long h = FNV_START_HASH_64;
     for (int i = 0; i < length; i++ ) {
-        h = ( h ^ p[i] ) * 1099511628211L;
+        h = ( h ^ p[i] ) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
 
-static public long fnv_hash_64(long[] p) {
-    return fnv_hash_64(p, p.length);
-}
-
-static public long fnv_hash_56(long[] p, int length) {
-    long h = fnv_hash_64(p, length);
-    long MASK_56 = (1L<<56)-1;
-    return (h>>>56) ^ (h & MASK_56);
-}
-
-static public long fnv_hash_56(long[] p) {
-    return fnv_hash_56(p, p.length);
-}
-
-static public long fnv_hash_48(long[] p, int length) {
-    long h = fnv_hash_64(p, length);
-    long MASK_48 = (1L<<48)-1;
-    return (h>>>48) ^ (h & MASK_48);
-}
-
-static public long fnv_hash_48(long[] p) {
-    return fnv_hash_48(p, p.length);
-}
-
-static public long fnv_hash_40(long[] p, int length) {
-    long h = fnv_hash_64(p, length);
-    long MASK_40 = (1L<<40)-1;
-    return (h>>>40) ^ (h & MASK_40);
-}
-
-static public long fnv_hash_40(long[] p) {
-    return fnv_hash_40(p, p.length);
-}
-
-static public int fnv_hash_32(int[] p, int length) {
-    int h = FNV_START_HASH_32;
-    for (int i = 0; i < p.length; i++ ) {
-        h = ( h ^ p[i] ) * 16777619;
+static public long fnv_hash_64(double[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ Double.doubleToLongBits(p[i])) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
 
-static public int fnv_hash_32(int[] p) {
-    return fnv_hash_32(p, p.length);
+static public long fnv_hash_64(int[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ p[i] ) * _FNV_64_MULTIPLIER;
+    }
+    return h;
 }
 
-static public int fnv_hash_24(int[] p, int length) {
-    int h = fnv_hash_32(p, length);
-    int MASK_24 = (1<<24)-1;
-    return (h>>>24) ^ (h & MASK_24);
+static public long fnv_hash_64(float[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ Float.floatToIntBits(p[i])) * _FNV_64_MULTIPLIER;
+    }
+    return h;
 }
 
-static public int fnv_hash_24(int[] p) {
-    return fnv_hash_24(p, p.length);
+static public long fnv_hash_64(byte[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
+    }
+    return h;
 }
 
-static public int fnv_hash_16(int[] p, int length) {
-    int h = fnv_hash_32(p, length);
-    int MASK_16 = (1<<16)-1;
-    return (h>>>16) ^ (h & MASK_16);
+static public long fnv_hash_64(short[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
+    }
+    return h;
 }
 
-static public int fnv_hash_16(int[] p) {
-    return fnv_hash_16(p, p.length);
-}
-
-static public int fnv_hash_8(int[] p, int length) {
-    int h = fnv_hash_32(p, length);
-    int MASK_8 = (1<<8)-1;
-    return (h>>>8) ^ (h & MASK_8);
-}
-
-static public int fnv_hash_8(int[] p) {
-    return fnv_hash_8(p, p.length);
+static public long fnv_hash_64(char[] p, int length) {
+    long h = FNV_START_HASH_64;
+    for (int i = 0; i < length; i++ ) {
+        h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
+    }
+    return h;
 }
 
 static public long fnv_hash_64(String s) {
     long h = FNV_START_HASH_64;
     for (int i = 0; i < s.length(); i++ ) {
         int c = s.charAt(i);
-        h = ( h ^ c ) * 1099511628211L;
+        h = ( h ^ c ) * _FNV_64_MULTIPLIER;
+    }
+    return h;
+}
+
+static public long fnv_hash_64(long   []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(double []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(int    []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(float  []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(byte   []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(short  []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(char   []p) { return fnv_hash_64(p, p.length); }
+static public long fnv_hash_64(String []p) { 
+    long h = FNV_START_HASH_64;
+    for (String s : p) {
+        for (int i = 0; i < s.length(); i++) {
+            h = fnv_hash_64_builder(h, s.charAt(i));
+        }
+    }
+    return h;
+}
+
+// -----------------------------------------------------------------
+
+//
+// 32
+//
+
+static public int fnv_hash_32(long[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(double[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(int[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(float[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(byte[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(short[] p, int length) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+}
+
+static public int fnv_hash_32(char[] p, int length) {
+    // Note(Doeke): hash to match String, therefor we don't reduce
+    int h = FNV_START_HASH_32;
+    for (int i = 0; i < length; i++) {
+        h = fnv_hash_32_builder(h, p[i]);
     }
     return h;
 }
@@ -121,56 +186,29 @@ static public int fnv_hash_32(String s) {
     int h = FNV_START_HASH_32;
     for (int i = 0; i < s.length(); i++) {
         int c = s.charAt(i);
-        h = ( h ^ c ) * 16777619;
+        h = ( h ^ c ) * _FNV_32_MULTIPLIER;
     }
     return h;
 }
 
 
-// start with START_HASH_64
-static public long fnv_hash_64_builder(long h, long i) {
-    assert h != 0;
-    h = ( h ^ i ) * 1099511628211L;
+static public long fnv_hash_32(long   []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(double []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(int    []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(float  []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(byte   []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(short  []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(char   []p) { return fnv_hash_32(p, p.length); }
+static public long fnv_hash_32(String []p) { 
+    
+    int h = FNV_START_HASH_32;
+    for (String s : p) {
+        for (int i = 0; i < s.length(); i++) {
+            h = fnv_hash_32_builder(h, s.charAt(i));
+        }
+    }
     return h;
 }
-
-// start with START_HASH_32
-static public int fnv_hash_32_builder(int h, int i) {
-    assert h != 0;
-    h = ( h ^ i ) * 16777619;
-    return h;
-}
-
-static public long fnv_hash_64b_to_56b(long hash_64) {
-    long MASK_56 = (1L<<56)-1;
-    return (hash_64>>>56) ^ (hash_64 & MASK_56);
-}
-
-static public long fnv_hash_64b_to_48b(long hash_64) {
-    long MASK_48 = (1L<<48)-1;
-    return (hash_64>>>48) ^ (hash_64 & MASK_48);
-}
-
-static public long fnv_hash_64b_to_40b(long hash_64) {
-    long MASK_40 = (1L<<40)-1;
-    return (hash_64>>>40) ^ (hash_64 & MASK_40);
-}
-
-static public int fnv_hash_32b_to_24b(int hash_32) {
-    int MASK_24 = (1<<24)-1;
-    return (hash_32>>>24) ^ (hash_32 & MASK_24);
-}
-
-static public int fnv_hash_32b_to_16b(int hash_32) {
-    int MASK_16 = (1<<16)-1;
-    return (hash_32>>>16) ^ (hash_32 & MASK_16);
-}
-
-static public int fnv_hash_32b_to_8b(int hash_32) {
-    int MASK_8 = (1<<8)-1;
-    return (hash_32>>>8) ^ (hash_32 & MASK_8);
-}
-
 
  
 }

@@ -5,12 +5,12 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | library                                       | latest version | category | LoC | description                                      |
 | --------------------------------------------- | -------------- | -------- | --- | ------------------------------------------------ |
-| **[SFJL_Tween][sfjl_tween_link]**             |                | utility  | 188 | tween functions                                  |
 | **[SFJL_Print][sfjl_print_link]**             |                | utility  | 164 | print and println without the need of System.out |
 | **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136 | base64 encoder and decoder functions             |
-| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 125 | [FNV hash][fnv_link] implementation              |
+| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 149 | [FNV hash][fnv_link] implementation              |
+| **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 188 | tween functions                                  |
 | **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 180 | line based curve decimator for 2d and 3d         |
-|                                               |                | **sum**  | 793 |                                                  |
+|                                               |                | **sum**  | 817 |                                                  |
 
 
 [sfjl_tween_link]: src/sfjl/SFJL_Tween.java
@@ -26,11 +26,11 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 ## Dependencies Libraries
 | library                                                        | dependencies |
 | -------------------------------------------------------------- | :----------- |
-| **[SFJL_Tween](src/sfjl/SFJL_Tween.java)**                     | &#x274c;     |
 | **[SFJL_Print](src/sfjl/SFJL_Print.java)**                     | &#x274c;     |
 | **[SFJL_Base64](src/sfjl/SFJL_Base64.java)**                   | &#x274c;     |
 | **[SFJL_FNV_Hash](src/sfjl/SFJL_FNV_Hash.java)**               | &#x274c;     |
 | **[SFJL_Douglas_Peucker](src/sfjl/SFJL_Douglas_Peucker.java)** | &#x274c;     |
+| **[SFJL_Tween](src/sfjl/SFJL_Tween.java)**                     | &#x274c;     |
 
 ## Dependencies Libraries Examples
 
@@ -40,11 +40,11 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | example                                                       | dependencies                     |
 | ------------------------------------------------------------- | :------------------------------- |
-| **[SFJL_Tween_Example][sfjl_tween_example_link]**             | [processing](www.processing.org) |
 | **[SFJL_Print_Example][sfjl_print_example_link]**             | &#x274c;                         |
 | **[SFJL_Base64_Example][sfjl_base64_example_link]**           | &#x274c;                         |
 | **[SFJL_FNV_Hash_Example][sfjl_fnv_hash_example_link]**       | &#x274c;                         |
 | **[SFJL_Douglas_Peucker_Example][sfjl_douglas_example_link]** | [processing](www.processing.org) |
+| **[SFJL_Tween_Example][sfjl_tween_example_link]**             | [processing](www.processing.org) |
 
 [sfjl_tween_example_link]: src/sfjl_examples/SFJL_Tween_Example.java
 [sfjl_print_example_link]: src/sfjl_examples/SFJL_Print_Example.java
