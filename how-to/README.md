@@ -2,6 +2,7 @@
 
 **Table of Contents**
 
+- [Preface](#preface)
 - [How I write single-file java libraries](#how-i-write-single-file-java-libraries)
   - [Some Java frustrations](#some-java-frustrations)
 - [How I write them, part II](#how-i-write-them-part-ii)
@@ -19,6 +20,14 @@
     - [`static public` vs `public static` order](#static-public-vs-public-static-order)
 
 ---
+
+# Preface
+
+I wan't to clarify what I mean by the difference between a *method*, *function* and a *procedure*. A function takes parameters as a input and from inside the function it does not access any data from outside the function, neither it manipulates any state outside the function. You can see functions as mathematical things, `x = f(y)` where `x` is always the same answer if the input is always the same.
+For methods `x` can be a different answer all the time, even if the input `y` is always the same. This is because it can read and manipulate the state outside of the method. A method operates on the class it belongs to. It can make behaviour difficult to predict cause you might need to read the whole method body in order to get a sense of what data it manipulates.
+A procedure can also have a different answer for `x` while `y` does not change, but we tend to lean towards the functional aproach. We do not operate on a class with a procedure.
+It's a bit inbetween a function and a method, we can still read and change the state of globals. But we attempt to be near the surfuce of functional programming.
+Go light on globals, some good examples for globals are things like the current frameRate, frame count, keys being pressed, mouse position, delta time, asset loader, and the sound player.
 
 # How I write single-file java libraries
 
