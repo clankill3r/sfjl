@@ -69,7 +69,7 @@ static public final void douglas_peucker_2d(float[][] points, int length, float 
     result.points[0][0] = points[0][0];
     result.points[0][1] = points[0][1];
     result.length++;
-    douglas_peucker_2d_step(points, 0, length-1, sq(threshold), result);
+    _douglas_peucker_2d_step(points, 0, length-1, sq(threshold), result);
     // last point
     result.points[result.length][0] = points[length-1][0];
     result.points[result.length][1] = points[length-1][1];
@@ -79,7 +79,7 @@ static public final void douglas_peucker_2d(float[][] points, int length, float 
 
 
 
-static public final void douglas_peucker_2d_step(float[][] points, int first, int last, float threshold_sq, Path_Buffer result) {
+static public final void _douglas_peucker_2d_step(float[][] points, int first, int last, float threshold_sq, Path_Buffer result) {
 
     float max_dist_sq = 0;
     int index = -1;
@@ -98,11 +98,11 @@ static public final void douglas_peucker_2d_step(float[][] points, int first, in
     if (index == -1) return;
 
     if (max_dist_sq > threshold_sq) {
-        if (index - first > 1) douglas_peucker_2d_step(points, first, index, threshold_sq, result);
+        if (index - first > 1) _douglas_peucker_2d_step(points, first, index, threshold_sq, result);
         result.points[result.length][0] = points[index][0];
         result.points[result.length][1] = points[index][1];
         result.length++;
-        if (last - index > 1) douglas_peucker_2d_step(points, index, last, threshold_sq, result);
+        if (last - index > 1) _douglas_peucker_2d_step(points, index, last, threshold_sq, result);
     }
     
 }
@@ -172,7 +172,7 @@ static public final void douglas_peucker_3d(float[][] points, int length, float 
     result.points[0][1] = points[0][1];
     result.points[0][2] = points[0][2];
     result.length++;
-    douglas_peucker_3d_step(points, 0, length-1, sq(threshold), result);
+    _douglas_peucker_3d_step(points, 0, length-1, sq(threshold), result);
     // last point
     result.points[result.length][0] = points[length-1][0];
     result.points[result.length][1] = points[length-1][1];
@@ -182,7 +182,7 @@ static public final void douglas_peucker_3d(float[][] points, int length, float 
 }
 
 
-static public final void douglas_peucker_3d_step(float[][] points, int first, int last, float threshold_sq, Path_Buffer result) {
+static public final void _douglas_peucker_3d_step(float[][] points, int first, int last, float threshold_sq, Path_Buffer result) {
 
     float max_dist_sq = 0;
     int index = -1;
@@ -201,12 +201,12 @@ static public final void douglas_peucker_3d_step(float[][] points, int first, in
     if (index == -1) return;
 
     if (max_dist_sq > threshold_sq) {
-        if (index - first > 1) douglas_peucker_3d_step(points, first, index, threshold_sq, result);
+        if (index - first > 1) _douglas_peucker_3d_step(points, first, index, threshold_sq, result);
         result.points[result.length][0] = points[index][0];
         result.points[result.length][1] = points[index][1];
         result.points[result.length][2] = points[index][2];
         result.length++;
-        if (last - index > 1) douglas_peucker_3d_step(points, index, last, threshold_sq, result);
+        if (last - index > 1) _douglas_peucker_3d_step(points, index, last, threshold_sq, result);
     }
     
 }
