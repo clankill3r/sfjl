@@ -15,6 +15,7 @@ public class SFJL_Print_Example {
         
         int[][] array_2d = {{1}, {1, 2}, {1, 2, 3}};
         println("array_2d");
-        println(array_2d);        
+        println(array_2d);
     }
+    
 }

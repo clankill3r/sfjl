@@ -127,16 +127,34 @@ static public void println(Object what) {
     }
 }
 
-static public void println(Object... variables) {
+// https://stackoverflow.com/questions/63131631/type-int-of-the-last-argument-to-method-printlnobject-doesnt-exactly-m
+// Note(Doeke): problem still exists, but atleast we need 3 or more parameters now for
+// this to happen, where after the first two parameters it has to be an array.
+// I keep it like this to reduce the amount of problems being reported.
+static public void println(Object a, Object b, Object... variables) {
 
-    for (int i = 0; i < variables.length; i++) {
-        Object o = variables[i];
+    int count = variables.length+2;
+
+    for (int j = 0; j < count; j++) {
+
+        Object o = null;
+
+        if (j == 0) {
+            o = a;
+        }
+        else if (j == 1) {
+            o = b;
+        }
+        else {
+            o = variables[j-2];
+        }
+        
         if (o.getClass().isArray()) {
             printlnArray(o);
         }
         else {
             out.print(o);
-            if (i != variables.length-1) out.print(" ");
+            if (j != count-1) out.print(" ");
         }
     }
     out.println();
