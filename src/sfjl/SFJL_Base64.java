@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 
 public class SFJL_Base64 {
-    private SFJL_Base64() {}
+     private SFJL_Base64() {}
 
 
 public enum Base64_Type {

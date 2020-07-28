@@ -2,8 +2,7 @@ package sfjl;
 
 
 public class SFJL_Douglas_Peucker {
-    private SFJL_Douglas_Peucker() {
-    }
+     private SFJL_Douglas_Peucker() {}
     
 
 static public class Path_Buffer {

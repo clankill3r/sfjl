@@ -15,8 +15,7 @@ Note(Doeke): I don't trust the JITC to inline that well, that's why the usage of
 
 */
 public class SFJL_FNV_Hash {
-    private SFJL_FNV_Hash() {
-    }
+     private SFJL_FNV_Hash() {}
 
 
 // "In the general case, almost any offset_basis will serve so long as it is non-zero."

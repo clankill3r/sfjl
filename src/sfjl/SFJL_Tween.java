@@ -4,8 +4,7 @@ import static java.lang.Math.*;
 
 
 public class SFJL_Tween {
-    private SFJL_Tween() {
-    }
+     private SFJL_Tween() {}
 
 
 static public enum Ease_In_Out_Type {
