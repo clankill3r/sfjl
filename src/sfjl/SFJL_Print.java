@@ -6,8 +6,7 @@ import java.util.Arrays;
 
 
 public class SFJL_Print {
-    private SFJL_Print() {
-    }
+     private SFJL_Print() {}
 
 
 static public PrintStream out = System.out;
@@ -114,7 +113,6 @@ static public void println(String what) {
     out.flush();
 }
 
-
 static public void println(Object what) {
     if (what == null) {
         out.println("null");    
@@ -127,22 +125,22 @@ static public void println(Object what) {
         out.println(what);
         out.flush();
     }
-    
 }
 
 static public void println(Object... variables) {
 
-    for (Object o : variables) {
+    for (int i = 0; i < variables.length; i++) {
+        Object o = variables[i];
         if (o.getClass().isArray()) {
             printlnArray(o);
         }
         else {
             out.print(o);
-            out.println();
+            if (i != variables.length-1) out.print(" ");
         }
     }
-    out.flush();
-    
+    out.println();
+    out.flush();  
 }
 
 static public void printlnArray(Object what) {
@@ -150,7 +148,6 @@ static public void printlnArray(Object what) {
     out.println();
     out.flush();
 }
-
 
 static public void printArray(Object what) {
     if (what == null) {

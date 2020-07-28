@@ -5,12 +5,12 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | library                                       | latest version | category | LoC | description                                      |
 | --------------------------------------------- | -------------- | -------- | --- | ------------------------------------------------ |
-| **[SFJL_Print][sfjl_print_link]**             |                | utility  | 164 | print and println without the need of System.out |
+| **[SFJL_Print][sfjl_print_link]**             |                | utility  | 165 | print and println without the need of System.out |
 | **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136 | base64 encoder and decoder functions             |
-| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 149 | [FNV hash][fnv_link] implementation              |
-| **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 188 | tween functions                                  |
-| **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 180 | line based curve decimator for 2d and 3d         |
-|                                               |                | **sum**  | 817 |                                                  |
+| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 148 | [FNV hash][fnv_link] implementation              |
+| **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 187 | tween functions                                  |
+| **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 179 | line based curve decimator for 2d and 3d         |
+|                                               |                | **sum**  | 815 |                                                  |
 
 
 [sfjl_tween_link]: src/sfjl/SFJL_Tween.java
