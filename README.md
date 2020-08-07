@@ -3,16 +3,20 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 # Libraries
 
-| library                                       | latest version | category | LoC | description                                      |
-| --------------------------------------------- | -------------- | -------- | --- | ------------------------------------------------ |
-| **[SFJL_Print][sfjl_print_link]**             |                | utility  | 175 | print and println without the need of System.out |
-| **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136 | base64 encoder and decoder functions             |
-| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 148 | [FNV hash][fnv_link] implementation              |
-| **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 187 | tween functions                                  |
-| **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 179 | line based curve decimator for 2d and 3d         |
-|                                               |                | **sum**  | 825 |                                                  |
+| library                                       | latest version | category | LoC: | description                                      |
+| --------------------------------------------- | -------------- | -------- | ---- | ------------------------------------------------ |
+| **[SFJL_Math][sfjl_math_link]**               |                | math     | 328  | vector and matrix classes (work in progress)     |
+| **[SFJL_PCB_Tree][sfjl_pcb_tree_link]**       |                | utility  | 254  | tree data structure that avoids using arrays     |
+| **[SFJL_Print][sfjl_print_link]**             |                | utility  | 175  | print and println without the need of System.out |
+| **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136  | base64 encoder and decoder functions             |
+| **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 148  | [FNV hash][fnv_link] implementation              |
+| **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 187  | tween functions                                  |
+| **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 179  | line based curve decimator for 2d and 3d         |
+|                                               |                | **sum**  | 1493 |                                                  |
 
 
+[sfjl_math_link]: src/sfjl/SFJL_Math.java
+[sfjl_pcb_tree_link]: src/sfjl/SFJL_PCB_Tree.java
 [sfjl_tween_link]: src/sfjl/SFJL_Tween.java
 [sfjl_douglas_link]: src/sfjl/SFJL_Douglas_Peucker.java
 [sfjl_print_link]: src/sfjl/SFJL_Print.java
@@ -26,6 +30,8 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 ## Dependencies Libraries
 | library                                                        | dependencies |
 | -------------------------------------------------------------- | :----------- |
+| **[SFJL_Math](src/sfjl/SFJL_Math.java)**                       | &#x274c;     |
+| **[SFJL_PCB_Tree](src/sfjl/SFJL_PCB_Tree.java)**               | &#x274c;     |
 | **[SFJL_Print](src/sfjl/SFJL_Print.java)**                     | &#x274c;     |
 | **[SFJL_Base64](src/sfjl/SFJL_Base64.java)**                   | &#x274c;     |
 | **[SFJL_FNV_Hash](src/sfjl/SFJL_FNV_Hash.java)**               | &#x274c;     |
@@ -40,12 +46,14 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | example                                                       | dependencies                     |
 | ------------------------------------------------------------- | :------------------------------- |
+| **[SFJL_PCB_Tree_Example][sfjl_pcb_tree_example_link]**       | &#x274c;                         |
 | **[SFJL_Print_Example][sfjl_print_example_link]**             | &#x274c;                         |
 | **[SFJL_Base64_Example][sfjl_base64_example_link]**           | &#x274c;                         |
 | **[SFJL_FNV_Hash_Example][sfjl_fnv_hash_example_link]**       | &#x274c;                         |
 | **[SFJL_Douglas_Peucker_Example][sfjl_douglas_example_link]** | [processing](www.processing.org) |
 | **[SFJL_Tween_Example][sfjl_tween_example_link]**             | [processing](www.processing.org) |
 
+[sfjl_pcb_tree_example_link]: src/sfjl_examples/SFJL_PCB_Tree_Example.java
 [sfjl_tween_example_link]: src/sfjl_examples/SFJL_Tween_Example.java
 [sfjl_print_example_link]: src/sfjl_examples/SFJL_Print_Example.java
 [sfjl_base64_example_link]: src/sfjl_examples/SFJL_Base64_Example.java
