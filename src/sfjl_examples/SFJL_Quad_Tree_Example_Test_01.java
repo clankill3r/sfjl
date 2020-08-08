@@ -61,7 +61,7 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
                 if (n < 0.5f) {
 
                     if (noise(x * 0.025f, y * 0.025f) < 0.4) {
-                            tree.add(new PVector(x, y));
+                            add(tree, new PVector(x, y));
                             //vecs.add(new PVector(x, y));
                      }
                  }
@@ -103,7 +103,7 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
                 tree.remove(v2);
                 v2.x += random(-3, 3);
                 v2.y += random(-3, 3);
-                tree.add(v2);
+                add(tree, v2);
                 v2.z = 1; // to avoid drawing again
             }
             tree.merge_update();
@@ -200,7 +200,7 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
     public void mouseDragged() {
         if (frameCount % 2 == 0) {
             for (int i = 0; i < 10; i++) {
-                tree.add(new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50)));
+                add(tree, new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50)));
             }
         }
     }

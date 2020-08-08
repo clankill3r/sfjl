@@ -49,10 +49,6 @@ static public class Quad_Tree_Manager<T> {
 
 
 static public class Quad_Tree<T> implements Iterable<T> {
-    
-    public int debug_get_closest_n__points_added_without_individual_check;
-    public Quad_Tree<T> debug_current;
-
     public final Quad_Tree_Manager<T> manager;
     public Quad_Tree<T> parent;
     public Quad_Tree<T>[] children;
@@ -117,39 +113,6 @@ static public class Quad_Tree<T> implements Iterable<T> {
     }
     
     
-    public void add(T t) {
-        add(t, x(t), y(t));
-    }
-
-    
-    public void add(T t, float x, float y) {
-        
-        // TODO bounds checking
-        if (depth == 0) {
-            if (x < x1 || x > x2 || y < y1 || y > y2) {
-                return;
-            }
-        }
-        
-        if (has_children()) {
-            int where = get_index(x, y);
-            children[where].add(t, x, y);
-        }
-        else {
-            data.add(t);
-            manager.size++;
-            if (data.size() > manager.max_items) {
-                split();
-            }
-        }
-    }
-    
-
-    public void add_all(List<T> items) {
-        for (T t : items) {
-            add(t);
-        }
-    }
     
     
     public void split() {
@@ -161,7 +124,7 @@ static public class Quad_Tree<T> implements Iterable<T> {
         
         for (T t : data) {
             int where = get_index(x(t), y(t));
-            children[where].add(t);
+            add(children[where], t);
         }
         manager.size -= data.size(); // correction
         data.clear();
@@ -304,7 +267,7 @@ static public class Quad_Tree<T> implements Iterable<T> {
         }
 
         if (n >= size()) {
-            add_all(result);
+            add_all(this, result);
             return;
         }
         // do size() -1 and get closest, return all others?
@@ -641,14 +604,12 @@ static public class Quad_Tree<T> implements Iterable<T> {
 
         if (n >= manager.size) {
             get_all(result);
-            debug_get_closest_n__points_added_without_individual_check = manager.size;
             return;
         }
 
         if (n == 1) {
             T t = get_closest(x, y);
             if (t != null) result.add(t);
-            debug_get_closest_n__points_added_without_individual_check = 0;
             return;
         }
 
@@ -725,8 +686,6 @@ static public class Quad_Tree<T> implements Iterable<T> {
             }
         }
 
-        debug_current = current;
-
         // we now know a minimum radius before we overflow N, now we can  add quads if they are fully contained in this radius
         if (do_add_containing) {
             float dist_point_to_overflow_leaf = dist_sq_point_to_aabb(x, y, current.x1, current.y1, current.x2, current.y2);
@@ -742,8 +701,6 @@ static public class Quad_Tree<T> implements Iterable<T> {
                 }
             }
         }
-
-        debug_get_closest_n__points_added_without_individual_check = result.size(); 
 
         ArrayList<T> buffer = new ArrayList<>((n-result.size())*2);
 
@@ -987,7 +944,7 @@ static public class Quad_Tree<T> implements Iterable<T> {
         ArrayList<T> items = new ArrayList<>();
         get_all(items);
         clear();
-        add_all(items);
+        add_all(this, items);
     }
     
 
@@ -1143,6 +1100,43 @@ static public class Quad_Tree<T> implements Iterable<T> {
     
     
     
+}
+
+
+
+
+static public <T> void add(Quad_Tree<T> qt, T t) {
+    add(qt, t, qt.x(t), qt.y(t));
+}
+
+
+static public <T> void add(Quad_Tree<T> qt, T t, float x, float y) {
+    
+    // TODO bounds checking
+    if (qt.depth == 0) {
+        if (x < qt.x1 || x > qt.x2 || y < qt.y1 || y > qt.y2) {
+            return;
+        }
+    }
+    
+    if (qt.has_children()) {
+        int where = qt.get_index(x, y);
+        add(qt.children[where], t, x, y);
+    }
+    else {
+        qt.data.add(t);
+        qt.manager.size++;
+        if (qt.data.size() > qt.manager.max_items) {
+            qt.split();
+        }
+    }
+}
+
+
+static public <T> void add_all(Quad_Tree<T> quad_tree, List<T> items) {
+    for (T t : items) {
+        add(quad_tree, t);
+    }
 }
 
 
