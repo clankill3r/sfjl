@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 import static java.lang.Math.*;
 import static sfjl.SFJL_Math.*;
 
@@ -199,8 +198,8 @@ static public <T> void split(Quad_Tree<T> qt) {
     
 static public <T> Iterator<T> iterator(Quad_Tree<T> qt) {
         
-    Stack<T> open = new Stack<>();
-    Stack<Quad_Tree<T>> open_quad_trees = new Stack<>();
+    ArrayList<T> open = new ArrayList<>();
+    ArrayList<Quad_Tree<T>> open_quad_trees = new ArrayList<>();
     
     open_quad_trees.add(qt);
     
@@ -209,7 +208,7 @@ static public <T> Iterator<T> iterator(Quad_Tree<T> qt) {
         @Override
         public boolean hasNext() {
             while (open.size() == 0 && open_quad_trees.size() != 0) {
-                Quad_Tree<T> tree = open_quad_trees.pop();
+                Quad_Tree<T> tree = remove_last(open_quad_trees);
                 if (tree.has_children()) {
                     open_quad_trees.add(tree.children[0]);
                     open_quad_trees.add(tree.children[1]);
@@ -225,7 +224,7 @@ static public <T> Iterator<T> iterator(Quad_Tree<T> qt) {
         
         @Override
         public T next() {
-            return open.pop();
+            return remove_last(open);
         }
     };
 }
@@ -238,11 +237,11 @@ static public <T> T get_closest(Quad_Tree<T> qt, float x, float y) {
     T closest = null;
     float closest_dist_sq = Float.POSITIVE_INFINITY;
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> tree =  open.pop();
+        Quad_Tree<T> tree =  remove_last(open);
         float d = dist_sq_point_to_aabb(x, y, tree.x1, tree.y1, tree.x2, tree.y2);
         if (d > closest_dist_sq) {
             continue;
@@ -275,7 +274,7 @@ static public <T> T get_closest(Quad_Tree<T> qt, float x, float y) {
 }
 
 
-static public <T> T get_farrest(Quad_Tree<T> qt, float x, float y) {
+static public <T> T get_farthest(Quad_Tree<T> qt, float x, float y) {
 
     T closest = null;
     float max_dist = Float.NEGATIVE_INFINITY;
@@ -501,11 +500,11 @@ static public <T> void get_farrest_n(Quad_Tree<T> qt, float x, float y, int n, A
 
 
 static public <T> void get_all(Quad_Tree<T> qt, List<T> result) {
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (current.has_children()) {
             open.add(current.children[0]);
             open.add(current.children[1]);
@@ -675,7 +674,7 @@ static public <T> void get_closest_n(Quad_Tree<T> qt, float x, float y, int n, L
         return;
     }
 
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
 
     ArrayList<Quad_Tree<T>> leafs = new ArrayList<>();
@@ -725,7 +724,7 @@ static public <T> void get_closest_n(Quad_Tree<T> qt, float x, float y, int n, L
             }
         });
 
-        current = open.pop();
+        current = remove_last(open);
 
         if (current.has_children()) {
             open.add(current.children[0]);
@@ -773,7 +772,7 @@ static public <T> void get_closest_n(Quad_Tree<T> qt, float x, float y, int n, L
     float add_all_quads_within_this_radius_sq = max_dist_sq_point_to_corner_aabb(x, y, current.x1, current.y1, current.x2, current.y2);
 
     while (open.size() > 0) {
-        Quad_Tree<T> tree = open.pop();
+        Quad_Tree<T> tree = remove_last(open);
         if (tree.has_children()) {
 
             float d = dist_sq_point_to_aabb(x, y, tree.x1, tree.y1, tree.x2, tree.y2);
@@ -819,11 +818,11 @@ static public <T> T min_x(Quad_Tree<T> qt) {
     T best = null;
     float min_x = Float.POSITIVE_INFINITY;
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (min_x < current.x1) continue;
         if (current.has_children()) {
             // reversed for optimal popping!
@@ -853,11 +852,11 @@ static public <T> T min_y(Quad_Tree<T> qt) {
     T best = null;
     float min_y = Float.POSITIVE_INFINITY;
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (min_y < current.y1) continue;
         if (current.has_children()) {
             // reversed for optimal popping!
@@ -887,11 +886,11 @@ static public <T> T max_x(Quad_Tree<T> qt) {
     T best = null;
     float max_x = Float.NEGATIVE_INFINITY;
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (max_x > current.x2) continue;
         if (current.has_children()) {
             // reversed for optimal popping!
@@ -921,11 +920,11 @@ static public <T> T max_y(Quad_Tree<T> qt) {
     T best = null;
     float max_y = Float.NEGATIVE_INFINITY;
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (max_y > current.y2) continue;
         if (current.has_children()) {
             // reversed for optimal popping!
@@ -950,11 +949,11 @@ static public <T> T max_y(Quad_Tree<T> qt) {
 
 static public <T> void clear(Quad_Tree<T> qt) {
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (current.has_children()) {
             open.add(current.children[0]);
             open.add(current.children[1]);
@@ -1012,11 +1011,11 @@ static public <T> void rebuild(Quad_Tree<T> qt) {
 
 static public <T> void merge_update(Quad_Tree<T> qt) {
     
-    Stack<Quad_Tree<T>> open = new Stack<>();
+    ArrayList<Quad_Tree<T>> open = new ArrayList<>();
     open.add(qt);
     
     while (open.size() > 0) {
-        Quad_Tree<T> current = open.pop();
+        Quad_Tree<T> current = remove_last(open);
         if (current.has_children()) {
             
             if (!current.children[0].has_children() &&
@@ -1031,7 +1030,7 @@ static public <T> void merge_update(Quad_Tree<T> qt) {
                 
                 if (count < qt.manager.max_items) {
                     // merge
-                    current.data = new ArrayList<>(manager.max_items);
+                    current.data = new ArrayList<>(qt.manager.max_items);
                     get_all(current, current.data);
                     current.children[0] = null;
                     current.children[1] = null;
@@ -1159,6 +1158,10 @@ static public <T> boolean intersects_rect(float x1, float y1, float x2, float y2
     tree.x2 < x1 || 
     tree.y1 > y2 ||
     tree.y2 < y1);
+}
+
+static public <T> T remove_last(ArrayList<T> arr) {
+    return arr.remove(arr.size()-1);
 }
 
 
