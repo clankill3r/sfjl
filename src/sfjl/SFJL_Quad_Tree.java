@@ -115,26 +115,6 @@ static public class Quad_Tree<T> implements Iterable<T> {
     
     
     
-    public void split() {
-        children = new Quad_Tree[4];
-        children[TR] = new Quad_Tree<>(manager, this, center_x(), y1, x2, center_y());
-        children[TL] = new Quad_Tree<>(manager, this, x1, y1, center_x(), center_y());
-        children[BL] = new Quad_Tree<>(manager, this, x1, center_y(), center_x(), y2);
-        children[BR] = new Quad_Tree<>(manager, this, center_x(), center_y(), x2, y2);
-        
-        for (T t : data) {
-            int where = get_index(x(t), y(t));
-            add(children[where], t);
-        }
-        manager.size -= data.size(); // correction
-        data.clear();
-        data = null;
-        
-        if (depth + 1 > manager.highest_depth_with_items) {
-            manager.highest_depth_with_items = depth + 1;
-        }
-        
-    }
     
     
     public Iterator<T> iterator() {
@@ -1112,9 +1092,9 @@ static public <T> void add(Quad_Tree<T> qt, T t) {
 
 static public <T> void add(Quad_Tree<T> qt, T t, float x, float y) {
     
-    // TODO bounds checking
     if (qt.depth == 0) {
         if (x < qt.x1 || x > qt.x2 || y < qt.y1 || y > qt.y2) {
+            // TODO return false?
             return;
         }
     }
@@ -1127,7 +1107,7 @@ static public <T> void add(Quad_Tree<T> qt, T t, float x, float y) {
         qt.data.add(t);
         qt.manager.size++;
         if (qt.data.size() > qt.manager.max_items) {
-            qt.split();
+            split(qt);
         }
     }
 }
@@ -1138,6 +1118,30 @@ static public <T> void add_all(Quad_Tree<T> quad_tree, List<T> items) {
         add(quad_tree, t);
     }
 }
+
+
+
+static public <T> void split(Quad_Tree<T> qt) {
+    qt.children = new Quad_Tree[4];
+    qt.children[TR] = new Quad_Tree<>(qt.manager, qt, qt.center_x(), qt.y1, qt.x2, qt.center_y());
+    qt.children[TL] = new Quad_Tree<>(qt.manager, qt, qt.x1, qt.y1, qt.center_x(), qt.center_y());
+    qt.children[BL] = new Quad_Tree<>(qt.manager, qt, qt.x1, qt.center_y(), qt.center_x(), qt.y2);
+    qt.children[BR] = new Quad_Tree<>(qt.manager, qt, qt.center_x(), qt.center_y(), qt.x2, qt.y2);
+    
+    for (T t : qt.data) {
+        int where = qt.get_index(qt.x(t), qt.y(t));
+        add(qt.children[where], t);
+    }
+    qt.manager.size -= qt.data.size(); // correction
+    qt.data.clear();
+    qt.data = null;
+    
+    if (qt.depth + 1 > qt.manager.highest_depth_with_items) {
+        qt.manager.highest_depth_with_items = qt.depth + 1;
+    }
+    
+}
+
 
 
 // TODO use something like rect_intersects_rect
