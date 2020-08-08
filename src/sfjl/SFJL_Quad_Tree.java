@@ -317,7 +317,7 @@ static public <T> T get_farthest(Quad_Tree<T> qt, float x, float y) {
 }
 
 
-static public <T> void get_farrest_n(Quad_Tree<T> qt, float x, float y, int n, ArrayList<T> result) {
+static public <T> void get_farthest_n(Quad_Tree<T> qt, float x, float y, int n, ArrayList<T> result) {
     
     if (n <= 0) return;
 
@@ -446,7 +446,7 @@ static public <T> void get_farrest_n(Quad_Tree<T> qt, float x, float y, int n, A
     
 
         if (buffer.size() >= n) {
-            float max_dist_to_current = dist_sq_farrest_point_to_aabb_no_zero(x, y, current.x1, current.y1, current.x2, current.y2);
+            float max_dist_to_current = dist_sq_farthest_point_to_aabb_no_zero(x, y, current.x1, current.y1, current.x2, current.y2);
             if (max_dist_to_current <= closest_dist_so_far) {
                 continue; // maybe we can break but there might be edge cases!
             }
