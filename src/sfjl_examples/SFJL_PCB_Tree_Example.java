@@ -48,9 +48,6 @@ public static void main(String[] args) {
     
     // Lets add a new element "warnings" to the status_bar.
 
-    // TODO FIX APPEND when the tree is closed!!!!!!!
-    // begin_element("warnings", status_bar, APPEND);
-
     Element warnings =
     begin_element("warnings", status_bar, APPEND_AS_CHILD);
     end_element();
@@ -75,7 +72,10 @@ public static void main(String[] args) {
             element("save");
         end_element();
     end_element();
+
     
+    System.out.println("tree_is_closed: "+tree_is_closed(pcb_tree_builder));
+
 
     // We have a variety of iterators
     Iterator<Element> itr;
@@ -124,6 +124,7 @@ public static void main(String[] args) {
 
 static public Add_Type APPEND           = Add_Type.APPEND;
 static public Add_Type APPEND_AS_CHILD  = Add_Type.APPEND_AS_CHILD;
+static public Add_Type PREPEND          = Add_Type.PREPEND;
 static public Add_Type PREPEND_AS_CHILD = Add_Type.PREPEND_AS_CHILD;
 
 
@@ -140,14 +141,14 @@ static {
     }
 }
 
-static public Builder<Element> builder = new Builder<>();
+static public PCB_Tree_Builder<Element> pcb_tree_builder = new PCB_Tree_Builder<>();
 
 
 
 static public Element begin_element(String name) {
     Element e = element_buffer[element_buffer_index++];
     e.name = name;
-    begin_node(builder, e);
+    begin_node(pcb_tree_builder, e);
     return e;
 }
 
@@ -155,12 +156,12 @@ static public Element begin_element(String name) {
 static public Element begin_element(String name, Element parent, Add_Type add_type) {
     Element e = element_buffer[element_buffer_index++];
     e.name = name;
-    begin_node(builder, e, parent, add_type);
+    begin_node(pcb_tree_builder, e, parent, add_type);
     return e;
 }
 
 static public Element end_element() {
-    return end_node(builder);
+    return end_node(pcb_tree_builder);
 }
 
 static public Element element(String name) {

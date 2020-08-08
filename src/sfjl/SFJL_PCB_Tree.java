@@ -65,75 +65,108 @@ static public class PCB_Node<T> {
 }
 
 
-static public class Builder_Branch<T extends PCB_Node<T>> {
+static public class PCB_Tree_Builder_Branch<T extends PCB_Node<T>> {
     public ArrayList<T> last_node_depth_view = new ArrayList<>();
     public int insert_slot = 0;
 }
 
 
-static public class Builder<T extends PCB_Node<T>> {
-    public ArrayList<Builder_Branch<T>> builder_branches = new ArrayList<Builder_Branch<T>>();
-    public Builder_Branch<T> current = new Builder_Branch<>();
-    public Builder() { builder_branches.add(current); }
+static public class PCB_Tree_Builder<T extends PCB_Node<T>> {
+    public ArrayList<PCB_Tree_Builder_Branch<T>> builder_branches = new ArrayList<PCB_Tree_Builder_Branch<T>>();
+    public PCB_Tree_Builder_Branch<T> current_branch = new PCB_Tree_Builder_Branch<>();
+    public PCB_Tree_Builder() { builder_branches.add(current_branch); }
 }
 
 
 public enum Add_Type {
     APPEND,
     APPEND_AS_CHILD,
+    PREPEND,
     PREPEND_AS_CHILD
 }
 
 
-static public <T extends PCB_Node<T>> void begin_node(Builder<T> builder, T node) {
+static public <T extends PCB_Node<T>> void begin_node(PCB_Tree_Builder<T> builder, T node) {
     begin_node(builder, node, null, Add_Type.APPEND);
 }
 
 
-static public <T extends PCB_Node<T>> void begin_node(Builder<T> builder, T node, T parent, Add_Type add_type) {
-
-    if (add_type == Add_Type.APPEND_AS_CHILD || add_type == Add_Type.PREPEND_AS_CHILD) {
-        Builder_Branch<T> branch = new Builder_Branch<>();
-        builder.builder_branches.add(branch);
-        builder.current = branch;
-
-        branch.last_node_depth_view.add(parent);
-        branch.last_node_depth_view.add(get_last_child(parent));
-        branch.insert_slot = 1;
-    }
-
-    Builder_Branch<T> branch = builder.current;
-
-    // ensure size
-    if (branch.last_node_depth_view.size() == branch.insert_slot) {
-        branch.last_node_depth_view.add(null);
-    }
-
-    T parent_node = branch.insert_slot > 0 ? branch.last_node_depth_view.get(branch.insert_slot-1) : null;
-    T last_child_of_parent = branch.last_node_depth_view.get(branch.insert_slot);
-
-    branch.last_node_depth_view.set(branch.insert_slot, node);
-    branch.insert_slot += 1;
-
-    if (parent_node != null) {
-        node.parent = parent_node;
-        if (last_child_of_parent != null) {
-            last_child_of_parent.next_brother = node;
-        }
-        else {
-            parent_node.first_child = node;
-        }
-    }
-
-    if (add_type == Add_Type.PREPEND_AS_CHILD) {
-        swap(node, parent.first_child);
-    }
+static public <T extends PCB_Node<T>> boolean tree_is_closed(PCB_Tree_Builder<T> builder) {
+    return builder.builder_branches.size() == 1 && builder.current_branch.insert_slot == 0;
 }
 
 
-static public <T extends PCB_Node<T>> T end_node(Builder<T> builder) {
+static public <T extends PCB_Node<T>> void begin_node(PCB_Tree_Builder<T> builder, T node, T add_to_node, Add_Type add_type) {
 
-    Builder_Branch<T> branch = builder.current;
+    if (add_to_node != null) {
+        PCB_Tree_Builder_Branch<T> branch = new PCB_Tree_Builder_Branch<>();
+        builder.builder_branches.add(branch);
+        builder.current_branch = branch;
+        branch.last_node_depth_view.add(add_to_node);
+        branch.insert_slot = 1;
+    }
+
+    if (add_type == Add_Type.APPEND_AS_CHILD || add_type == Add_Type.PREPEND_AS_CHILD) {
+        builder.current_branch.last_node_depth_view.add(get_last_child(add_to_node));
+    }
+
+    PCB_Tree_Builder_Branch<T> branch = builder.current_branch;
+
+
+    if (add_to_node != null && (add_type == Add_Type.APPEND || add_type == Add_Type.PREPEND)) {
+
+        assert add_to_node.parent != null : "Can't use Add_Type "+add_type+" on the root node";
+
+        T original_next_brother = add_to_node.next_brother;
+        add_to_node.next_brother = node;
+        node.next_brother = original_next_brother;
+
+        node.parent = add_to_node.parent;
+
+        branch.last_node_depth_view.add(node);
+        branch.insert_slot += 1;
+
+        if (add_type == Add_Type.PREPEND) {
+            swap(node, add_to_node);
+        }
+
+    }
+    else {
+
+        // ensure size
+        if (branch.last_node_depth_view.size() == branch.insert_slot) {
+            branch.last_node_depth_view.add(null);
+        }
+        
+        T parent_node = branch.insert_slot > 0 ? branch.last_node_depth_view.get(branch.insert_slot-1) : null;
+        T last_child_of_parent = branch.last_node_depth_view.get(branch.insert_slot);
+
+        branch.last_node_depth_view.set(branch.insert_slot, node);
+        branch.insert_slot += 1;
+
+        if (parent_node != null) {
+            node.parent = parent_node;
+            if (last_child_of_parent != null) {
+                last_child_of_parent.next_brother = node;
+            }
+            else {
+                parent_node.first_child = node;
+            }
+        }
+
+        if (add_type == Add_Type.PREPEND_AS_CHILD) {
+            swap(node, add_to_node.first_child);
+        }
+    }
+    
+
+   
+}
+
+
+static public <T extends PCB_Node<T>> T end_node(PCB_Tree_Builder<T> builder) {
+
+    PCB_Tree_Builder_Branch<T> branch = builder.current_branch;
     T node = branch.last_node_depth_view.get(branch.insert_slot-1);
 
     // -------------------
@@ -157,7 +190,7 @@ static public <T extends PCB_Node<T>> T end_node(Builder<T> builder) {
     // end that specific node.
     if (branch.insert_slot == 1 && builder.builder_branches.size() > 1) {
         builder.builder_branches.remove(builder.builder_branches.size()-1);
-        builder.current = builder.builder_branches.get(builder.builder_branches.size()-1);
+        builder.current_branch = builder.builder_branches.get(builder.builder_branches.size()-1);
     }
 
     return node;
