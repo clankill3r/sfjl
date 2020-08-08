@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 import processing.core.PVector;
 import processing.opengl.*;
+import sfjl.SFJL_Quad_Tree;
 
 
 public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
@@ -95,25 +96,25 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         if (sin(frameCount * 0.01f) > 0) {
             float radius = sin(frameCount * 0.01f) * 250;
             ArrayList<PVector> within = new ArrayList<>();
-            tree.get_within_radius_sq(mouseX, mouseY, sq(radius), within);
+            get_within_radius_sq(tree, mouseX, mouseY, sq(radius), within);
             stroke(255,0,0);
             strokeWeight(1f);
             for (PVector v2 : within) {
                 point(v2.x, v2.y);
-                tree.remove(v2);
+                remove(tree, v2);
                 v2.x += random(-3, 3);
                 v2.y += random(-3, 3);
                 add(tree, v2);
                 v2.z = 1; // to avoid drawing again
             }
-            tree.merge_update();
+            merge_update(tree);
             noFill();
             ellipse(mouseX, mouseY, radius*2, radius*2);    
         }
         else {
             ArrayList<PVector> within = new ArrayList<>();
             float s = sin(frameCount * 0.01f) * 250;
-            tree.get_within_aabb(mouseX-s, mouseY-s, mouseX+s, mouseY+s, within);
+            get_within_aabb(tree, mouseX-s, mouseY-s, mouseX+s, mouseY+s, within);
             stroke(255,0,0);
             strokeWeight(1f);
             for (PVector v2 : within) {
@@ -132,33 +133,39 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
             else v.z = 0;
         }
         
-        PVector v = tree.get_closest(mouseX, mouseY);
+        PVector v = get_closest(tree, mouseX, mouseY);
         if (v != null) {
             stroke(255,0,0);
             line(mouseX, mouseY, v.x, v.y);
-            tree.remove(v);
+            remove(tree, v);
         }
         
-        if (tree.size() > 0) {
+        if (size(tree) > 0) {
             stroke(255,0,0);
             strokeWeight(1f);
             noFill();
-            rect(tree.min_x().x, tree.min_y().y, tree.max_x().x, tree.max_y().y);
+            rect(min_x(tree).x, min_y(tree).y, max_x(tree).x, max_y(tree).y);
         }
 
         fill(255);
-        text(tree.size(), 20, 20);
-        text("lowest_depth_with_items: "+tree.lowest_depth_with_items(), 20, 50);
-        text("highest_depth_with_items: "+tree.highest_depth_with_items(), 20, 80);
+        text(size(tree), 20, 20);
+        text("lowest_depth_with_items: "+lowest_depth_with_items(tree), 20, 50);
+        text("highest_depth_with_items: "+highest_depth_with_items(tree), 20, 80);
         
 
     }
 
 
+    public <T> int size(Quad_Tree<T> qt) {
+        return SFJL_Quad_Tree.size(qt);
+    }
+
+
+
     public void draw_quad_tree(Quad_Tree<?> tree) {
         rectMode(CORNERS);
-        int lowest_depth_with_items = tree.lowest_depth_with_items();
-        int highest_depth_with_items = tree.highest_depth_with_items();
+        int lowest_depth_with_items = lowest_depth_with_items(tree);
+        int highest_depth_with_items = highest_depth_with_items(tree);
         draw_quad_tree(tree, 0, lowest_depth_with_items, highest_depth_with_items);
     }
 
@@ -180,10 +187,10 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
     @Override
     public void keyPressed() {
         if (key == 'c') {
-            tree.clear();
+            SFJL_Quad_Tree.clear(tree);
         }
         if (key == 'r') {
-            tree.rebuild();
+            rebuild(tree);
         }
         if (key == 'e') {
             // expand root
