@@ -117,39 +117,6 @@ static public class Quad_Tree<T> implements Iterable<T> {
     
     
     
-    public Iterator<T> iterator() {
-        
-        Stack<T> open = new Stack<>();
-        Stack<Quad_Tree<T>> open_quad_trees = new Stack<>();
-        
-        open_quad_trees.add(this);
-        
-        return new Iterator<T>() {
-            
-            @Override
-            public boolean hasNext() {
-                while (open.size() == 0 && open_quad_trees.size() != 0) {
-                    Quad_Tree<T> tree = open_quad_trees.pop();
-                    if (tree.has_children()) {
-                        open_quad_trees.add(tree.children[0]);
-                        open_quad_trees.add(tree.children[1]);
-                        open_quad_trees.add(tree.children[2]);
-                        open_quad_trees.add(tree.children[3]);
-                    }
-                    else {
-                        open.addAll(tree.data);
-                    }
-                }
-                return open.size() > 0;
-            }
-            
-            @Override
-            public T next() {
-                return open.pop();
-            }
-        };
-    }
-    
     
     public T get_closest(float x, float y) {
         
@@ -1077,6 +1044,11 @@ static public class Quad_Tree<T> implements Iterable<T> {
             }
         });
     }
+
+    @Override
+    public Iterator<T> iterator() {
+        return SFJL_Quad_Tree.iterator(this);
+    }
     
     
     
@@ -1140,6 +1112,42 @@ static public <T> void split(Quad_Tree<T> qt) {
         qt.manager.highest_depth_with_items = qt.depth + 1;
     }
     
+}
+
+
+
+    
+static public <T> Iterator<T> iterator(Quad_Tree<T> qt) {
+        
+    Stack<T> open = new Stack<>();
+    Stack<Quad_Tree<T>> open_quad_trees = new Stack<>();
+    
+    open_quad_trees.add(qt);
+    
+    return new Iterator<T>() {
+        
+        @Override
+        public boolean hasNext() {
+            while (open.size() == 0 && open_quad_trees.size() != 0) {
+                Quad_Tree<T> tree = open_quad_trees.pop();
+                if (tree.has_children()) {
+                    open_quad_trees.add(tree.children[0]);
+                    open_quad_trees.add(tree.children[1]);
+                    open_quad_trees.add(tree.children[2]);
+                    open_quad_trees.add(tree.children[3]);
+                }
+                else {
+                    open.addAll(tree.data);
+                }
+            }
+            return open.size() > 0;
+        }
+        
+        @Override
+        public T next() {
+            return open.pop();
+        }
+    };
 }
 
 
