@@ -56,6 +56,10 @@ static public final float dist(float x1, float y1, float x2, float y2) {
     return (float) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)));
 }
 
+static public final float sq(float f) {
+    return f * f;
+}
+
 static public final double dist(double x1, double y1, double x2, double y2) {
     return (double) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)));
 }
@@ -463,6 +467,10 @@ public boolean rect_rect_intersection_test(float a_x1, float a_y1, float a_x2, f
     return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2);
 }
 
+static public boolean rect_contains_rect(float r_x1, float r_y1, float r_x2, float r_y2, float r2_x1, float r2_y1, float r2_x2, float r2_y2) {
+    return (r2_x1 >= r_x1 && r2_x2 <= r_x2 && r2_y1 >= r_y1 &&  r2_y2 <= r_y2);
+}
+
 
 public static final float sign (float x1, float y1, float x2, float y2, float x3, float y3) {
     return (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
@@ -493,18 +501,61 @@ public static final boolean point_inside_quad(float tx, float ty, Vec2 a, Vec2 b
 }
 
 
-static public final boolean point_inside_rect(float x, float y, Vec2 lt, Vec2 rb) {
-    return (!(x < lt.x || x > rb.x ) && !(y < lt.y || y > rb.y ));
+static public final boolean point_inside_aabb(float x, float y, Vec2 lt, Vec2 rb) {
+    return !(x < lt.x || x > rb.x ) && !(y < lt.y || y > rb.y );
 }
 
-static public final boolean point_inside_rect(float x, float y, float x1, float y1, float x2, float y2) {
-    return (!(x < x1 || x > x2 ) && !(y < y1 || y > y2 ));
+static public final boolean point_inside_aabb(float x, float y, float x1, float y1, float x2, float y2) {
+    return !(x < x1 || x > x2 ) && !(y < y1 || y > y2 );
 }
+
+static public final boolean point_outside_aabb(float x, float y, float x1, float y1, float x2, float y2) {
+    return !point_inside_aabb(x, y, x1, y1, x2, y2);
+}
+
 
 
 // ----------------------------------------------------------------------------------------------------------------
 
-
-
-
+// return 0 if the point is inside the aabb
+static public final float dist_sq_point_to_aabb(float px, float py, float x1, float y1, float x2, float y2) {
+    
+    //
+    //         I    |    II    |   III
+    //      --------+----------+--------   
+    //        VIII  |   IX (0) |   IV
+    //      --------+----------+--------   
+    //        VII   |    VI    |    V
+    
+    if (px < x1) { 
+        if      (py < y1) { return dist_sq(px, py, x1, y1); } // I
+        else if (py > y2) { return dist_sq(px, py, x1, y2); } // VII
+        else {              return sq(x1 - px);}              // VIII
+    }
+    else if (px > x2) {
+        if      (py < y1) { return dist_sq(px, py, x2, y1);} // III
+        else if (py > y2) { return dist_sq(px, py, x2, y2);} // V
+        else {              return sq(px - x2);}             // IV
+    }
+    else {
+        if      (py < y1) { return sq(y1 - py);} // II
+        else if (py > y2) { return sq(py - y2);} // VI
+        else {              return 0f;}          // IX
+    }
 }
+
+
+static public final float max_dist_sq_point_to_corner_aabb(float px, float py, float x1, float y1, float x2, float y2) {
+    // TODO, this can probably be done without calculating the distance for every corner
+    return max(
+        max(dist_sq(px, py, x1, y1), dist_sq(px, py, x2, y1)), 
+        max(dist_sq(px, py, x2, y2), dist_sq(px, py, x1, y2))
+    );
+}
+
+
+
+
+
+
+} // EOF
