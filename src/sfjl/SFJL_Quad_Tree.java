@@ -967,7 +967,7 @@ static public <T> void clear(Quad_Tree<T> qt) {
         }
     }
     if (qt.data == null) {
-        qt.data = new ArrayList<>();
+        qt.data = new ArrayList<>(qt.manager.max_items);
     }
     
     qt.manager.size = 0;
@@ -1031,7 +1031,7 @@ static public <T> void merge_update(Quad_Tree<T> qt) {
                 
                 if (count < qt.manager.max_items) {
                     // merge
-                    current.data = new ArrayList<>();
+                    current.data = new ArrayList<>(manager.max_items);
                     get_all(current, current.data);
                     current.children[0] = null;
                     current.children[1] = null;
