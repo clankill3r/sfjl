@@ -44,6 +44,8 @@ static public class Quad_Tree<T> implements Iterable<T> {
     public Y<T> y;
     public int size = 0;
     public int[] n_items_at_depth_lookup = new int[64];
+    // public int[] 
+    public int max_depth;
 
     public Quad_Tree_Node<T> root;
     public ArrayList<Quad_Tree_Node<T>> node_buffer = new ArrayList<>();
@@ -1046,7 +1048,7 @@ static public <T> boolean remove(Quad_Tree_Node<T> qt, T t) {
     }
     if(current.data.remove(t)) {
         qt.part_of_tree.size--;
-        qt.part_of_tree.n_items_at_depth_lookup[qt.depth] -= 1;
+        qt.part_of_tree.n_items_at_depth_lookup[current.depth] -= 1;
         return true;
     }
     return false;
@@ -1133,34 +1135,18 @@ static public <T> int lowest_depth_with_items(Quad_Tree<T> qt) {
 
 static public <T> int lowest_depth_with_items(Quad_Tree_Node<T> qt) {
     
-    // breadth-first search
-    int index = 0;
-    ArrayList<Quad_Tree_Node<T>> open = new ArrayList<>();
-    open.add(qt);
-    
-    Quad_Tree_Node<T> found = null;
-    
-    while (index < open.size()) {
-        
-        Quad_Tree_Node<T> current = open.get(index);
-        index++;
-        
-        if (has_children(current)) {
-            open.add(current.children[0]);
-            open.add(current.children[1]);
-            open.add(current.children[2]);
-            open.add(current.children[3]);
-        }
-        else {
-            if (current.data.size() > 0) {
-                found = current;
-                break;
-            }
-        }
+    if (qt.part_of_tree.size == 0) {
+        return -1;
     }
-    
-    if (found == null) return -1;
-    return found.depth;
+
+    int[] n_items_at_depth_lookup = qt.part_of_tree.n_items_at_depth_lookup;
+
+    for (int i = 0; i < n_items_at_depth_lookup.length; i++) {
+        if (n_items_at_depth_lookup[i] != 0) {
+            return i;
+        }
+    }  
+    return _unreachable_int("bug");
 }
 
 
