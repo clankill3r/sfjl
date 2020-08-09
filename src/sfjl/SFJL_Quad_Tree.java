@@ -43,7 +43,8 @@ static public class Quad_Tree<T> implements Iterable<T> {
     public X<T> x;
     public Y<T> y;
     public int size = 0;
-    public int highest_depth_with_items = -1;
+    public int[] n_items_at_depth_lookup = new int[64];
+
     public Quad_Tree_Node<T> root;
     public ArrayList<Quad_Tree_Node<T>> node_buffer = new ArrayList<>();
     
@@ -151,6 +152,7 @@ static public <T> void add(Quad_Tree_Node<T> qt, T t, float x, float y) {
     }
     else {
         qt.data.add(t);
+        qt.part_of_tree.n_items_at_depth_lookup[qt.depth] += 1;
         qt.part_of_tree.size++;
         if (qt.data.size() > qt.part_of_tree.max_items) {
             split(qt);
@@ -202,13 +204,11 @@ static public <T> void split(Quad_Tree_Node<T> qtn) {
         int where = get_optimal_index(qtn, x(qtn, t), y(qtn, t));
         add(qtn.children[where], t);
     }
+
+    qtn.part_of_tree.n_items_at_depth_lookup[qtn.depth] -= qtn.data.size();
     qtn.part_of_tree.size -= qtn.data.size(); // correction
     qtn.data.clear();
-    
-    if (qtn.depth + 1 > qtn.part_of_tree.highest_depth_with_items) {
-        qtn.part_of_tree.highest_depth_with_items = qtn.depth + 1;
-    }
-    
+
 }
 
 
@@ -1018,8 +1018,7 @@ static public <T> void clear(Quad_Tree_Node<T> qt) {
         }
     }
     
-    qt.part_of_tree.size = 0;
-    qt.part_of_tree.highest_depth_with_items = 0;
+    qt.part_of_tree.size = 0; // check lookup thing
     
 }
 
@@ -1034,9 +1033,6 @@ static public <T> boolean remove(Quad_Tree<T> qt, T t) {
 }
 
 
-/**
-* Does not update lowest_depth_with_items and highest_depth_with_items for speed reasons.
-*/
 static public <T> boolean remove(Quad_Tree_Node<T> qt, T t) {
     
     Quad_Tree_Node<T> current = qt;
@@ -1050,6 +1046,7 @@ static public <T> boolean remove(Quad_Tree_Node<T> qt, T t) {
     }
     if(current.data.remove(t)) {
         qt.part_of_tree.size--;
+        qt.part_of_tree.n_items_at_depth_lookup[qt.depth] -= 1;
         return true;
     }
     return false;
@@ -1172,7 +1169,24 @@ static public <T> int highest_depth_with_items(Quad_Tree<T> qt) {
 }
 
 static public <T> int highest_depth_with_items(Quad_Tree_Node<T> qt) {
-    return qt.part_of_tree.highest_depth_with_items;
+
+    if (qt.part_of_tree.size == 0) {
+        return -1;
+    }
+
+    int[] n_items_at_depth_lookup = qt.part_of_tree.n_items_at_depth_lookup;
+
+    for (int i = n_items_at_depth_lookup.length-1; i >= 0; i--) {
+        if (n_items_at_depth_lookup[i] != 0) {
+            return i;
+        }
+    }  
+    return _unreachable_int("bug");
+}
+
+
+static public int _unreachable_int(String message) {
+    throw new RuntimeException(message);
 }
 
 
