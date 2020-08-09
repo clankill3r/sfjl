@@ -329,7 +329,7 @@ static public <T> T get_farthest(Quad_Tree_Node<T> qt, float x, float y) {
             int rl = center_x(current) < x ? 1 : 0;
             int bt = center_y(current) < y ? 1 : 0;
             
-            // wost is added as last cause we remove the last one from open
+            // worst is added as last cause we remove the last one from open
             open.add(current.children[bt*2+rl]); // <- closest
             open.add(current.children[bt*2+(1-rl)]);
             open.add(current.children[(1-bt)*2+rl]);
