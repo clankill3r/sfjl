@@ -78,6 +78,7 @@ static public class Quad_Tree_Node<T> implements Iterable<T> {
     public float x2;
     public float y2;
     public int depth;
+    public long split_hash;
 
     public Quad_Tree_Node(Quad_Tree<T> part_of_tree) { 
         this.part_of_tree = part_of_tree;
@@ -202,6 +203,15 @@ static public <T> void split(Quad_Tree_Node<T> qtn) {
     set(qtn.children[BL], qtn, qtn.x1, center_y(qtn), center_x(qtn), qtn.y2);
     set(qtn.children[BR], qtn, center_x(qtn), center_y(qtn), qtn.x2, qtn.y2);
 
+    int FLAG_TR = 0x1;
+    int FLAG_TL = 0x2;
+    int FLAG_BL = 0x4;
+    int FLAG_BR = 0x8;
+
+    qtn.children[TR].split_hash = qtn.split_hash | (FLAG_TR << qtn.depth * 4);
+    qtn.children[TL].split_hash = qtn.split_hash | (FLAG_TL << qtn.depth * 4);
+    qtn.children[BL].split_hash = qtn.split_hash | (FLAG_BL << qtn.depth * 4);
+    qtn.children[BR].split_hash = qtn.split_hash | (FLAG_BR << qtn.depth * 4);
     for (T t : qtn.data) {
         int where = get_optimal_index(qtn, x(qtn, t), y(qtn, t));
         add(qtn.children[where], t);
@@ -342,6 +352,10 @@ static public <T> T get_farthest(Quad_Tree_Node<T> qt, float x, float y) {
 
 
 static public <T> void get_farthest_n(Quad_Tree_Node<T> qt, float x, float y, int n, ArrayList<T> result) {
+static public <T> boolean node_is_child_of_node(Quad_Tree_Node<T> possible_child, Quad_Tree_Node<T> node) {
+    if (possible_child.depth < node.depth) return false;
+    return (possible_child.split_hash & node.split_hash) == node.split_hash;
+}
     
     if (n <= 0) return;
 
