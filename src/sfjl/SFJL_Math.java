@@ -545,29 +545,20 @@ static public final float dist_sq_point_to_aabb(float px, float py, float x1, fl
 }
 
 
-
-static public final float max_dist_sq_point_to_corner_aabb(float px, float py, float x1, float y1, float x2, float y2) {
-    // TODO, this can probably be done without calculating the distance for every corner
-    return max(
-        max(dist_sq(px, py, x1, y1), dist_sq(px, py, x2, y1)), 
-        max(dist_sq(px, py, x2, y2), dist_sq(px, py, x1, y2))
-    );
+static public final float max_dist_sq_point_to_corner_aabb(float x, float y, float x1, float y1, float x2, float y2) {
+    
+    float far_x = abs(x-x1) > abs(x-x2) ? x1 : x2;
+    float far_y = abs(y-y1) > abs(y-y2) ? y1 : y2;
+    return dist_sq(x, y, far_x, far_y);
 }
 
 
-static public final float min_dist_sq_point_to_corner_aabb(float px, float py, float x1, float y1, float x2, float y2) {
-    // TODO, this can probably be done without calculating the distance for every corner
-    return min(
-        min(dist_sq(px, py, x1, y1), dist_sq(px, py, x2, y1)), 
-        min(dist_sq(px, py, x2, y2), dist_sq(px, py, x1, y2))
-    );
+static public final float min_dist_sq_point_to_corner_aabb(float x, float y, float x1, float y1, float x2, float y2) {
+
+    float close_x = abs(x-x1) < abs(x-x2) ? x1 : x2;
+    float close_y = abs(y-y1) < abs(y-y2) ? y1 : y2;
+    return dist_sq(x, y, close_x, close_y);
 }
-
-
-
-
-
-
 
 
 } // EOF
