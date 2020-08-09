@@ -545,6 +545,7 @@ static public final float dist_sq_point_to_aabb(float px, float py, float x1, fl
 }
 
 
+
 static public final float max_dist_sq_point_to_corner_aabb(float px, float py, float x1, float y1, float x2, float y2) {
     // TODO, this can probably be done without calculating the distance for every corner
     return max(
@@ -552,6 +553,17 @@ static public final float max_dist_sq_point_to_corner_aabb(float px, float py, f
         max(dist_sq(px, py, x2, y2), dist_sq(px, py, x1, y2))
     );
 }
+
+
+static public final float min_dist_sq_point_to_corner_aabb(float px, float py, float x1, float y1, float x2, float y2) {
+    // TODO, this can probably be done without calculating the distance for every corner
+    return min(
+        min(dist_sq(px, py, x1, y1), dist_sq(px, py, x2, y1)), 
+        min(dist_sq(px, py, x2, y2), dist_sq(px, py, x1, y2))
+    );
+}
+
+
 
 
 
