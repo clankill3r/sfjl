@@ -1264,6 +1264,11 @@ static public <T> T remove_last(ArrayList<T> arr) {
     return arr.remove(arr.size()-1);
 }
 
+public static <T> T swap_with_last_remove(ArrayList<T> list, int index_to_remove) {
+    list.set(index_to_remove, list.get(list.size()-1));
+    return list.remove(list.size()-1);
+}
+
 
     
 } // EOF
