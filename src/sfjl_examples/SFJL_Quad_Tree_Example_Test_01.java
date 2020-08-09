@@ -17,13 +17,6 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         PApplet.main(SFJL_Quad_Tree_Example_Test_01.class, args);
     }
 
-
-    // quad tree
-    // kd - tree
-    // bvh tree
-
-
-
     Quad_Tree<PVector> tree;
 
     //ArrayList<PVector> vecs = new ArrayList<>();
@@ -35,7 +28,12 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         
     }
 
+
+    float[] precomputed_random_sequence = new float[2048];
+    int precomputed_random_sequence_index = 0;
     
+
+    ArrayList<PVector> within = new ArrayList<>();
 
     @Override
     public void setup() {
@@ -49,13 +47,12 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         int plot_width = plot_x2 - plot_x1;
         int plot_height = plot_y2 - plot_y1;
 
-        tree  = new Quad_Tree<>((v)-> v.x, (v)->v.y, 
-                                null, 
-                                plot_x1, plot_y1, plot_x2, plot_y2,
-                                32);
 
-        for (int y = plot_y1; y <  plot_y2; y += 3) {
-            for (int x = plot_x1; x < plot_x2; x += 3) {
+        tree = new Quad_Tree<>((v)-> v.x, (v)->v.y, 32, plot_x1, plot_y1, plot_x2, plot_y2);
+
+
+        for (int y = plot_y1; y <  plot_y2; y += 1) {
+            for (int x = plot_x1; x < plot_x2; x += 1) {
 
                 float n = dist(x, y, width/2, height/2) / max(plot_width, plot_height);
                 // println(n);
@@ -68,8 +65,24 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
                  }
             }
         }
+        println(tree.size);
+
+        for (int i = 0; i < precomputed_random_sequence.length; i++) {
+            precomputed_random_sequence[i] = random(-1, 1);
+        }
+
 
     }
+
+    float next_random() {
+        float r = precomputed_random_sequence[precomputed_random_sequence_index++];
+        if (precomputed_random_sequence_index == precomputed_random_sequence.length) {
+            precomputed_random_sequence_index = 0;
+        }
+        return r;
+    }
+
+
 
     @Override
     public void draw() {
@@ -81,7 +94,7 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         noFill();
         stroke(255);
         strokeWeight(0.5f);
-        draw_quad_tree(tree);
+        // draw_quad_tree(tree);
 
      
 
@@ -90,20 +103,21 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         // OUT_OF_BOUNDS_IGNORE
         // OUT_OF_BOUNDS_EXPAND
         // OUT_OF_BOUNDS_REJECT
-
+        
+        within.clear();
 
         
         if (sin(frameCount * 0.01f) > 0) {
             float radius = sin(frameCount * 0.01f) * 250;
-            ArrayList<PVector> within = new ArrayList<>();
+            
             get_within_radius_sq(tree, mouseX, mouseY, sq(radius), within);
             stroke(255,0,0);
             strokeWeight(1f);
             for (PVector v2 : within) {
-                point(v2.x, v2.y);
+                // point(v2.x, v2.y);
                 remove(tree, v2);
-                v2.x += random(-3, 3);
-                v2.y += random(-3, 3);
+                v2.x += next_random() * 3; //random(-3, 3);
+                v2.y += next_random() * 3; //random(-3, 3);
                 add(tree, v2);
                 v2.z = 1; // to avoid drawing again
             }
@@ -112,13 +126,13 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
             ellipse(mouseX, mouseY, radius*2, radius*2);    
         }
         else {
-            ArrayList<PVector> within = new ArrayList<>();
+            
             float s = sin(frameCount * 0.01f) * 250;
             get_within_aabb(tree, mouseX-s, mouseY-s, mouseX+s, mouseY+s, within);
             stroke(255,0,0);
             strokeWeight(1f);
             for (PVector v2 : within) {
-                point(v2.x, v2.y);
+                // point(v2.x, v2.y);
                 v2.z = 1; // to avoid drawing again
             }
             rectMode(CORNERS);
@@ -129,8 +143,12 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
         stroke(255,255,0);
         strokeWeight(1f);
         for (PVector v : tree) {
-            if (v.z == 0) point(v.x, v.y);
-            else v.z = 0;
+            if (v.z == 0) {
+                // point(v.x, v.y);
+            }
+            else {
+                v.z = 0;
+            }
         }
         
         PVector v = get_closest(tree, mouseX, mouseY);
@@ -157,20 +175,24 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
 
 
     public <T> int size(Quad_Tree<T> qt) {
+        return SFJL_Quad_Tree.size(qt.root);
+    }
+
+    public <T> int size(Quad_Tree_Node<T> qt) {
         return SFJL_Quad_Tree.size(qt);
     }
 
 
 
-    public void draw_quad_tree(Quad_Tree<?> tree) {
+    public <T> void draw_quad_tree(Quad_Tree<T> tree) {
         rectMode(CORNERS);
         int lowest_depth_with_items = lowest_depth_with_items(tree);
         int highest_depth_with_items = highest_depth_with_items(tree);
-        draw_quad_tree(tree, 0, lowest_depth_with_items, highest_depth_with_items);
+        draw_quad_tree(tree.root, 0, lowest_depth_with_items, highest_depth_with_items);
     }
 
-    public void draw_quad_tree(Quad_Tree<?> tree, int level, int lowest_depth_with_items, int highest_depth_with_items) {
-        if (tree.has_children()) {
+    public void draw_quad_tree(Quad_Tree_Node<?> tree, int level, int lowest_depth_with_items, int highest_depth_with_items) {
+        if (has_children(tree)) {
             draw_quad_tree(tree.children[0], level+1, lowest_depth_with_items, highest_depth_with_items);
             draw_quad_tree(tree.children[1], level+1, lowest_depth_with_items, highest_depth_with_items);
             draw_quad_tree(tree.children[2], level+1, lowest_depth_with_items, highest_depth_with_items);
