@@ -446,7 +446,7 @@ static public <T extends PCB_Node<T>> Iterator<T> get_iterator(T e, PCB_Node_Acc
 
 static public class Print_Tree_Formatter {
     public String  h_bar = "─";
-    public String  v_bar = "|";
+    public String  v_bar = "│";
     public String  t     = "├";
     public String  l     = "└";
     public int     h_span = 2;
