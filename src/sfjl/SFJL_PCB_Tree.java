@@ -58,10 +58,16 @@ THOUGHTS:
                                                      private SFJL_PCB_Tree() {}
 //
 
-static public class PCB_Node<T extends PCB_Node<T>> {
+static public class PCB_Node<T extends PCB_Node<T>> implements Iterable<T> {
     public T parent;
     public T first_child;
     public T next_brother;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Iterator<T> iterator() {
+        return get_iterator((T)this);
+    }
 }
 
 

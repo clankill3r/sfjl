@@ -142,6 +142,15 @@ public static void main(String[] args) {
     }, ptf);
 
 
+    System.out.println("-----------------------------------------------------");
+    
+    // most simple way to loop over the elements:
+    for (Element e : root) {
+        System.out.println(e.name);
+    }
+
+
+
 }
 
 
