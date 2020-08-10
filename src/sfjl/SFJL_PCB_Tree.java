@@ -53,12 +53,12 @@ THOUGHTS:
 */
 
 
-                                                           //SFJL_PCB_Tree
+//-----------------------------------------------------------SFJL_PCB_Tree
                                                 public class SFJL_PCB_Tree {
                                                      private SFJL_PCB_Tree() {}
+//
 
-
-static public class PCB_Node<T> {
+static public class PCB_Node<T extends PCB_Node<T>> {
     public T parent;
     public T first_child;
     public T next_brother;
@@ -434,6 +434,99 @@ static public <T extends PCB_Node<T>> Iterator<T> get_iterator(T e, PCB_Node_Acc
     };
 }
 
+
+//------------------------------------- tree printing
+
+
+static public class Print_Tree_Formatter {
+    public String  h_bar = "─";
+    public String  v_bar = "|";
+    public String  t     = "├";
+    public String  l     = "└";
+    public int     h_span = 2;
+    public boolean print_root_name = true;
+    public String  root_substitute_name = ".";
+    public String  line_prefix = "";
+}
+
+
+public interface Print_Tree_Name_Printer<T extends PCB_Node<T>>{
+    String name(T t);
+}
+
+
+static public <T extends PCB_Node<T>> void print_tree(T e, Print_Tree_Name_Printer<T> name_printer, Print_Tree_Formatter ptf) {
+    if (ptf == null) {
+        ptf = new Print_Tree_Formatter();
+    }
+    print_tree(e, ptf.line_prefix, 0, e.first_child == null, name_printer, ptf);
+}
+
+
+static public <T extends PCB_Node<T>> void print_tree(T e, String prefix, int depth, boolean is_last_child, Print_Tree_Name_Printer<T> name_printer, Print_Tree_Formatter ptf) {
+
+    if (depth == 0) {
+        if (ptf.print_root_name) {
+            System.out.println(prefix+name_printer.name(e));
+        }
+        else {
+            System.out.println(prefix+ptf.root_substitute_name); // "."
+        }
+    }
+    else {
+
+        // it comes like "   │" or "    ", so we chop off the last char
+        // so we can add "└" or "├"
+        String line = prefix.substring(0, prefix.length()-1);
+        if (is_last_child) {
+            line += ptf.l; // "└"
+        }
+        else {
+            line += ptf.t; // "├"
+        }
+        line += _str_repeat(ptf.h_bar, ptf.h_span)+" "; // "── "
+        line += name_printer.name(e);
+
+        System.out.println(line);
+    }
+
+    Iterator<T> itr = get_child_iterator(e);
+
+    while (itr.hasNext()) {
+
+        T child = itr.next();
+        boolean child_is_last_child = child.next_brother == null;
+        String next_prefix = prefix;
+
+        if (depth == 0) {
+
+            if (child_is_last_child) {
+                next_prefix += " ";
+            }
+            else {
+                next_prefix += ptf.v_bar; // "│"
+            }
+        }
+        else {
+            if (child_is_last_child) {
+                next_prefix += _str_repeat(" ", ptf.h_span+2); // "   "
+            }
+            else {
+                next_prefix += _str_repeat(" ", ptf.h_span+1) + ptf.v_bar; // "   │"
+            }
+        }
+        print_tree(child, next_prefix, depth+1, child_is_last_child, name_printer, ptf);
+    }
+}
+
+
+static public String _str_repeat(String s, int n) {
+    String r = "";
+    while (n-- > 0) {
+        r += s;
+    }
+    return r;
+}
 
 
 } // EOF

@@ -119,7 +119,31 @@ public static void main(String[] args) {
     }
 
 
+    System.out.println("-----------------------------------------------------");
+    
+    // print pretty:
+    
+    print_tree(root, (e)-> {
+        return e.name;
+    }, null);
+
+    // print even more pretty with some color:
+
+    String ANSI_RESET  = "\u001b[0m";
+    String ANSI_WHITE  = "\u001b[37m";
+    String ANSI_GREEN  = "\u001b[32m";
+
+    Print_Tree_Formatter ptf = new Print_Tree_Formatter();
+    ptf.print_root_name = false;
+    ptf.line_prefix = ANSI_WHITE;
+
+    print_tree(root, (e)-> {
+        return ANSI_GREEN + e.name + ANSI_RESET;
+    }, ptf);
+
+
 }
+
 
 
 static public Add_Type APPEND           = Add_Type.APPEND;
@@ -193,5 +217,6 @@ static public String indent(int depth) {
 }
 
 
-    
+
+
 } // EOF

@@ -6,13 +6,13 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 | library                                       | latest version | category | LoC: | description                                      |
 | --------------------------------------------- | -------------- | -------- | ---- | ------------------------------------------------ |
 | **[SFJL_Math][sfjl_math_link]**               |                | math     | 328  | vector and matrix classes (work in progress)     |
-| **[SFJL_PCB_Tree][sfjl_pcb_tree_link]**       |                | utility  | 274  | tree data structure that avoids using arrays     |
+| **[SFJL_PCB_Tree][sfjl_pcb_tree_link]**       |                | utility  | 345  | tree data structure that avoids using arrays     |
 | **[SFJL_Print][sfjl_print_link]**             |                | utility  | 175  | print and println without the need of System.out |
 | **[SFJL_Base64][sfjl_base64_link]**           |                | utility  | 136  | base64 encoder and decoder functions             |
 | **[SFJL_FNV_Hash][sfjl_fnv_hash_link]**       |                | utility  | 148  | [FNV hash][fnv_link] implementation              |
 | **[SFJL_Tween][sfjl_tween_link]**             |                | graphics | 187  | tween functions                                  |
 | **[SFJL_Douglas_Peucker][sfjl_douglas_link]** |                | graphics | 179  | line based curve decimator for 2d and 3d         |
-|                                               |                | **sum**  | 1513 |                                                  |
+|                                               |                | **sum**  | 1534 |                                                  |
 
 
 [sfjl_math_link]: src/sfjl/SFJL_Math.java
