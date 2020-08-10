@@ -21,6 +21,8 @@ public final static int TR = 1;
 public final static int BL = 2;
 public final static int BR = 3;
 
+public final static int _HARD_MAX_DEPTH = 16; // check split_hash for why this is the max
+
 
 public interface X<T> {
     public float x(T t);
@@ -37,9 +39,10 @@ static public class Quad_Tree<T> implements Iterable<T> {
     public X<T> x;
     public Y<T> y;
     public int size = 0;
-    public int[] n_items_at_depth_lookup = new int[64];
     public Quad_Tree_Node<T> root;
     public ArrayList<Quad_Tree_Node<T>> node_buffer = new ArrayList<>();
+    public int[] n_quads_at_depth_lookup = new int[_HARD_MAX_DEPTH+1];
+    public int[] n_leafs_at_depth_lookup = new int[_HARD_MAX_DEPTH+1];
     
     public Quad_Tree(X<T> x, Y<T> y, int max_items, float x1, float y1, float x2, float y2) {
         this.x = x;
@@ -153,7 +156,6 @@ static public <T> Quad_Tree_Node<T> add(Quad_Tree_Node<T> qt, T t, float x, floa
 
     if (qt != null) {
         qt.data.add(t);
-        qt.part_of_tree.n_items_at_depth_lookup[qt.depth] += 1;
         qt.part_of_tree.size++;
         if (qt.data.size() > qt.part_of_tree.max_items) {
             split(qt);
@@ -193,6 +195,10 @@ static public <T> void set(Quad_Tree_Node<T> qtn, Quad_Tree_Node<T> parent, floa
 
 static public <T> void split(Quad_Tree_Node<T> qtn) {
 
+    if (qtn.depth == _HARD_MAX_DEPTH) {
+        return;
+    }
+
     qtn.children[TR] = get_or_create_node(qtn.part_of_tree);
     qtn.children[TL] = get_or_create_node(qtn.part_of_tree);
     qtn.children[BL] = get_or_create_node(qtn.part_of_tree);
@@ -217,10 +223,11 @@ static public <T> void split(Quad_Tree_Node<T> qtn) {
         add(qtn, t);
     }
 
-    qtn.part_of_tree.n_items_at_depth_lookup[qtn.depth] -= qtn.data.size();
     qtn.part_of_tree.size -= qtn.data.size(); // correction
     qtn.data.clear();
-  
+
+    qtn.part_of_tree.n_quads_at_depth_lookup[qtn.depth+1] += 4; 
+    qtn.part_of_tree.n_leafs_at_depth_lookup[qtn.depth+1] += 4;
 }
 
 
@@ -899,7 +906,6 @@ static public <T> boolean remove(Quad_Tree_Node<T> qt, T t) {
     qt = get_deepest_node(qt, x, y);
     if (qt.data.remove(t)) {
         qt.part_of_tree.size--;
-        qt.part_of_tree.n_items_at_depth_lookup[qt.depth] -= 1;
         return true;
     }
     return false;
@@ -922,6 +928,67 @@ static public <T> void rebuild(Quad_Tree_Node<T> qt) {
 }
 
 
+static public <T> boolean merge(Quad_Tree_Node<T> qt) {
+
+    if (!has_children(qt)) {
+        return false;
+    }
+
+    if (has_children(qt.children[0]) ||
+        has_children(qt.children[1]) ||
+        has_children(qt.children[2]) ||
+        has_children(qt.children[3])) {
+        return false;
+    }
+     
+    int count =  qt.children[0].data.size();
+        count += qt.children[1].data.size();
+        count += qt.children[2].data.size();
+        count += qt.children[3].data.size();
+    
+    // The merge_threshold should be between 0 and 1. The higher it
+    // is the more likely it will do a merge. If the amount of times
+    // is less then the max_items * merge_threshold then a merge
+    // will happen. For example if max_items is 32, then: 
+    // 32 * 0.75 = merge when items drop below 24
+    // 32 * 0.50 = merge when items drop below 16
+    // 32 * 0.25 = merge when items drop below 8
+
+    if (count < (qt.part_of_tree.max_items * qt.part_of_tree.merge_threshold)) { 
+        //
+        // merge
+        //
+        qt.data.addAll(qt.children[0].data);
+        qt.data.addAll(qt.children[1].data);
+        qt.data.addAll(qt.children[2].data);
+        qt.data.addAll(qt.children[3].data);
+
+        qt.part_of_tree.node_buffer.add(qt.children[0]);
+        qt.part_of_tree.node_buffer.add(qt.children[1]);
+        qt.part_of_tree.node_buffer.add(qt.children[2]);
+        qt.part_of_tree.node_buffer.add(qt.children[3]);
+
+        qt.children[0].data.clear();
+        qt.children[1].data.clear();
+        qt.children[2].data.clear();
+        qt.children[3].data.clear();
+
+        qt.children[0] = null;
+        qt.children[1] = null;
+        qt.children[2] = null;
+        qt.children[3] = null;
+
+        qt.part_of_tree.n_quads_at_depth_lookup[qt.depth+1] -= 4;
+        qt.part_of_tree.n_leafs_at_depth_lookup[qt.depth+1] -= 4;
+        qt.part_of_tree.n_leafs_at_depth_lookup[qt.depth]   += 1;
+
+        return true;
+    }
+    return false;
+}
+
+
+
 static public <T> void merge_update(Quad_Tree<T> qt) {
     merge_update(qt.root);
 }
@@ -934,107 +1001,50 @@ static public <T> void merge_update(Quad_Tree_Node<T> qt) {
     
     while (open.size() > 0) {
         Quad_Tree_Node<T> current = remove_last(open);
-      
-        if (has_children(current)) {
-            
-            if (!has_children(current.children[0]) &&
-                !has_children(current.children[1]) &&
-                !has_children(current.children[2]) &&
-                !has_children(current.children[3])) {
-                
-                int count =  current.children[0].data.size();
-                    count += current.children[1].data.size();
-                    count += current.children[2].data.size();
-                    count += current.children[3].data.size();
-                
-                // The merge_threshold should be between 0 and 1. The higher it
-                // is the more likely it will do a merge. If the amount of times
-                // is less then the max_items * merge_threshold then a merge
-                // will happen. For example if max_items is 32, then: 
-                // 32 * 0.75 = merge when items drop below 24
-                // 32 * 0.50 = merge when items drop below 16
-                // 32 * 0.25 = merge when items drop below 8
-
-                if (count < (qt.part_of_tree.max_items * qt.part_of_tree.merge_threshold)) { 
-                    // merge
-                    get_all(current, current.data);
-
-                    qt.part_of_tree.node_buffer.add(current.children[0]);
-                    qt.part_of_tree.node_buffer.add(current.children[1]);
-                    qt.part_of_tree.node_buffer.add(current.children[2]);
-                    qt.part_of_tree.node_buffer.add(current.children[3]);
-
-                    current.children[0].data.clear();
-                    current.children[1].data.clear();
-                    current.children[2].data.clear();
-                    current.children[3].data.clear();
-
-                    current.children[0] = null;
-                    current.children[1] = null;
-                    current.children[2] = null;
-                    current.children[3] = null;
-                }
-            }
-            else {
-                open.add(current.children[0]);
-                open.add(current.children[1]);
-                open.add(current.children[2]);
-                open.add(current.children[3]);
-            }
-        }
         
+        if (!merge(current) && has_children(current)) {
+            open.add(current.children[0]);
+            open.add(current.children[1]);
+            open.add(current.children[2]);
+            open.add(current.children[3]);
+        }
     }
-    
-    
 }
 
 
-static public <T> int lowest_depth_with_items(Quad_Tree<T> qt) {
-    return lowest_depth_with_items(qt.root);
+static public <T> int highest_depth_with_leafs(Quad_Tree<T> qt) {
+    return highest_depth_with_leafs(qt.root);
 }
 
 
-static public <T> int lowest_depth_with_items(Quad_Tree_Node<T> qt) {
-    
-    if (qt.part_of_tree.size == 0) {
-        return -1;
-    }
+static public <T> int highest_depth_with_leafs(Quad_Tree_Node<T> qt) {
 
-    int[] n_items_at_depth_lookup = qt.part_of_tree.n_items_at_depth_lookup;
+    int[] n_leafs_at_depth_lookup = qt.part_of_tree.n_leafs_at_depth_lookup;
 
-    for (int i = 0; i < n_items_at_depth_lookup.length; i++) {
-        if (n_items_at_depth_lookup[i] != 0) {
+    for (int i = n_leafs_at_depth_lookup.length-1; i >= 0; i--) {
+        if (n_leafs_at_depth_lookup[i] != 0) {
             return i;
         }
     }  
-    return _unreachable_int("bug");
+    throw new RuntimeException("unreachable");
 }
 
 
-static public <T> int highest_depth_with_items(Quad_Tree<T> qt) {
-    return highest_depth_with_items(qt.root);
+static public <T> int lowest_depth_with_leafs(Quad_Tree<T> qt) {
+    return lowest_depth_with_leafs(qt.root);
 }
 
 
-static public <T> int highest_depth_with_items(Quad_Tree_Node<T> qt) {
+static public <T> int lowest_depth_with_leafs(Quad_Tree_Node<T> qt) {
 
-    if (qt.part_of_tree.size == 0) {
-        return -1;
-    }
+    int[] n_leafs_at_depth_lookup = qt.part_of_tree.n_leafs_at_depth_lookup;
 
-    int[] n_items_at_depth_lookup = qt.part_of_tree.n_items_at_depth_lookup;
-
-    for (int i = n_items_at_depth_lookup.length-1; i >= 0; i--) {
-        if (n_items_at_depth_lookup[i] != 0) {
+    for (int i = 0; i < n_leafs_at_depth_lookup.length; i++) {
+        if (n_leafs_at_depth_lookup[i] != 0) {
             return i;
         }
     }  
-    return _unreachable_int("bug");
-}
-
-
-static public int _unreachable_int(String message) {
-    throw new RuntimeException(message);
+    throw new RuntimeException("unreachable");
 }
 
 

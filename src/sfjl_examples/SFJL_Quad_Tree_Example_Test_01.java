@@ -32,6 +32,7 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
     public void setup() {
         
         frameRate(60);
+        strokeCap(SQUARE);
 
         int plot_x1 = 50;
         int plot_x2 = width - 50;
@@ -42,8 +43,8 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
 
         tree = new Quad_Tree<>((v)-> v.x, (v)->v.y, 64, plot_x1, plot_y1, plot_x2, plot_y2);
 
-        for (int y = plot_y1; y <  plot_y2; y += 3) {
-            for (int x = plot_x1; x < plot_x2; x += 3) {
+        for (int y = plot_y1; y <  plot_y2; y += 2) {
+            for (int x = plot_x1; x < plot_x2; x += 2) {
 
                 float n = dist(x, y, width/2, height/2) / max(plot_width, plot_height);
                 
@@ -100,8 +101,8 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
             for (PVector v2 : within) {
                 point(v2.x, v2.y);
                 remove(tree, v2);
-                v2.x += next_random() * 3; //random(-3, 3);
-                v2.y += next_random() * 3; //random(-3, 3);
+                v2.x += next_random() * 1; //random(-3, 3);
+                v2.y += next_random() * 1; //random(-3, 3);
                 add(tree, v2);
                 v2.z = 1; // to avoid drawing again
             }
@@ -153,8 +154,8 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
 
         fill(255);
         text(size(tree), 20, 20);
-        text("lowest_depth_with_items: "+lowest_depth_with_items(tree), 20, 50);
-        text("highest_depth_with_items: "+highest_depth_with_items(tree), 20, 80);
+        text("highest_depth_with_leafs: "+highest_depth_with_leafs(tree), 20, 80);
+        text("lowest_depth_with_leafs: "+lowest_depth_with_leafs(tree), 20, 100);
         
 
     }
@@ -172,21 +173,21 @@ public class SFJL_Quad_Tree_Example_Test_01 extends PApplet {
 
     public <T> void draw_quad_tree(Quad_Tree<T> tree) {
         rectMode(CORNERS);
-        int lowest_depth_with_items = lowest_depth_with_items(tree);
-        int highest_depth_with_items = highest_depth_with_items(tree);
-        draw_quad_tree(tree.root, 0, lowest_depth_with_items, highest_depth_with_items);
+        int lowest_depth_with_leafs = lowest_depth_with_leafs(tree);
+        int highest_depth_with_leafs = highest_depth_with_leafs(tree);
+        draw_quad_tree(tree.root, 0, lowest_depth_with_leafs, highest_depth_with_leafs);
     }
 
 
-    public void draw_quad_tree(Quad_Tree_Node<?> tree, int level, int lowest_depth_with_items, int highest_depth_with_items) {
+    public void draw_quad_tree(Quad_Tree_Node<?> tree, int level, int lowest_depth_with_leafs, int highest_depth_with_leafs) {
         if (has_children(tree)) {
-            draw_quad_tree(tree.children[0], level+1, lowest_depth_with_items, highest_depth_with_items);
-            draw_quad_tree(tree.children[1], level+1, lowest_depth_with_items, highest_depth_with_items);
-            draw_quad_tree(tree.children[2], level+1, lowest_depth_with_items, highest_depth_with_items);
-            draw_quad_tree(tree.children[3], level+1, lowest_depth_with_items, highest_depth_with_items);
+            draw_quad_tree(tree.children[0], level+1, lowest_depth_with_leafs, highest_depth_with_leafs);
+            draw_quad_tree(tree.children[1], level+1, lowest_depth_with_leafs, highest_depth_with_leafs);
+            draw_quad_tree(tree.children[2], level+1, lowest_depth_with_leafs, highest_depth_with_leafs);
+            draw_quad_tree(tree.children[3], level+1, lowest_depth_with_leafs, highest_depth_with_leafs);
         }
         else {
-            fill(map(level, lowest_depth_with_items, highest_depth_with_items, 0, 50));
+            fill(map(level, lowest_depth_with_leafs, highest_depth_with_leafs, 0, 50));
             rect(tree.x1, tree.y1, tree.x2, tree.y2);
         }
     }
