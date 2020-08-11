@@ -501,16 +501,12 @@ public static final boolean point_inside_quad(float tx, float ty, Vec2 a, Vec2 b
 }
 
 
-static public final boolean point_inside_aabb(float x, float y, Vec2 lt, Vec2 rb) {
-    return !(x < lt.x || x > rb.x ) && !(y < lt.y || y > rb.y );
-}
-
 static public final boolean point_inside_aabb(float x, float y, float x1, float y1, float x2, float y2) {
-    return !(x < x1 || x > x2 ) && !(y < y1 || y > y2 );
+    return !(x < x1 || x > x2  || y < y1 || y > y2);
 }
 
 static public final boolean point_outside_aabb(float x, float y, float x1, float y1, float x2, float y2) {
-    return !point_inside_aabb(x, y, x1, y1, x2, y2);
+    return x < x1 || x > x2  || y < y1 || y > y2;
 }
 
 
