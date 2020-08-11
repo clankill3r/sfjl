@@ -1,13 +1,13 @@
 package sfjl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import static java.lang.Math.*;
 import static sfjl.SFJL_Math.*;
+import static sfjl.SFJL.*;
 
 //--------------------------------------------------------------- SFJL_Quad_Tree
                                                      public class SFJL_Quad_Tree {
@@ -41,6 +41,7 @@ static public class Quad_Tree<T> implements Iterable<T> {
     public ArrayList<Quad_Tree_Node<T>> node_buffer = new ArrayList<>();
     public int[] n_quads_at_depth_lookup = new int[_HARD_MAX_DEPTH + 1];
     public int[] n_leafs_at_depth_lookup = new int[_HARD_MAX_DEPTH + 1];
+    public boolean max_depth_reached = false;
 
     public Quad_Tree(X<T> x, Y<T> y, int max_items, float x1, float y1, float x2, float y2) {
         this.x = x;
@@ -48,7 +49,7 @@ static public class Quad_Tree<T> implements Iterable<T> {
         assert (max_items > 0);
         this.max_items = max_items;
         root = new Quad_Tree_Node<>(this);
-        set(root, null, x1, y1, x2, y2);
+        _set(root, null, x1, y1, x2, y2);
     }
 
     @Override
@@ -163,14 +164,14 @@ static public <T> Quad_Tree_Node<T> add(Quad_Tree_Node<T> qtn, T t, float x, flo
 }
 
 
-static public <T> void add_all(Quad_Tree_Node<T> qtn, List<T> items) {
+static public <T> void add(Quad_Tree_Node<T> qtn, List<T> items) {
     for (T t : items) {
         add(qtn, t);
     }
 }
 
 
-static public <T> Quad_Tree_Node<T> get_or_create_node(Quad_Tree<T> qt) {
+static public <T> Quad_Tree_Node<T> _get_or_create_node(Quad_Tree<T> qt) {
     Quad_Tree_Node<T> t = remove_last(qt.node_buffer);
     if (t == null) {
         t = new Quad_Tree_Node<>(qt);
@@ -179,8 +180,7 @@ static public <T> Quad_Tree_Node<T> get_or_create_node(Quad_Tree<T> qt) {
 }
 
 
-static public <T> void set(Quad_Tree_Node<T> qtn, Quad_Tree_Node<T> parent, float x1, float y1, float x2,
-        float y2) {
+static public <T> void _set(Quad_Tree_Node<T> qtn, Quad_Tree_Node<T> parent, float x1, float y1, float x2, float y2) {
     qtn.parent = parent;
     qtn.x1 = x1;
     qtn.y1 = y1;
@@ -193,24 +193,47 @@ static public <T> void set(Quad_Tree_Node<T> qtn, Quad_Tree_Node<T> parent, floa
 static public <T> void split(Quad_Tree_Node<T> qtn) {
 
     if (qtn.depth == _HARD_MAX_DEPTH) {
-        return;
+        qtn.part_of_tree.max_depth_reached = true;
+        return; 
     }
 
-    qtn.children[TR] = get_or_create_node(qtn.part_of_tree);
-    qtn.children[TL] = get_or_create_node(qtn.part_of_tree);
-    qtn.children[BL] = get_or_create_node(qtn.part_of_tree);
-    qtn.children[BR] = get_or_create_node(qtn.part_of_tree);
+    qtn.children[TR] = _get_or_create_node(qtn.part_of_tree);
+    qtn.children[TL] = _get_or_create_node(qtn.part_of_tree);
+    qtn.children[BL] = _get_or_create_node(qtn.part_of_tree);
+    qtn.children[BR] = _get_or_create_node(qtn.part_of_tree);
 
-    set(qtn.children[TR], qtn, center_x(qtn), qtn.y1, qtn.x2, center_y(qtn));
-    set(qtn.children[TL], qtn, qtn.x1, qtn.y1, center_x(qtn), center_y(qtn));
-    set(qtn.children[BL], qtn, qtn.x1, center_y(qtn), center_x(qtn), qtn.y2);
-    set(qtn.children[BR], qtn, center_x(qtn), center_y(qtn), qtn.x2, qtn.y2);
+    _set(qtn.children[TR], qtn, center_x(qtn), qtn.y1, qtn.x2, center_y(qtn));
+    _set(qtn.children[TL], qtn, qtn.x1, qtn.y1, center_x(qtn), center_y(qtn));
+    _set(qtn.children[BL], qtn, qtn.x1, center_y(qtn), center_x(qtn), qtn.y2);
+    _set(qtn.children[BR], qtn, center_x(qtn), center_y(qtn), qtn.x2, qtn.y2);
 
-    int FLAG_TR = 0x1;
-    int FLAG_TL = 0x2;
-    int FLAG_BL = 0x4;
-    int FLAG_BR = 0x8;
-
+    int FLAG_TR = 0x1; // 0001
+    int FLAG_TL = 0x2; // 0010
+    int FLAG_BL = 0x4; // 0100
+    int FLAG_BR = 0x8; // 1000
+    
+    // Note(Doeke):
+    //
+    // split_hash is 64 bits, which we use in parts of 4.
+    // Each part represent the depth, the root is not represented.
+    // 0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000|0000 - bits
+    //   16|  15|  14|  13|  12|  11|  10|   9|   8|   7|   6|   5|   4|   3|   2|   1 - depth
+    // We use 4 flags to determine if we went; 
+    // top_right (TR), top_left (TL), bottom_left (BL) or bottom_right (BR).
+    //
+    // For a node this is stored till the root. So for example we could have:
+    // 0000|0000|0000|0000|0000|0000|0000|0000|0001|0100|0100|1000|1000|0001|0100|1000
+    // So in order to get to that node from the root we have to go:
+    // BR, BL, TR, BR, BR, BL, BL, TR
+    //
+    // The great thing about it is that we can check if a node is a child of a node
+    // with only one to two really cheap tests. First we check the depth, if the
+    // depth of the possbile child is higher then the other node then we test:
+    //
+    // (possible_child.split_hash & node.split_hash) == node.split_hash
+    //
+    // If that is true, then it is a child of the other node.
+    
     qtn.children[TR].split_hash = qtn.split_hash | (FLAG_TR << qtn.depth * 4);
     qtn.children[TL].split_hash = qtn.split_hash | (FLAG_TL << qtn.depth * 4);
     qtn.children[BL].split_hash = qtn.split_hash | (FLAG_BL << qtn.depth * 4);
@@ -352,33 +375,8 @@ static public <T> T get_farthest(Quad_Tree_Node<T> qtn, float x, float y) {
 
 
 static public <T> boolean node_is_child_of_node(Quad_Tree_Node<T> possible_child, Quad_Tree_Node<T> node) {
-    if (possible_child.depth < node.depth)
-        return false;
+    if (possible_child.depth < node.depth) return false;
     return (possible_child.split_hash & node.split_hash) == node.split_hash;
-}
-
-
-static public <T> void get_leafs(Quad_Tree_Node<T> qtn, ArrayList<Quad_Tree_Node<T>> leafs,
-        boolean must_have_data) {
-
-    ArrayList<Quad_Tree_Node<T>> open = new ArrayList<>();
-
-    open.add(qtn);
-
-    while (open.size() > 0) {
-
-        Quad_Tree_Node<T> current = open.remove(open.size() - 1);
-
-        if (has_children(current)) {
-            open.add(current.children[TR]);
-            open.add(current.children[BR]);
-            open.add(current.children[TL]);
-            open.add(current.children[BL]);
-        } else {
-            leafs.add(current);
-        }
-    }
-
 }
 
 
@@ -476,7 +474,7 @@ static public <T> void get_within_aabb(Quad_Tree_Node<T> qtn, float _r_x1, float
 
         if (rect_contains_rect(r_x1, r_y1, r_x2, r_y2, current.x1, current.y1, current.x2, current.y2)) {
             get_all(current, result);
-        } else if (intersects_rect(r_x1, r_y1, r_x2, r_y2, current)) {
+        } else if (intersects_rect(current, r_x1, r_y1, r_x2, r_y2)) {
             if (has_children(current)) {
                 open.add(current.children[0]);
                 open.add(current.children[1]);
@@ -519,7 +517,7 @@ static public <T> void get_outside_aabb(Quad_Tree_Node<T> qtn, float _r_x1, floa
     while (open.size() > 0) {
         Quad_Tree_Node<T> current = open.remove(open.size() - 1);
 
-        if (!intersects_rect(r_x1, r_y1, r_x2, r_y2, current)) {
+        if (!intersects_rect(current, r_x1, r_y1, r_x2, r_y2)) {
             get_all(current, result);
         } else {
             if (has_children(current)) {
@@ -904,7 +902,7 @@ static public <T> boolean remove(Quad_Tree_Node<T> qtn, T t) {
     float y = y(qtn, t);
 
     qtn = get_leaf(qtn, x, y);
-    if (swap_with_last_remove(qtn.data, t) != null) {
+    if (swap_remove(qtn.data, t) != null) {
         qtn.part_of_tree.size--;
         return true;
     }
@@ -1006,13 +1004,13 @@ static public <T> void update(Quad_Tree_Node<T> qtn, ArrayList<T> update_helper,
             float x = x(qtn, t);
             float y = y(qtn, t);
             if (point_outside_aabb(x, y, qtn.x1, qtn.y1, qtn.x2, qtn.y2)) {
-                out_of_bounds.add(swap_with_last_remove(qtn.data, i));
+                out_of_bounds.add(swap_remove(qtn.data, i));
             }
         }
         return;
     }
 
-    Iterator<Quad_Tree_Node<T>> itr = node_iterator(qtn);
+    Iterator<Quad_Tree_Node<T>> itr = get_iterator(qtn, Iterator_Type.LEAFS);
 
     while (itr.hasNext()) {
         Quad_Tree_Node<T> n = itr.next();
@@ -1025,7 +1023,7 @@ static public <T> void update(Quad_Tree_Node<T> qtn, ArrayList<T> update_helper,
                 float y = y(n, t);
 
                 if (point_outside_aabb(x, y, n.x1, n.y1, n.x2, n.y2)) {
-                    swap_with_last_remove(n.data, i);
+                    swap_remove(n.data, i);
                     update_helper.add(t);
                 }
             }
@@ -1056,33 +1054,129 @@ static public <T> void update(Quad_Tree_Node<T> qtn, ArrayList<T> update_helper,
 }
 
 
-static public <T> Iterator<Quad_Tree_Node<T>> node_iterator(Quad_Tree_Node<T> qtn) {
-
-    ArrayList<Quad_Tree_Node<T>> open1 = new ArrayList<>();
-    open1.add(qtn);
-
-    return new Iterator<SFJL_Quad_Tree.Quad_Tree_Node<T>>(){
-
-        ArrayList<Quad_Tree_Node<T>> open = open1;
-
-        @Override
-        public boolean hasNext() {
-            return open.size() > 0;
-        }
-
-        @Override
-        public Quad_Tree_Node<T> next() {
-            Quad_Tree_Node<T> r = remove_last(open);
-            if (has_children(r)) {
-                open.add(r.children[0]);
-                open.add(r.children[1]);
-                open.add(r.children[2]);
-                open.add(r.children[3]);
-            }
-            return r;
-        }
-    };
+public enum Iterator_Type {
+    BREADTH_FIRST,
+    DEPTH_FIRST,
+    LEAFS
 }
+
+
+static public <T> Iterator<Quad_Tree_Node<T>> get_iterator(Quad_Tree_Node<T> qtn, Iterator_Type iterator_type) {
+
+    if (iterator_type == Iterator_Type.DEPTH_FIRST) {
+
+        ArrayList<Quad_Tree_Node<T>> _open = new ArrayList<>();
+        _open.add(qtn);
+        
+        return new Iterator<SFJL_Quad_Tree.Quad_Tree_Node<T>>(){
+            
+            ArrayList<Quad_Tree_Node<T>> open = _open;
+            
+            @Override
+            public boolean hasNext() {
+                return open.size() > 0;
+            }
+            
+            @Override
+            public Quad_Tree_Node<T> next() {
+                Quad_Tree_Node<T> r = remove_last(open);
+                if (has_children(r)) {
+                    open.add(r.children[0]);
+                    open.add(r.children[1]);
+                    open.add(r.children[2]);
+                    open.add(r.children[3]);
+                }
+                return r;
+            }
+        };
+    }
+    if (iterator_type == Iterator_Type.BREADTH_FIRST) {
+
+        ArrayList<Quad_Tree_Node<T>> _current_depth = new ArrayList<>();
+        _current_depth.add(qtn);
+
+        return new Iterator<SFJL_Quad_Tree.Quad_Tree_Node<T>>(){
+
+            ArrayList<Quad_Tree_Node<T>> current_depth = _current_depth;
+            ArrayList<Quad_Tree_Node<T>> next_depth = new ArrayList<>(16);
+
+            @Override
+            public boolean hasNext() {
+                return current_depth.size() > 0;
+            }
+
+            @Override
+            public Quad_Tree_Node<T> next() {
+                Quad_Tree_Node<T> r = swap_remove(current_depth, 0);
+                if (has_children(r)) {
+                    next_depth.add(r.children[0]);
+                    next_depth.add(r.children[1]);
+                    next_depth.add(r.children[2]);
+                    next_depth.add(r.children[3]);
+                }
+                if (current_depth.size() == 0) {
+                    var temp = current_depth;
+                    current_depth = next_depth;
+                    next_depth = temp;
+                    next_depth.clear();
+                }
+                return r;
+            }
+            
+        };
+
+    }
+    if (iterator_type == Iterator_Type.LEAFS) {
+
+        ArrayList<Quad_Tree_Node<T>> open       = new ArrayList<>();
+        ArrayList<Quad_Tree_Node<T>> open_leafs = new ArrayList<>();
+        open.add(qtn);
+
+        // find the first leaf
+        while (true) {
+            Quad_Tree_Node<T> n = remove_last(open);
+            if (has_children(n)) {
+                open.add(n.children[0]);
+                open.add(n.children[1]);
+                open.add(n.children[2]);
+                open.add(n.children[3]);
+            }
+            else {
+                open_leafs.add(n);
+                break;
+            }
+        }
+        
+        return new Iterator<SFJL_Quad_Tree.Quad_Tree_Node<T>>(){
+            
+            @Override
+            public boolean hasNext() {
+                return open_leafs.size() > 0;
+            }
+            
+            @Override
+            public Quad_Tree_Node<T> next() {
+                Quad_Tree_Node<T> r = remove_last(open_leafs);
+                while (open_leafs.size() == 0 && open.size() > 0) {
+                    Quad_Tree_Node<T> n = remove_last(open);
+                    if (has_children(n)) {
+                        open.add(n.children[0]);
+                        open.add(n.children[1]);
+                        open.add(n.children[2]);
+                        open.add(n.children[3]);
+                    }
+                    else {
+                        open_leafs.add(n);
+                    }
+                }
+                return r;
+            }
+        };
+    }
+
+    return null;
+}
+
 
 
 static public <T> int highest_depth_with_leafs(Quad_Tree<T> qt) {
@@ -1121,32 +1215,11 @@ static public <T> int lowest_depth_with_leafs(Quad_Tree_Node<T> qtn) {
 }
 
 
-// TODO use something like rect_intersects_rect
-static public <T> boolean intersects_rect(float x1, float y1, float x2, float y2, Quad_Tree_Node<T> tree) {
+static public <T> boolean intersects_rect(Quad_Tree_Node<T> tree, float x1, float y1, float x2, float y2) {
     return !(tree.x1 > x2 || 
     tree.x2 < x1 || 
     tree.y1 > y2 ||
     tree.y2 < y1);
-}
-
-
-static public <T> T remove_last(ArrayList<T> arr) {
-    if (arr.size() == 0) return null;
-    return arr.remove(arr.size()-1);
-}
-
-
-public static <T> T swap_with_last_remove(ArrayList<T> list, int index_to_remove) {
-    list.set(index_to_remove, list.get(list.size()-1));
-    return list.remove(list.size()-1);
-}
-
-
-public static <T> T swap_with_last_remove(ArrayList<T> list, T object_to_remove) {
-    int index_to_remove = list.indexOf(object_to_remove);
-    if (index_to_remove == -1) return null;
-    list.set(index_to_remove, list.get(list.size()-1));
-    return list.remove(list.size()-1);
 }
 
     

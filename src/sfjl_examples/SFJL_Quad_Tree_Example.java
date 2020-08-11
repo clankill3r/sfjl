@@ -3,7 +3,7 @@ package sfjl_examples;
 import static sfjl.SFJL_Quad_Tree.*;
 
 import java.util.ArrayList;
-
+import java.util.Iterator;
 
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -66,6 +66,8 @@ public class SFJL_Quad_Tree_Example extends PApplet {
             precomputed_random_sequence[i] = random(-1, 1);
         }
 
+
+      
       
 
     }
