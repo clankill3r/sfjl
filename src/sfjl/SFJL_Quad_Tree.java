@@ -120,7 +120,7 @@ static public <T> int get_optimal_index(Quad_Tree_Node<T> n, float x, float y) {
 }
 
 
-static public <T> Quad_Tree_Node<T> get_deepest_node(Quad_Tree_Node<T> qtn, float x, float y) {
+static public <T> Quad_Tree_Node<T> get_leaf(Quad_Tree_Node<T> qtn, float x, float y) {
 
     if (qtn.depth == 0) {
         if (x < qtn.x1 || x > qtn.x2 || y < qtn.y1 || y > qtn.y2) {
@@ -149,7 +149,7 @@ static public <T> Quad_Tree_Node<T> add(Quad_Tree_Node<T> qtn, T t) {
 
 static public <T> Quad_Tree_Node<T> add(Quad_Tree_Node<T> qtn, T t, float x, float y) {
 
-    qtn = get_deepest_node(qtn, x, y);
+    qtn = get_leaf(qtn, x, y);
 
     if (qtn != null) {
         qtn.data.add(t);
@@ -903,7 +903,7 @@ static public <T> boolean remove(Quad_Tree_Node<T> qtn, T t) {
     float x = x(qtn, t);
     float y = y(qtn, t);
 
-    qtn = get_deepest_node(qtn, x, y);
+    qtn = get_leaf(qtn, x, y);
     if (swap_with_last_remove(qtn.data, t) != null) {
         qtn.part_of_tree.size--;
         return true;
@@ -1035,7 +1035,7 @@ static public <T> void update(Quad_Tree_Node<T> qtn, ArrayList<T> update_helper,
 
     for (T t : update_helper) {
 
-        Quad_Tree_Node<T> n = get_deepest_node(qtn, x(qtn, t), y(qtn, t));
+        Quad_Tree_Node<T> n = get_leaf(qtn, x(qtn, t), y(qtn, t));
 
         if (n != null) {
             n.data.add(t);
