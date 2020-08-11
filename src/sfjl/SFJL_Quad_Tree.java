@@ -7,7 +7,7 @@ import java.util.List;
 
 import static java.lang.Math.*;
 import static sfjl.SFJL_Math.*;
-import static sfjl.SFJL.*;
+import static sfjl.SFJL_Doeke.*;
 
 //--------------------------------------------------------------- SFJL_Quad_Tree
                                                      public class SFJL_Quad_Tree {
