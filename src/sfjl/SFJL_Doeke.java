@@ -4,9 +4,9 @@ package sfjl;
 import java.util.ArrayList;
 
 
-public class SFJL {
-     private SFJL() {}
-//           SFJL     
+public class SFJL_Doeke {
+     private SFJL_Doeke() {}
+//           SFJL_Doeke     
     
 
 static public <T> T remove_last(ArrayList<T> arr) {
