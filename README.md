@@ -2,6 +2,7 @@
 [SFJL_Quad_Tree]:       src/sfjl/SFJL_Quad_Tree.java
 [SFJL_Math]:            src/sfjl/SFJL_Math.java
 [SFJL_PCB_Tree]:        src/sfjl/SFJL_PCB_Tree.java
+[SFJL_Terminal_IO]:     src/sfjl/SFJL_Terminal_IO.java
 [SFJL_Tween]:           src/sfjl/SFJL_Tween.java
 [SFJL_Douglas_Peucker]: src/sfjl/SFJL_Douglas_Peucker.java
 [SFJL_Print]:           src/sfjl/SFJL_Print.java
@@ -15,6 +16,7 @@
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
 [SFJL_Math_Ex]:            src/sfjl_examples/SFJL_Math_Example.java
 [SFJL_PCB_Tree_Ex]:        src/sfjl_examples/SFJL_PCB_Tree_Example.java
+[SFJL_Terminal_IO_Ex]:     src/sfjl_examples/SFJL_Terminal_IO_Example.java
 [SFJL_Tween_Ex]:           src/sfjl_examples/SFJL_Tween_Example.java
 [SFJL_Douglas_Peucker_Ex]: src/sfjl_examples/SFJL_Douglas_Peucker_Example.java
 [SFJL_Print_Ex]:           src/sfjl_examples/SFJL_Print_Example.java
@@ -28,20 +30,22 @@
 # sfjl
 Collection of single-file java libraries with minimal to no dependencies, inspired by the [stb](https://github.com/nothings/stb) libraries.
 
+
 # Libraries
 
-| library                                          | latest version | category | LoC: | description                                             |
-| ------------------------------------------------ | -------------- | -------- | ---- | ------------------------------------------------------- |
-| **[SFJL_Math][SFJL_Math]**                       |                | math     | 328  | vector and matrix classes (work in progress)            |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               |                | utility  | 350  | tree data structure that avoids using arrays            |
-| **[SFJL_Print][SFJL_Print]**                     |                | utility  | 175  | print and println without the need of System.out        |
-| **[SFJL_Base64][SFJL_Base64]**                   |                | utility  | 136  | base64 encoder and decoder functions                    |
-| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               |                | utility  | 148  | [FNV hash][fnv_link] implementation                     |
-| **[SFJL_Tween][SFJL_Tween]**                     |                | graphics | 187  | tween functions                                         |
-| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** |                | graphics | 179  | line based curve decimator for 2d and 3d                |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             |                | graphics | 898  | fast quad_tree implementation                           |
-| **[SFJL_Doeke][SFJL_Doeke]**                     |                | misc     | 19   | collection of functions that do not need their own file |
-|                                                  |                | **sum**  | 2453 |                                                         |
+| library                                          | latest version | category           | LoC: | description                                                                                                                     |
+| ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **[SFJL_Math][SFJL_Math]**                       |                | math               | 328  | vector and matrix classes (work in progress)                                                                                    |
+| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               |                | utility            | 350  | tree data structure that avoids using arrays                                                                                    |
+| **[SFJL_Print][SFJL_Print]**                     |                | utility            | 175  | print and println without the need of System.out                                                                                |
+| **[SFJL_Base64][SFJL_Base64]**                   |                | utility            | 136  | base64 encoder and decoder functions                                                                                            |
+| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               |                | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
+| **[SFJL_Tween][SFJL_Tween]**                     |                | graphics           | 187  | tween functions                                                                                                                 |
+| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** |                | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
+| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             |                | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
+| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         |                | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
+| **[SFJL_Doeke][SFJL_Doeke]**                     |                | misc               | 19   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
+|                                                  |                | **sum**            | 2699 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -60,6 +64,7 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 | **[SFJL_Tween][SFJL_Tween]**                     | &#x274c;     |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | &#x274c;     |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | SFJL_Doeke   |
+| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;     |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;     |
 
 ## Dependencies Libraries Examples
@@ -77,6 +82,7 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 | **[SFJL_Tween_Example][SFJL_Tween_Ex]**                     | [processing](www.processing.org) |
 | **[SFJL_Douglas_Peucker_Example][SFJL_Douglas_Peucker_Ex]** | [processing](www.processing.org) |
 | **[SFJL_Quad_Tree_Example][SFJL_Quad_Tree_Ex]**             | [processing](www.processing.org) |
+| **[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**         | [processing](www.processing.org) |
 
 <!-- | **[SFJL_Doeke_Example][SFJL_Doeke_Ex]**                     | &#x274c;     | -->
 <!-- | **[SFJL_Math_Example][SFJL_Math_Ex]**                       | &#x274c;     | -->
@@ -91,10 +97,10 @@ I have not made up my mind about how I want to provide this functionality. Right
 # Soon to come libraries
 More libraries are coming soon, i'm in the process of wrapping them up.
 Here a list of what is coming for sure:
-| library               | category | description                                        |
-| --------------------- | -------- | -------------------------------------------------- |
-| SFJL_Blobscanner      | graphics | blobscanner                                        |
-| SFJL_Spatial_Hash_Map | graphics | data structure to store points based on hashes     |
+| library               | category | description                                    |
+| --------------------- | -------- | ---------------------------------------------- |
+| SFJL_Blobscanner      | graphics | blobscanner                                    |
+| SFJL_Spatial_Hash_Map | graphics | data structure to store points based on hashes |
 
 
 
@@ -104,6 +110,12 @@ Yes, [How I write single-file java libraries](how-to/README.md)
 
 #### Are there other single-file java libraries with public-domain/open source libraries with minimal dependencies out there?
 I can't find them, if you know any please let me know. I would love to list them.
+
+
+# Libraries Worth Mentioning
+Biased mentioning alert since I made this;
+[java_preproc_macros](https://github.com/clankill3r/java_preproc_macros) a almost single file library to replicate C macros like `__LINE__` with bytecode manipulation. I did not make this into a SFJL_Preproc_Macros cause it's a java agent, and therefor does not fall in the easy to use category. 
+
 
 <br>
 
