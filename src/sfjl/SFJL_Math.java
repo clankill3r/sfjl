@@ -1,4 +1,4 @@
-/** SFJL_Math - v0.50
+/** SFJL_Math - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -14,13 +14,61 @@ import static java.lang.Math.*;
 public class SFJL_Math {
      private SFJL_Math() {}
 //           SFJL_Math
-    
 
     
 //
 // Constants
 //
 static final public float TWO_PI = (float) (2.0 * PI);
+
+
+
+//
+// Classes
+//
+
+static public class Vec2 {
+    public float x;
+    public float y;
+    public Vec2(){}
+    public Vec2(float x, float y) {this.x = x; this.y = y;}
+}
+
+static public class Mat3 {
+    public float[][] m = {
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1}
+    };
+}
+
+static public class AABB {
+    public float x1;
+    public float y1;
+    public float x2;
+    public float y2;
+    public AABB(float x1, float y1, float x2, float y2) { this.x1 = x1; this.y1 = y1; this.x2 = x2; this.y2 = y2;}
+}
+
+//
+// Make
+//
+
+static public Vec2 make_vec2(float x, float y) {
+    return new Vec2(x, y);
+}
+
+
+static public Mat3 make_mat3(float m00, float m01, float m02,
+                             float m10, float m11, float m12,
+                             float m20, float m21, float m22) {
+
+    Mat3 m = new Mat3();
+    m.m[0][0] = m00; m.m[0][1] = m01; m.m[0][2] = m02;
+    m.m[1][0] = m10; m.m[1][1] = m11; m.m[1][2] = m12;
+    m.m[2][0] = m20; m.m[2][1] = m21; m.m[2][2] = m22;
+    return m;
+}
 
 
 //
@@ -116,16 +164,6 @@ static public boolean ellipse_hit(float tx, float ty, float cx, float cy, float 
 // Vec2
 //
 
-static public class Vec2 {
-    public float x;
-    public float y;
-    public Vec2(){}
-    public Vec2(float x, float y) {this.x = x; this.y = y;}
-}
-
-static public Vec2 make_vec2(float x, float y) {
-    return new Vec2(x, y);
-}
 
 static public void mult(Vec2 v, float m) {
     v.x *= m;
@@ -136,25 +174,6 @@ static public void mult(Vec2 v, float m) {
 //
 // Mat3
 //
-
-static public class Mat3 {
-    public float[][] m = new float[3][3];
-
-    public Mat3() {
-        set_to_identity(this);
-    }
-}
-
-static public Mat3 make_mat3(float m00, float m01, float m02,
-                             float m10, float m11, float m12,
-                             float m20, float m21, float m22) {
-
-    Mat3 m = new Mat3();
-    m.m[0][0] = m00; m.m[0][1] = m01; m.m[0][2] = m02;
-    m.m[1][0] = m10; m.m[1][1] = m11; m.m[1][2] = m12;
-    m.m[2][0] = m20; m.m[2][1] = m21; m.m[2][2] = m22;
-    return m;
-}
 
 
 static public Mat3 copy_mat3(Mat3 m) {
@@ -468,8 +487,6 @@ static public int test_matrix_axis_aligned(Mat3 m) {
 // -----------------------------------------------------------------------------
 
 
-
-    
 public boolean rect_rect_intersection_test(float a_x1, float a_y1, float a_x2, float a_y2, float b_x1, float b_y1, float b_x2, float b_y2) {
     return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2);
 }
@@ -566,8 +583,8 @@ static public final float min_dist_sq_point_to_corner_aabb(float x, float y, flo
 }
 /**
 revision history:
-
-   0.50  (2020-08-12) first numbered version
+    0.51  (2020-08-12) added AABB
+    0.50  (2020-08-12) first numbered version
 
 */
 
