@@ -399,19 +399,15 @@ static public Vec2 mult(Mat3 m, Vec2 v, Vec2 result) {
 }
 
 
-
-// move to SFJL_Math?
 static public float get_rotation(Mat3 m) {
     return atan2(m.m[1][0], m.m[0][0]);  
 }
 
 
-// move to SFJL_Math?
 static public void get_scale(Mat3 m, Vec2 result) {
     result.x = (float)Math.sqrt(m.m[0][0] * m.m[0][0] + m.m[1][0] * m.m[1][0]);
     result.y = (float)Math.sqrt(m.m[0][1] * m.m[0][1] + m.m[1][1] * m.m[1][1]);
 }
-
 
 
 static public float screen_x(Mat3 m, float x, float y) {
@@ -488,40 +484,42 @@ static public int test_matrix_axis_aligned(Mat3 m) {
 // -----------------------------------------------------------------------------
 
 
-public boolean rect_rect_intersection_test(float a_x1, float a_y1, float a_x2, float a_y2, float b_x1, float b_y1, float b_x2, float b_y2) {
+public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_x2, float a_y2, float b_x1, float b_y1, float b_x2, float b_y2) {
     return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2);
 }
 
-static public boolean rect_contains_rect(float r_x1, float r_y1, float r_x2, float r_y2, float r2_x1, float r2_y1, float r2_x2, float r2_y2) {
+static public boolean aabb_contains_aabb(float r_x1, float r_y1, float r_x2, float r_y2, float r2_x1, float r2_y1, float r2_x2, float r2_y2) {
     return (r2_x1 >= r_x1 && r2_x2 <= r_x2 && r2_y1 >= r_y1 &&  r2_y2 <= r_y2);
 }
 
 
-public static final float sign (float x1, float y1, float x2, float y2, float x3, float y3) {
+
+
+static public final float _sign (float x1, float y1, float x2, float y2, float x3, float y3) {
     return (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
 }
 
-// todo, there is a better faster way
-public static final boolean point_in_triangle (float tx, float ty, float x1, float y1, float x2, float y2, float x3, float y3) {
+// todo, maybe there was a faster way?
+static public final boolean point_in_triangle (float tx, float ty, float x1, float y1, float x2, float y2, float x3, float y3) {
     
-    boolean b1 = sign(tx, ty, x1, y1, x2, y2) < 0.0f;
-    boolean b2 = sign(tx, ty, x2, y2, x3, y3) < 0.0f;
-    boolean b3 = sign(tx, ty, x3, y3, x1, y1) < 0.0f;
+    boolean b1 = _sign(tx, ty, x1, y1, x2, y2) < 0.0f;
+    boolean b2 = _sign(tx, ty, x2, y2, x3, y3) < 0.0f;
+    boolean b3 = _sign(tx, ty, x3, y3, x1, y1) < 0.0f;
     
     return ((b1 == b2) && (b2 == b3));
 }
 
-public static final boolean point_in_triangle (float tx, float ty, Vec2 a, Vec2 b, Vec2 c) {
+static public final boolean point_in_triangle (float tx, float ty, Vec2 a, Vec2 b, Vec2 c) {
     return point_in_triangle(tx, ty, a, b, c);
 }
 
 
-public static final boolean point_inside_quad(float tx, float ty, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+static public final boolean point_inside_quad(float tx, float ty, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
     return point_in_triangle(tx, ty, x1, y1, x2, y2, x3, y3) || point_in_triangle(tx, ty, x1, y1, x3, y3, x4, y4);
 }
 
 
-public static final boolean point_inside_quad(float tx, float ty, Vec2 a, Vec2 b, Vec2 c, Vec2 d) {
+static public final boolean point_inside_quad(float tx, float ty, Vec2 a, Vec2 b, Vec2 c, Vec2 d) {
     return point_in_triangle(tx, ty, a.x, a.y, b.x, b.y, c.x, c.y) || point_in_triangle(tx, ty, a.x, a.y, c.x, c.y, d.x, d.y);
 }
 
