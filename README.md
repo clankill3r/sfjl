@@ -35,17 +35,17 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | library                                          | latest version | category           | LoC: | description                                                                                                                     |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **[SFJL_Math][SFJL_Math]**                       |                | math               | 361  | vector and matrix classes (work in progress)                                                                                    |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               |                | utility            | 350  | tree data structure that avoids using arrays                                                                                    |
-| **[SFJL_Print][SFJL_Print]**                     |                | utility            | 175  | print and println without the need of System.out                                                                                |
-| **[SFJL_Base64][SFJL_Base64]**                   |                | utility            | 136  | base64 encoder and decoder functions                                                                                            |
-| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               |                | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
-| **[SFJL_Tween][SFJL_Tween]**                     |                | graphics           | 187  | tween functions                                                                                                                 |
-| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** |                | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             |                | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
-| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         |                | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
-| **[SFJL_Doeke][SFJL_Doeke]**                     |                | misc               | 19   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2699 |                                                                                                                                 |
+| **[SFJL_Math][SFJL_Math]**                       | v0.5           | math               | 361  | vector and matrix classes (work in progress)                                                                                    |
+| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.5           | utility            | 350  | tree data structure that avoids using arrays                                                                                    |
+| **[SFJL_Print][SFJL_Print]**                     | v0.5           | utility            | 175  | print and println without the need of System.out                                                                                |
+| **[SFJL_Base64][SFJL_Base64]**                   | v0.5           | utility            | 136  | base64 encoder and decoder functions                                                                                            |
+| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.5           | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
+| **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics           | 187  | tween functions                                                                                                                 |
+| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
+| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
+| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
+| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.5           | misc               | 19   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
+|                                                  | v0.5           | **sum**            | 2699 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
