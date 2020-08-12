@@ -35,7 +35,7 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 | library                                          | latest version | category           | LoC: | description                                                                                                                     |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **[SFJL_Math][SFJL_Math]**                       |                | math               | 328  | vector and matrix classes (work in progress)                                                                                    |
+| **[SFJL_Math][SFJL_Math]**                       |                | math               | 361  | vector and matrix classes (work in progress)                                                                                    |
 | **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               |                | utility            | 350  | tree data structure that avoids using arrays                                                                                    |
 | **[SFJL_Print][SFJL_Print]**                     |                | utility            | 175  | print and println without the need of System.out                                                                                |
 | **[SFJL_Base64][SFJL_Base64]**                   |                | utility            | 136  | base64 encoder and decoder functions                                                                                            |
@@ -54,24 +54,26 @@ Collection of single-file java libraries with minimal to no dependencies, inspir
 
 
 ## Dependencies Libraries
-| library                                          | dependencies |
-| ------------------------------------------------ | :----------- |
-| **[SFJL_Math][SFJL_Math]**                       | &#x274c;     |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | &#x274c;     |
-| **[SFJL_Print][SFJL_Print]**                     | &#x274c;     |
-| **[SFJL_Base64][SFJL_Base64]**                   | &#x274c;     |
-| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | &#x274c;     |
-| **[SFJL_Tween][SFJL_Tween]**                     | &#x274c;     |
-| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | &#x274c;     |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | SFJL_Doeke   |
-| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;     |
-| **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;     |
+| library                                          | dependencies          |
+| ------------------------------------------------ | :-------------------- |
+| **[SFJL_Math][SFJL_Math]**                       | &#x274c;              |
+| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | &#x274c;              |
+| **[SFJL_Print][SFJL_Print]**                     | &#x274c;              |
+| **[SFJL_Base64][SFJL_Base64]**                   | &#x274c;              |
+| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | &#x274c;              |
+| **[SFJL_Tween][SFJL_Tween]**                     | &#x274c;              |
+| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | &#x274c;              |
+| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | SFJL_Doeke, SFJL_Math |
+| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;              |
+| **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;              |
 
 ## Dependencies Libraries Examples
 
 > &#x26A0; The dependencies of the library itself are not repeated here
 
-> &#x26A0; The dependencies are included in the repository
+> &#x26A0; Dependencies to any if the SFJL_* libraries are not listed
+
+> &#x26A0; All the dependencies required are included in this repository
 
 | example                                                     | dependencies                     |
 | ----------------------------------------------------------- | :------------------------------- |
