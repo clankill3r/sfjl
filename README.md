@@ -30,6 +30,26 @@
 # sfjl
 Collection of single-file java libraries with minimal to no dependencies, inspired by the [stb](https://github.com/nothings/stb) libraries.
 
+Too quote [Sean Barrett](http://nothings.org/) on his philosophy of the stb libraries:
+
+> Philosophy
+>
+> stb libraries are designed with the following priorities:
+>
+>    1. easy to use
+>    2. easy to maintain
+>    3. good performance
+>
+> Sometimes I let "good performance" creep up in priority over "easy to maintain", and for best performance I may provide less-easy-to-use APIs that give higher performance, in addition to the easy-to-use ones. Nevertheless, it's important to keep in mind that from the standpoint of you, a client of this library, all you care about is #1 and #3, and stb libraries DO NOT emphasize #3 above all. 
+>
+>  Some secondary priorities arise directly from the first two, some of which provide more explicit reasons why performance can't be emphasized.
+>
+>    - Portable ("ease of use")
+>    - Small source code footprint ("easy to maintain")
+>    - No dependencies ("ease of use")
+
+I feel very aligned with this philosophy, hence the quote. I do however have a huge dependency on [processing](www.processing.org) when it comes to the examples. But this goes back to the *easy to use* priority. This also means the libraries are centered around using floats instead of doubles and the order of color is assumed to be argb. Also it will be centered around using the latest version of processing with no backwards compatibility.
+
 
 # Libraries
 
