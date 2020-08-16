@@ -56,7 +56,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | library                                          | latest version | category           | LoC: | description                                                                                                                     |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
 | **[SFJL_Math][SFJL_Math]**                       | v0.5           | math               | 361  | vector and matrix classes (work in progress)                                                                                    |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.5           | utility            | 350  | tree data structure that avoids using arrays                                                                                    |
+| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.51          | utility            | 316  | tree data structure that avoids using arrays                                                                                    |
 | **[SFJL_Print][SFJL_Print]**                     | v0.5           | utility            | 175  | print and println without the need of System.out                                                                                |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.5           | utility            | 136  | base64 encoder and decoder functions                                                                                            |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.5           | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
@@ -65,7 +65,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.5           | misc               | 19   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2699 |                                                                                                                                 |
+|                                                  |                | **sum**            | 2715 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 

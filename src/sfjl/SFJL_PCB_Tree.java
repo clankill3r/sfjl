@@ -1,4 +1,4 @@
-/** SFJL_PCB_Tree - v0.50
+/** SFJL_PCB_Tree - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -337,6 +337,9 @@ static public <T extends PCB_Node<T>> Iterator<T> get_iterator(T e) {
                     }
                     current = current.next_brother;
                 }
+                else {
+                    current = null;
+                }
             }
             return r;
         }
@@ -415,6 +418,9 @@ static public <T extends PCB_Node<T>> Iterator<T> get_iterator(T e, PCB_Node_Acc
                         depth_of_current -= 1;
                     }
                     current = current.next_brother;
+                }
+                else {
+                    current = null;
                 }
             }
         }
@@ -541,8 +547,8 @@ static public String _str_repeat(String s, int n) {
 }
 /**
 revision history:
-
-   0.50  (2020-08-12) first numbered version
+    0.51  (2020-08-16) bugfix when looping over trees that only have a root
+    0.50  (2020-08-12) first numbered version
 
 */
 
