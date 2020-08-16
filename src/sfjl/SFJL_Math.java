@@ -399,6 +399,19 @@ static public Vec2 mult(Mat3 m, Vec2 v, Vec2 result) {
 }
 
 
+static public Mat3 mat3_to_rotation_mat3(Mat3 m) {
+
+    // extract scale
+    float sx = (float)Math.sqrt(m.m[0][0] * m.m[0][0] + m.m[1][0] * m.m[1][0]);
+    float sy = (float)Math.sqrt(m.m[0][1] * m.m[0][1] + m.m[1][1] * m.m[1][1]);
+  
+    return make_mat3(m.m[0][0] / sx, m.m[0][1] / sy, 0,
+      m.m[1][0] / sx, m.m[1][1] / sy, 0,
+      0, 0, 1);
+}
+
+  
+
 static public float get_rotation(Mat3 m) {
     return atan2(m.m[1][0], m.m[0][0]);  
 }
