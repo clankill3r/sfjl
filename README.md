@@ -64,8 +64,8 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
-| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.5           | misc               | 19   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2715 |                                                                                                                                 |
+| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.51           | misc               | 47   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
+|                                                  |                | **sum**            | 2742 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 

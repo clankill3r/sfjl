@@ -1,4 +1,4 @@
-/** SFJL_Doeke - v0.50
+/** SFJL_Doeke - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -9,37 +9,81 @@ REVISION HISTORY:
 */
 package sfjl;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 public class SFJL_Doeke {
      private SFJL_Doeke() {}
-//           SFJL_Doeke     
-    
+//           SFJL_Doeke
+
 
 static public <T> T remove_last(ArrayList<T> arr) {
-    if (arr.size() == 0) return null;
-    return arr.remove(arr.size()-1);
+    if (arr.size() == 0)
+        return null;
+    return arr.remove(arr.size() - 1);
 }
 
 
-public static <T> T swap_remove(ArrayList<T> list, int index_to_remove) {
-    list.set(index_to_remove, list.get(list.size()-1));
-    return list.remove(list.size()-1);
+static public <T> T swap_remove(ArrayList<T> list, int index_to_remove) {
+    list.set(index_to_remove, list.get(list.size() - 1));
+    return list.remove(list.size() - 1);
 }
 
 
-public static <T> T swap_remove(ArrayList<T> list, T object_to_remove) {
+static public <T> T swap_remove(ArrayList<T> list, T object_to_remove) {
     int index_to_remove = list.indexOf(object_to_remove);
-    if (index_to_remove == -1) return null;
-    list.set(index_to_remove, list.get(list.size()-1));
-    return list.remove(list.size()-1);
+    if (index_to_remove == -1)
+        return null;
+    list.set(index_to_remove, list.get(list.size() - 1));
+    return list.remove(list.size() - 1);
 }
+
+
+/*
+/bananas.txt    --- start at root of jar 
+../bananas.txt  --- go up one dir from package folder
+bananas.txt     --- load relative from where the class file is located
+*/
+static public URL get_url_to_jar_resource_file(String file, Class<?> clazz) {
+
+    String absolute_path = null;
+
+    char first_char = file.charAt(0);
+    
+    if (first_char == '/') { // "/bananas.txt" --- absolute path fram jar root
+        
+        absolute_path = file;
+    }
+    else if (first_char != '.') { // "bananas.txt" --- relative from class location
+        
+        absolute_path = "/"+clazz.getPackageName().replace(".", "/")+"/"+file;
+    }
+    else { // "../bananas" --- first go back N dirs
+        String package_name = clazz.getPackageName().replace(".", "/");
+
+        int pos = 0;
+        int split_end_index = package_name.length();
+
+        while (file.charAt(pos+0) == '.' &&
+               file.charAt(pos+1) == '.' &&
+               file.charAt(pos+2) == '/') 
+        {
+            pos += 3;
+            split_end_index = package_name.lastIndexOf("/", split_end_index);
+        }
+        absolute_path = "/"+package_name.substring(0, split_end_index)+"/"+file.substring(pos);
+    }
+
+    URL url = clazz.getResource(absolute_path);
+    return url;
+}
+
 
 } 
 /**
 revision history:
-
-   0.50  (2020-08-12) first numbered version
+    0.51  (2020-08-17) get_url_to_jar_resource_file
+    0.50  (2020-08-12) first numbered version
 
 */
 
