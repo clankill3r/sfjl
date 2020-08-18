@@ -1,4 +1,4 @@
-/** SFJL_Integral_Image - v0.50
+/** SFJL_Integral_Image - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -11,6 +11,9 @@ EXAMPLE:
 
 */
 package sfjl;
+
+import static java.lang.Math.*;
+import static sfjl.SFJL_Math.*;
 
 public class SFJL_Integral_Image {
      private SFJL_Integral_Image() {}
@@ -36,35 +39,44 @@ static public Integral_Image[] make_integral_image_from_rgb(int[] pixels, int wi
     int[] values_g = integral_images[1].values;
     int[] values_b = integral_images[2].values;
 
-    // first row
+    int red, green, blue;
+
+    // --- first row
     values_r[0] = (pixels[0] >> 16) & 255;
     values_g[0] = (pixels[1] >> 8)  & 255;
     values_b[0] = (pixels[2] >> 0)  & 255;
     for (int x = 1; x < width; x++) {
-        values_r[x] = values_r[x-1] + ((pixels[x] >> 16) & 255);
-        values_g[x] = values_g[x-1] + ((pixels[x] >> 8)  & 255);
-        values_b[x] = values_b[x-1] + ((pixels[x] >> 0)  & 255);
+        int c = pixels[x];
+        red   = ((c >> 16) & 255);
+        green = ((c >>  8) & 255);
+        blue  = ((c >>  0) & 255);
+        values_r[x] = red   + values_r[x-1];
+        values_g[x] = green + values_g[x-1];
+        values_b[x] = blue  + values_b[x-1];
     }
-    
-    // 2nd row till end   
+
+    // --- other rows
+    int i;
+    int c;
     for (int y = 1; y < height; y++) {
-        
-        int index = y*width;
-        int total_r = 0;
-        int total_g = 0;
-        int total_b = 0;
-        values_r[index] = values_r[index-width] + ((pixels[index] >> 16) & 255);
-        values_g[index] = values_g[index-width] + ((pixels[index] >> 8)  & 255);
-        values_b[index] = values_b[index-width] + ((pixels[index] >> 0)  & 255);
+        i = y*width;
+        c = pixels[i];
+        red   = ((c >> 16) & 255);
+        green = ((c >>  8) & 255);
+        blue  = ((c >>  0) & 255);
+        values_r[i] = red   + values_r[i-width];
+        values_g[i] = green + values_g[i-width];
+        values_b[i] = blue  + values_b[i-width];
 
         for (int x = 1; x < width; x++) {
-            index = y * width + x;
-            total_r += ((pixels[index] >> 16) & 255);
-            total_g += ((pixels[index] >> 8)  & 255);
-            total_b += ((pixels[index] >> 0)  & 255);
-            values_r[index] = total_r + values_r[index-width];
-            values_g[index] = total_g + values_g[index-width];
-            values_b[index] = total_b + values_b[index-width];
+            i += 1;
+            c = pixels[i];
+            red   = ((c >> 16) & 255);
+            green = ((c >>  8) & 255);
+            blue  = ((c >>  0) & 255);
+            values_r[i] = red   + values_r[i-width] + values_r[i-1] - values_r[i-1-width];
+            values_g[i] = green + values_g[i-width] + values_g[i-1] - values_g[i-1-width];
+            values_b[i] = blue  + values_b[i-width] + values_b[i-1] - values_b[i-1-width];
         }
     }
     return integral_images;
@@ -81,29 +93,35 @@ static public int rgb_for_aabb(Integral_Image[] layers_rgb, int x1, int y1, int 
 
 static public int integral_image_value(Integral_Image img, int x1, int y1, int x2, int y2) {
 
-    int min_x = Math.max(Math.min(x1, x2), 0);
-    int min_y = Math.max(Math.min(y1, y2), 0);
-    int max_x = Math.min(Math.max(x1, x2), img.width-1);
-    int max_y = Math.min(Math.max(y1, y2), img.height-1);
+    int min_x = constrain(min(x1, x2), 0, img.width-1);
+    int min_y = constrain(min(y1, y2), 0, img.height-1);
+    int max_x = constrain(max(x1, x2), 0, img.width-1);
+    int max_y = constrain(max(y1, y2), 0, img.height-1);
+
+    int w = max_x-min_x;
+    int h = max_y-min_y;
+
+    if (w == 0) {
+        if (max_x == 0) max_x += 1;
+        else min_x -= 1;
+    }
+    if (h == 0) {
+        if (max_y == 0) max_y += 1;
+        else min_y -= 1;
+    }
     
     int n_of_pixels = (max_x - min_x) * (max_y - min_y);
-    
-    // TODO NaN or specified error color
-    // we can base it on clamp, repeat or stretch
-    if (n_of_pixels == 0) return -1; 
-    
-    int w = img.width;
     
     int total_count = 0; // total count
     int i;
     
-    i = max_y * w + max_x; // right bottom
+    i = max_y * img.width + max_x; // right bottom
     total_count += img.values[i];
-    i = min_y * w + min_x; // left top
+    i = min_y * img.width + min_x; // left top
     total_count += img.values[i];
-    i = max_y * w + min_x; // left bottom
+    i = max_y * img.width + min_x; // left bottom
     total_count -= img.values[i];
-    i = min_y * w + max_x; // right top
+    i = min_y * img.width + max_x; // right top
     total_count -= img.values[i];
     
     return total_count / n_of_pixels;
@@ -113,8 +131,9 @@ static public int integral_image_value(Integral_Image img, int x1, int y1, int x
 }
 /**
 revision history:
-
-   0.50  (2020-08-18) first numbered version
+    0.51  (2020-08-18) - fixed bug where values where slightly off
+                       - out of bounds gives edge value now instead of crash
+    0.50  (2020-08-18) first numbered version
 
 */
 
