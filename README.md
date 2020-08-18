@@ -11,6 +11,7 @@
 [SFJL_Profiler]:        src/sfjl/SFJL_Profiler.java
 [SFJL_Doeke]:           src/sfjl/SFJL_Doeke.java
 [SFJL_Spatial_Map]:     src/sfjl/SFJL_Spatial_Map.java
+[SFJL_Intergral_Image]: src/sfjl/SFJL_Intergral_Image.java
 
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
@@ -25,6 +26,7 @@
 [SFJL_Profiler_Ex]:        src/sfjl_examples/SFJL_Profiler_Example.java
 [SFJL_Doeke_Ex]:           src/sfjl_examples/SFJL_Doeke_Example.java
 [SFJL_Spatial_Map_Ex]:     src/sfjl_examples/SFJL_Spatial_Map_Example.java
+[SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
 
 
 # sfjl
@@ -55,7 +57,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 
 | library                                          | latest version | category           | LoC: | description                                                                                                                     |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **[SFJL_Math][SFJL_Math]**                       | v0.5           | math               | 361  | vector and matrix classes (work in progress)                                                                                    |
+| **[SFJL_Math][SFJL_Math]**                       | v0.52          | math               | 389  | vector and matrix classes (work in progress)                                                                                    |
 | **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.51          | utility            | 316  | tree data structure that avoids using arrays                                                                                    |
 | **[SFJL_Print][SFJL_Print]**                     | v0.5           | utility            | 175  | print and println without the need of System.out                                                                                |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.5           | utility            | 136  | base64 encoder and decoder functions                                                                                            |
@@ -63,9 +65,10 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics           | 187  | tween functions                                                                                                                 |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
+| **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics           | 72   | simple intergral image
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
-| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.51           | misc               | 47   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2742 |                                                                                                                                 |
+| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.51          | misc               | 47   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
+|                                                  |                | **sum**            | 2835 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -84,6 +87,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Tween][SFJL_Tween]**                     | &#x274c;              |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | &#x274c;              |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | SFJL_Doeke, SFJL_Math |
+| **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | &#x274c;              |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;              |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;              |
 
@@ -104,6 +108,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Tween_Example][SFJL_Tween_Ex]**                     | [processing](www.processing.org) |
 | **[SFJL_Douglas_Peucker_Example][SFJL_Douglas_Peucker_Ex]** | [processing](www.processing.org) |
 | **[SFJL_Quad_Tree_Example][SFJL_Quad_Tree_Ex]**             | [processing](www.processing.org) |
+| **[SFJL_Intergral_Image][SFJL_Intergral_Image_Ex]**         | [processing](www.processing.org) |
 | **[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**         | [processing](www.processing.org) |
 
 <!-- | **[SFJL_Doeke_Example][SFJL_Doeke_Ex]**                     | &#x274c;     | -->
