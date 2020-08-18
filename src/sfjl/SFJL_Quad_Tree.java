@@ -482,7 +482,7 @@ static public <T> void get_within_aabb(Quad_Tree_Node<T> qtn, float _r_x1, float
     while (open.size() > 0) {
         Quad_Tree_Node<T> current = open.remove(open.size() - 1);
 
-        if (rect_contains_rect(r_x1, r_y1, r_x2, r_y2, current.x1, current.y1, current.x2, current.y2)) {
+        if (aabb_contains_aabb(r_x1, r_y1, r_x2, r_y2, current.x1, current.y1, current.x2, current.y2)) {
             get_all(current, result);
         } else if (intersects_rect(current, r_x1, r_y1, r_x2, r_y2)) {
             if (has_children(current)) {
@@ -585,7 +585,7 @@ static public <T> void get_closest_n(Quad_Tree_Node<T> qtn, float x, float y, in
         @Override
         public int compare(Quad_Tree_Node<T> o1, Quad_Tree_Node<T> o2) {
 
-            float d1 = 0;
+            float d1 = -1;
             if (has_children(o1)) {
                 if (point_outside_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2)) {
                     d1 = max_dist_sq_point_to_corner_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2);
@@ -594,7 +594,7 @@ static public <T> void get_closest_n(Quad_Tree_Node<T> qtn, float x, float y, in
                 d1 = dist_sq_point_to_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2);
             }
 
-            float d2 = 0;
+            float d2 = -1;
             if (has_children(o2)) {
                 if (point_outside_aabb(x, y, o2.x1, o2.y1, o2.x2, o2.y2)) {
                     d2 = max_dist_sq_point_to_corner_aabb(x, y, o2.x1, o2.y1, o2.x2, o2.y2);
