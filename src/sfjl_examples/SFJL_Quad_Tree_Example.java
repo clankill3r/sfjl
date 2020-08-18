@@ -36,10 +36,7 @@ public void settings() {
 @Override
 public void setup() {
 
-    randomSeed(1);
-    
     frameRate(60);
-    strokeCap(SQUARE);
 
     int plot_x1 = 50;
     int plot_x2 = width - 50;
@@ -71,22 +68,6 @@ public void setup() {
         precomputed_random_sequence[i] = random(-1, 1);
     }
 
-
-    
-    
-
-}
-
-
-float[] precomputed_random_sequence = new float[2048];
-int precomputed_random_sequence_index = 0;
-
-float next_random() {
-    float r = precomputed_random_sequence[precomputed_random_sequence_index++];
-    if (precomputed_random_sequence_index == precomputed_random_sequence.length) {
-        precomputed_random_sequence_index = 0;
-    }
-    return r;
 }
 
 
@@ -100,7 +81,7 @@ ArrayList<PVector> update_helper = new ArrayList<>();
 @Override
 public void draw() {
 
-    surface.setTitle((int)frameRate+"   "+frameCount+"  ");
+    surface.setTitle("fps: "+(int)frameRate);
 
     background(0);
 
@@ -111,45 +92,40 @@ public void draw() {
     
     within.clear();
 
-    
-    if (sin(frameCount * 0.01f) > 0) {
-        float radius = sin(frameCount * 0.01f) * 250;
+    float radius = sin(frameCount * 0.01f) * 250;
 
+    if (sin(frameCount * 0.01f) > 0) {
         get_within_radius_sq(tree, mouseX, mouseY, sq(radius), within);
         stroke(255,0,0);
         strokeWeight(1f);
-        for (PVector v2 : within) {
-            if (draw_points) point(v2.x, v2.y);
-
-            if (move_points) {
-                v2.x += next_random() * abs(v2.z) * abs(v2.z); //random(-3, 3);
-                v2.y += next_random() * abs(v2.z) * abs(v2.z); //random(-3, 3);
-            }
-            v2.z = -abs(v2.z); // to avoid drawing again
-        }
-
-        ArrayList<PVector> out_of_bounds = new ArrayList<>();
-
-        update(tree, update_helper, out_of_bounds);
         noFill();
-        ellipse(mouseX, mouseY, radius*2, radius*2);    
+        ellipse(mouseX, mouseY, radius*2, radius*2);  
     }
     else {
-        
-        float s = sin(frameCount * 0.01f) * 250;
-        get_within_aabb(tree, mouseX-s, mouseY-s, mouseX+s, mouseY+s, within);
+        get_within_aabb(tree, mouseX-radius, mouseY-radius, mouseX+radius, mouseY+radius, within);
         stroke(255,0,0);
         strokeWeight(1f);
-        for (PVector v2 : within) {
-            if (draw_points) point(v2.x, v2.y);
-            v2.z = -abs(v2.z); // to avoid drawing again
-        }
         rectMode(CORNERS);
         noFill();
-        rect(mouseX-s, mouseY-s, mouseX+s, mouseY+s);
+        rect(mouseX-radius, mouseY-radius, mouseX+radius, mouseY+radius);
     }
 
+    strokeCap(SQUARE);
+    stroke(255,0,0);
+    strokeWeight(1f);
+    for (PVector v2 : within) {
+        if (draw_points) point(v2.x, v2.y);
+        if (move_points) {
+            v2.x += fast_random() * abs(v2.z) * abs(v2.z);
+            v2.y += fast_random() * abs(v2.z) * abs(v2.z);
+        }
+        v2.z = -abs(v2.z); // we set z to a negative value to indicate that we have drawn it
+    }
 
+    ArrayList<PVector> out_of_bounds = new ArrayList<>();
+    update(tree, update_helper, out_of_bounds);
+    
+    strokeCap(SQUARE);
     stroke(255,255,0);
     strokeWeight(1f);
     for (PVector v : tree) {
@@ -157,11 +133,10 @@ public void draw() {
             if (draw_points) point(v.x, v.y);
         }
         else {
-            v.z = -v.z;
+            v.z = -v.z; // reset for next frame
         }
     }
 
-    
     PVector v = get_closest(tree, mouseX, mouseY);
     if (v != null) {
         stroke(255,0,0);
@@ -169,14 +144,13 @@ public void draw() {
         remove(tree, v);
     }
     
-    if (size(tree) > 0) {
+    if (size(tree) >= 2) {
         stroke(255,0,0);
         strokeWeight(1f);
         noFill();
         rectMode(CORNERS);
         rect(min_x(tree).x, min_y(tree).y, max_x(tree).x, max_y(tree).y);
     }
-
 
     fill(255);
     text(size(tree), 20, 20);
@@ -222,9 +196,6 @@ public void keyPressed() {
     if (key == 'c') {
         SFJL_Quad_Tree.clear(tree);
     }
-    if (key == 'e') {
-        // TODO, expand root            
-    }
     if (key == 'm') {
         move_points = !move_points;
     }
@@ -238,11 +209,21 @@ public void keyPressed() {
 
 @Override
 public void mouseDragged() {
-    if (frameCount % 2 == 0) {
-        for (int i = 0; i < 10; i++) {
-            add(tree, new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50)));
-        }
+    for (int i = 0; i < 10; i++) {
+        add(tree, new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50)));
     }
+}
+
+
+float[] precomputed_random_sequence = new float[2048];
+int precomputed_random_sequence_index = 0;
+
+float fast_random() {
+    float r = precomputed_random_sequence[precomputed_random_sequence_index++];
+    if (precomputed_random_sequence_index == precomputed_random_sequence.length) {
+        precomputed_random_sequence_index = 0;
+    }
+    return r;
 }
 
 
