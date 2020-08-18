@@ -1,4 +1,4 @@
-/** SFJL_Math - v0.51
+/** SFJL_Math - v0.53
  
 LICENSE:
     See end of file for license information.
@@ -32,6 +32,16 @@ static public class Vec2 {
     public float y;
     public Vec2(){}
     public Vec2(float x, float y) {this.x = x; this.y = y;}
+    public String toString() {return to_string(this);}
+}
+
+static public class Vec3 {
+    public float x;
+    public float y;
+    public float z;
+    public Vec3(){}
+    public Vec3(float x, float y, float z) {this.x = x; this.y = y; this.z = z;}
+    public String toString() {return to_string(this);}
 }
 
 static public class Mat3 {
@@ -40,6 +50,7 @@ static public class Mat3 {
         {0, 1, 0},
         {0, 0, 1}
     };
+    public String toString() {return to_string(this);}
 }
 
 static public class AABB {
@@ -69,6 +80,31 @@ static public Mat3 make_mat3(float m00, float m01, float m02,
     m.m[1][0] = m10; m.m[1][1] = m11; m.m[1][2] = m12;
     m.m[2][0] = m20; m.m[2][1] = m21; m.m[2][2] = m22;
     return m;
+}
+
+//
+// Overrides
+//
+// TODO think about angle brackets etc.
+// do we append a 'f' as well?
+static public String to_string(Mat3 m) {
+    String result = "";
+    result += m.m[0][0]+"  "+m.m[0][1]+"  "+m.m[0][2]+"\n";
+    result += m.m[1][0]+"  "+m.m[1][1]+"  "+m.m[1][2]+"\n";
+    result += m.m[2][0]+"  "+m.m[2][1]+"  "+m.m[2][2];
+    return result;
+}
+
+// TODO think about angle brackets etc.
+// do we append a 'f' as well?
+static public String to_string(Vec2 v) {
+    return v.x+", "+v.y;
+}
+
+// TODO think about angle brackets etc.
+// do we append a 'f' as well?
+static public String to_string(Vec3 v) {
+    return v.x+", "+v.y+", "+v.z;
 }
 
 
@@ -162,7 +198,7 @@ static public boolean ellipse_hit(float tx, float ty, float cx, float cy, float 
 
 
 //
-// Vec2
+// Vec
 //
 
 
@@ -207,6 +243,7 @@ static public void set_to_identity(Mat3 m) {
            0, 0, 1);
 }
 
+// TODO name set_mat3?
 static public void set(Mat3 m, float m00, float m01, float m02, 
                                float m10, float m11, float m12, 
                                float m20, float m21, float m22) {
@@ -592,9 +629,72 @@ static public final float min_dist_sq_point_to_corner_aabb(float x, float y, flo
     return dist_sq(x, y, close_x, close_y);
 }
 
+
+//
+// Hexagon related
+//
+
+// https://www.redblobgames.com/grids/hexagons/
+static public Vec2 cube_to_axial(Vec3 cube) {
+    float q = cube.x;
+    float r = cube.z;
+    return new Vec2(q, r);
+}
+
+
+static public Vec3 axial_to_cube(Vec2 hex_qr) {
+    float x = hex_qr.x;
+    float z = hex_qr.y;
+    float y = -x-z;
+    return new Vec3(x, y, z);
+}
+
+
+static public Vec3 cube_round(Vec3 cube) {
+    float rx = round(cube.x);
+    float ry = round(cube.y);
+    float rz = round(cube.z);
+    
+    float x_diff = abs(rx - cube.x);
+    float y_diff = abs(ry - cube.y);
+    float z_diff = abs(rz - cube.z);
+    
+    if (x_diff > y_diff && x_diff > z_diff) {
+        rx = -ry-rz;
+    } else if (y_diff > z_diff) {
+        ry = -rx-rz;
+    } else {
+        rz = -rx-ry;
+    }
+    return new Vec3(rx, ry, rz);
+}
+
+
+static public Vec2 hex_round(Vec2 hex_qr) {
+    return cube_to_axial(cube_round(axial_to_cube(hex_qr)));
+}
+
+
+static public Vec2 pixel_to_pointy_hex(Vec2 px, float size) {
+    float q = ((float)sqrt(3f)/3f * px.x  -  1f/3f * px.y) / size;
+    float r = (2f/3 * px.y) / size;
+    return hex_round(new Vec2(q, r));
+}
+
+
+static public Vec2 pointy_hex_to_pixel(Vec2 hex, float size) {
+    float x = size * ((float)sqrt(3) * hex.x  +  (float)sqrt(3)/2 * hex.y);
+    float y = size * (3f/2 * hex.y);
+    return new Vec2(x, y);
+}
+
+
+
 }
 /**
 revision history:
+    0.53  (2020-08-18) Vec3 and hexagon functions
+    0.52  (2020-08-17) toString and mat3_to_rotation_mat3
     0.51  (2020-08-12) added AABB
     0.50  (2020-08-12) first numbered version
 
