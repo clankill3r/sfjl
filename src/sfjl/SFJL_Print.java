@@ -226,7 +226,12 @@ static public void printArray(Object what) {
 
         }
         else {
-            out.println(what);
+            if (what instanceof String) {
+                out.println("\""+what+"\"");
+            }
+            else {
+                out.println(what);
+            }
         }
 
     }
