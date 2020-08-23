@@ -1,4 +1,4 @@
-/** SFJL_Print - v0.50
+/** SFJL_Print - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -241,8 +241,8 @@ static public void print_array(Object what) {
 }
 /**
 revision history:
-
-   0.50  (2020-08-12) first numbered version
+    0.51  (2020-08-23) printing string array surrounds items with double quotes
+    0.50  (2020-08-12) first numbered version
 
 */
 
