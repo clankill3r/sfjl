@@ -59,7 +59,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------- |
 | **[SFJL_Math][SFJL_Math]**                       | v0.52          | math               | 389  | vector and matrix classes (work in progress)                                                                                    |
 | **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.51          | utility            | 316  | tree data structure that avoids using arrays                                                                                    |
-| **[SFJL_Print][SFJL_Print]**                     | v0.5           | utility            | 175  | print and println without the need of System.out                                                                                |
+| **[SFJL_Print][SFJL_Print]**                     | v0.51          | utility            | 180  | print and println without the need of System.out                                                                                |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.5           | utility            | 136  | base64 encoder and decoder functions                                                                                            |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.5           | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
 | **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics           | 187  | tween functions                                                                                                                 |
@@ -68,7 +68,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics           | 91   | simple intergral image
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.51          | misc               | 47   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2854 |                                                                                                                                 |
+|                                                  |                | **sum**            | 2859 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
