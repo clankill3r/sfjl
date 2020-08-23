@@ -66,7 +66,7 @@ static public void print(String what) {
 
 static public void print(Object what) {
     if (what.getClass().isArray()) {
-        printArray(what);
+        print_array(what);
     }
     else {
         out.print(what);
@@ -131,7 +131,7 @@ static public void println(Object what) {
         out.flush();
     }
     else if (what.getClass().isArray()) {
-        printlnArray(what);
+        println_array(what);
     }
     else {
         out.println(what);
@@ -162,7 +162,7 @@ static public void println(Object a, Object b, Object... variables) {
         }
         
         if (o.getClass().isArray()) {
-            printlnArray(o);
+            println_array(o);
         }
         else {
             out.print(o);
@@ -173,13 +173,13 @@ static public void println(Object a, Object b, Object... variables) {
     out.flush();  
 }
 
-static public void printlnArray(Object what) {
-    printArray(what);
+static public void println_array(Object what) {
+    print_array(what);
     out.println();
     out.flush();
 }
 
-static public void printArray(Object what) {
+static public void print_array(Object what) {
     if (what == null) {
         out.print(what);
     }
@@ -214,7 +214,7 @@ static public void printArray(Object what) {
 
                     Object sub_array = Array.get(what, i);
                     if (i > 0) print(" ");
-                    printArray(sub_array);
+                    print_array(sub_array);
 
                     if (i < array_length-1) {
                         println(",");
