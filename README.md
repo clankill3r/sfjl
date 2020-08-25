@@ -67,8 +67,8 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics           | 91   | simple intergral image
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
-| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.51          | misc               | 64   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 2931 |                                                                                                                                 |
+| **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
+|                                                  |                | **sum**            | 2959 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 

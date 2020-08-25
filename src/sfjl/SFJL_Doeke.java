@@ -1,4 +1,4 @@
-/** SFJL_Doeke - v0.52
+/** SFJL_Doeke - v0.53
  
 LICENSE:
     See end of file for license information.
@@ -108,12 +108,46 @@ static public int hsb_to_rgb(float hue, float saturation, float brightness) {
 }
 
 
+static public int hue(int red, int green, int blue) {
 
+    float min = min(min(red, green), blue);
+    float max = max(max(red, green), blue);
+
+    if (min == max) {
+        return 0;
+    }
+
+    float hue = 0;
+    if (max == red) {
+        hue = (green - blue) / (max - min);
+    } 
+    else if (max == green) {
+        hue = 2 + (blue - red) / (max - min);
+    } 
+    else {
+        hue = 4 + (red - green) / (max - min);
+    }
+
+    hue = hue * 60;
+    if (hue < 0) {
+        hue = hue + 360;
+    }
+    return round(hue);
+}
+
+
+static public int hue(int clr) {
+    int red   = (clr >> 16) & 0xff;
+    int green = (clr >>  8) & 0xff;
+    int blue  = (clr >>  0) & 0xff;
+    return hue(red, green, blue);
+}
 
 
 } 
 /**
 revision history:
+    0.53  (2020-08-25) hue
     0.52  (2020-08-25) hsb_to_rgb
     0.51  (2020-08-17) get_url_to_jar_resource_file
     0.50  (2020-08-12) first numbered version
