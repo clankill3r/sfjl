@@ -1,4 +1,4 @@
-/** SFJL_Math - v0.53
+/** SFJL_Math - v0.54
  
 LICENSE:
     See end of file for license information.
@@ -162,6 +162,14 @@ static public final float dist_sq(float x1, float y1, float x2, float y2) {
 
 static public final double dist_sq(double x1, double y1, double x2, double y2) {
     return ((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1));
+}
+
+static public final float lerp(float start, float stop, float t) {
+    return start + (stop-start) * t;
+}
+
+static public final double lerp(double start, double stop, double t) {
+    return start + (stop-start) * t;
 }
 
 static public float nearest(float val, float min, float max, int steps) {
@@ -693,6 +701,7 @@ static public Vec2 pointy_hex_to_pixel(Vec2 hex, float size) {
 }
 /**
 revision history:
+    0.54  (2020-08-25) added lerp
     0.53  (2020-08-18) Vec3 and hexagon functions
     0.52  (2020-08-17) toString and mat3_to_rotation_mat3
     0.51  (2020-08-12) added AABB
