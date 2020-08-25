@@ -1,4 +1,4 @@
-/** SFJL_Doeke - v0.51
+/** SFJL_Doeke - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -11,6 +11,8 @@ package sfjl;
 
 import java.net.URL;
 import java.util.ArrayList;
+import static java.lang.Math.*;
+import static sfjl.SFJL_Math.*;
 
 public class SFJL_Doeke {
      private SFJL_Doeke() {}
@@ -79,9 +81,40 @@ static public URL get_url_to_jar_resource_file(String file, Class<?> clazz) {
 }
 
 
+//-----------------------------------------------------------------------------
+//--------- C O L O R ---------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+static float _mod(float x, float y) {
+    return x - y * (float)floor(x/y);
+}
+
+// range 0-1
+static public int hsb_to_rgb(float hue, float saturation, float brightness) {
+
+    float r = constrain(abs(_mod(hue*6f,      6f)-3f)-1f, 0, 1);
+    float g = constrain(abs(_mod(hue*6f + 4f, 6f)-3f)-1f, 0, 1);
+    float b = constrain(abs(_mod(hue*6f + 2f, 6f)-3f)-1f, 0, 1);
+
+    r = r*r*(3f-2f*r);
+    g = g*g*(3f-2f*g);
+    b = b*b*(3f-2f*b);
+
+    r = brightness * lerp(1f, r, saturation);
+    g = brightness * lerp(1f, g, saturation);
+    b = brightness * lerp(1f, b, saturation);
+
+    return 0xff000000 | (int) (r * 255) << 16 | (int) (g * 255) << 8 | (int) (b * 255);
+}
+
+
+
+
+
 } 
 /**
 revision history:
+    0.52  (2020-08-25) hsb_to_rgb
     0.51  (2020-08-17) get_url_to_jar_resource_file
     0.50  (2020-08-12) first numbered version
 
