@@ -128,9 +128,9 @@ static public int hue(int red, int green, int blue) {
         hue = 4 + (red - green) / (max - min);
     }
 
-    hue = hue * 60;
+    hue *= 60;
     if (hue < 0) {
-        hue = hue + 360;
+        hue += 360;
     }
     return round(hue);
 }
