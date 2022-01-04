@@ -210,7 +210,7 @@ public void keyPressed() {
 @Override
 public void mouseDragged() {
     for (int i = 0; i < 10; i++) {
-        add(tree, new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50)));
+        add(tree, new PVector(mouseX + random(-50, 50), mouseY + random(-50, 50), 1));
     }
 }
 
