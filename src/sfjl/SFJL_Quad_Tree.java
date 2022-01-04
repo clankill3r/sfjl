@@ -1,4 +1,4 @@
-/** SFJL_Quad_Tree - v0.51
+/** SFJL_Quad_Tree - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -30,8 +30,7 @@ public final static int TR = 1;
 public final static int BL = 2;
 public final static int BR = 3;
 
-public final static int _HARD_MAX_DEPTH = 32; // check split_hash for why this is the max
-
+public final static int _HARD_MAX_DEPTH = 32; // We could make this a variable, but this seems reasonable. 
 
 public interface X<T> {
     public float x(T t);
@@ -79,7 +78,6 @@ static public class Quad_Tree_Node<T> implements Iterable<T> {
     public float x2;
     public float y2;
     public int depth;
-    public long split_hash;
 
     public Quad_Tree_Node(Quad_Tree<T> part_of_tree) {
         this.part_of_tree = part_of_tree;
@@ -217,55 +215,6 @@ static public <T> void split(Quad_Tree_Node<T> qtn) {
     _set(qtn.children[BL], qtn, qtn.x1, center_y(qtn), center_x(qtn), qtn.y2);
     _set(qtn.children[BR], qtn, center_x(qtn), center_y(qtn), qtn.x2, qtn.y2);
 
-    int FLAG_TL = 0; // 00
-    int FLAG_TR = 1; // 01
-    int FLAG_BL = 2; // 10
-    int FLAG_BR = 3; // 11
-    
-    // Note(Doeke):
-    //
-    // split_hash is 64 bits, which we use in parts of 2 bits.
-    // When we split we store for each of the 4 children if it is TL, TR, LB or RB.
-    // 
-    // 00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00|00 - bits
-    // 32|31|30|29|28|27|26|25|24|23|22|21|20|19|18|17|16|15|14|13|12|11|10| 9| 8| 7| 6| 5| 4| 3| 2| 1 - depth
-    //
-    // A node with a depth of 5 could have a split_hash like the following:
-    // ...|BL|TL|TR|TL|BR
-    // ...|10|00|01|00|11
-    //
-    // In other word, in order to get to that node from the root we have to go:
-    // BR, TL, TR, TL
-    //
-    // This allows us to do a cheap check if a node is a child of another node.
-    // First we check the depth, if that test passes then we can compare the split hash.
-    // We start with creating a mask:
-    // 
-    // int mask = (1 << (node.depth*2))-1;
-    //
-    // The masks looks like this:
-    //
-    // depth | mask
-    // ------+-
-    // 1     | 000011
-    // 2     | 001111
-    // 3     | 111111
-    // .     | ......
-    //
-    // Next we mask the split_hash of the possible child so it is trimmed to
-    // the depth of the node we compare against.
-    // E.g. 1000010011 split_hash
-    //      0000111111 mask
-    //          010011 & result
-    //
-    // Now we can XOR this against the split_hash of the node,
-    // and if the result is 0 it is a child.
-    
-    qtn.children[TR].split_hash = qtn.split_hash | (FLAG_TR << qtn.depth * 2);
-    qtn.children[TL].split_hash = qtn.split_hash | (FLAG_TL << qtn.depth * 2);
-    qtn.children[BL].split_hash = qtn.split_hash | (FLAG_BL << qtn.depth * 2);
-    qtn.children[BR].split_hash = qtn.split_hash | (FLAG_BR << qtn.depth * 2);
-
     for (T t : qtn.data) {
         add(qtn, t);
     }
@@ -398,13 +347,6 @@ static public <T> T get_farthest(Quad_Tree_Node<T> qtn, float x, float y) {
         }
     }
     return closest;
-}
-
-static public <T> boolean node_is_child_of_node(Quad_Tree_Node<T> possible_child, Quad_Tree_Node<T> node) {
-    if (possible_child.depth <= node.depth) return false;
-    if (node.depth == 0) return true;
-    int mask = (1 << (node.depth*2))-1;
-    return ((possible_child.split_hash & mask) ^ node.split_hash) == 0;
 }
 
 
@@ -1256,7 +1198,7 @@ revision history:
 
    0.50  (2020-08-12) first numbered version
    0.51  (2022-01-04) changes to split_hash, max splits now 32 (was 16)
-
+   0.52  (2022-01-04) removed split_hash (max splits still hardcoded at 32)
 
 */
 
