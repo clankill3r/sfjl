@@ -8,7 +8,6 @@
 [SFJL_Print]:           src/sfjl/SFJL_Print.java
 [SFJL_FNV_Hash]:        src/sfjl/SFJL_FNV_Hash.java
 [SFJL_Base64]:          src/sfjl/SFJL_Base64.java
-[SFJL_Profiler]:        src/sfjl/SFJL_Profiler.java
 [SFJL_Doeke]:           src/sfjl/SFJL_Doeke.java
 [SFJL_Spatial_Map]:     src/sfjl/SFJL_Spatial_Map.java
 [SFJL_Intergral_Image]: src/sfjl/SFJL_Intergral_Image.java
@@ -23,7 +22,6 @@
 [SFJL_Print_Ex]:           src/sfjl_examples/SFJL_Print_Example.java
 [SFJL_FNV_Hash_Ex]:        src/sfjl_examples/SFJL_FNV_Hash_Example.java
 [SFJL_Base64_Ex]:          src/sfjl_examples/SFJL_Base64_Example.java
-[SFJL_Profiler_Ex]:        src/sfjl_examples/SFJL_Profiler_Example.java
 [SFJL_Doeke_Ex]:           src/sfjl_examples/SFJL_Doeke_Example.java
 [SFJL_Spatial_Map_Ex]:     src/sfjl_examples/SFJL_Spatial_Map_Example.java
 [SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
@@ -64,7 +62,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.5           | utility            | 148  | [FNV hash][fnv_link] implementation                                                                                             |
 | **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics           | 187  | tween functions                                                                                                                 |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics           | 179  | line based curve decimator for 2d and 3d                                                                                        |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.5           | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
+| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.51          | graphics           | 898  | fast quad_tree implementation, with lots of optimized functions to get points                                                   |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics           | 91   | simple intergral image
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |

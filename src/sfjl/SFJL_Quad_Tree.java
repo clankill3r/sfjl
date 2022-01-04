@@ -1,4 +1,4 @@
-/** SFJL_Quad_Tree - v0.50
+/** SFJL_Quad_Tree - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -1255,6 +1255,8 @@ static public <T> boolean intersects_rect(Quad_Tree_Node<T> tree, float x1, floa
 revision history:
 
    0.50  (2020-08-12) first numbered version
+   0.51  (2022-01-04) changes to split_hash, max splits now 32 (was 16)
+
 
 */
 
