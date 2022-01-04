@@ -3,5 +3,8 @@
     "java.project.outputPath": "bin",
     "workbench.colorCustomizations": {
         "statusBar.background":"#1aa3ad",
-    }
+    },
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+    ]
 }
