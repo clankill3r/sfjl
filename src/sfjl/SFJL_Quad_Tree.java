@@ -1,4 +1,4 @@
-/** SFJL_Quad_Tree - v0.52
+/** SFJL_Quad_Tree - v0.53
  
 LICENSE:
     See end of file for license information.
@@ -545,7 +545,7 @@ static public <T> void get_closest_n(Quad_Tree_Node<T> qtn, float x, float y, in
         @Override
         public int compare(Quad_Tree_Node<T> o1, Quad_Tree_Node<T> o2) {
 
-            float d1 = -1;
+            float d1 = Float.MAX_VALUE;
             if (has_children(o1)) {
                 if (point_outside_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2)) {
                     d1 = max_dist_sq_point_to_corner_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2);
@@ -554,7 +554,7 @@ static public <T> void get_closest_n(Quad_Tree_Node<T> qtn, float x, float y, in
                 d1 = dist_sq_point_to_aabb(x, y, o1.x1, o1.y1, o1.x2, o1.y2);
             }
 
-            float d2 = -1;
+            float d2 = Float.MAX_VALUE;
             if (has_children(o2)) {
                 if (point_outside_aabb(x, y, o2.x1, o2.y1, o2.x2, o2.y2)) {
                     d2 = max_dist_sq_point_to_corner_aabb(x, y, o2.x1, o2.y1, o2.x2, o2.y2);
@@ -1196,9 +1196,10 @@ static public <T> boolean intersects_rect(Quad_Tree_Node<T> tree, float x1, floa
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
-   0.51  (2022-01-04) changes to split_hash, max splits now 32 (was 16)
-   0.52  (2022-01-04) removed split_hash (max splits still hardcoded at 32)
+    0.53  (2022-01-30) fixed bug in comparator
+    0.52  (2022-01-04) removed split_hash (max splits still hardcoded at 32)
+    0.51  (2022-01-04) changes to split_hash, max splits now 32 (was 16)
+    0.50  (2020-08-12) first numbered version
 
 */
 

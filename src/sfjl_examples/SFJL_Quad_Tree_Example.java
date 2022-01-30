@@ -47,8 +47,8 @@ public void setup() {
 
     tree = new Quad_Tree<>((v)-> v.x, (v)->v.y, 96, plot_x1, plot_y1, plot_x2, plot_y2);
 
-    for (int y = plot_y1; y <  plot_y2; y += 1) {
-        for (int x = plot_x1; x < plot_x2; x += 1) {
+    for (int y = plot_y1; y <  plot_y2; y += 3) {
+        for (int x = plot_x1; x < plot_x2; x += 3) {
 
             float n = dist(x, y, width/2, height/2) / max(plot_width, plot_height);
             
