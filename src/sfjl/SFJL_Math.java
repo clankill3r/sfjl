@@ -1,4 +1,4 @@
-/** SFJL_Math - v0.54
+/** SFJL_Math - v0.55
  
 LICENSE:
     See end of file for license information.
@@ -144,12 +144,12 @@ static public final float atan2(float y, float x) {
     return (float)Math.atan2(y, x);
 }
 
-static public final float dist(float x1, float y1, float x2, float y2) {
-    return (float) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)));
-}
-
 static public final float sq(float f) {
     return f * f;
+}
+
+static public final float dist(float x1, float y1, float x2, float y2) {
+    return (float) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)));
 }
 
 static public final double dist(double x1, double y1, double x2, double y2) {
@@ -162,6 +162,22 @@ static public final float dist_sq(float x1, float y1, float x2, float y2) {
 
 static public final double dist_sq(double x1, double y1, double x2, double y2) {
     return ((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1));
+}
+
+static public final float dist(float x1, float y1, float z1, float x2, float y2, float z2) {
+    return (float) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)) + ((z2-z1)*(z2-z1)));
+}
+
+static public final double dist(double x1, double y1, double z1, double x2, double y2, double z2) {
+    return (double) sqrt(((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)) + ((z2-z1)*(z2-z1)));
+}
+
+static public final float dist_sq(float x1, float y1, float z1, float x2, float y2, float z2) {
+    return ((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1) + ((z2-z1)*(z2-z1)));
+}
+
+static public final double dist_sq(double x1, double y1, double z1, double x2, double y2, double z2) {
+    return ((x2-x1)*(x2-x1)) + ((y2-y1)*(y2-y1)) + ((z2-z1)*(z2-z1));
 }
 
 static public final float lerp(float start, float stop, float t) {
@@ -551,6 +567,13 @@ static public boolean aabb_contains_aabb(float r_x1, float r_y1, float r_x2, flo
 }
 
 
+public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_z1, float a_x2, float a_y2, float a_z2, float b_x1, float b_y1, float b_z1, float b_x2, float b_y2, float b_z2) {
+    return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2 || a_z2 < b_z1 || a_z1 > b_z2);
+}
+
+static public boolean aabb_contains_aabb(float r_x1, float r_y1, float r_z1, float r_x2, float r_y2, float r_z2, float r2_x1, float r2_y1, float r2_z1, float r2_x2, float r2_y2, float r2_z2) {
+    return (r2_x1 >= r_x1 && r2_x2 <= r_x2 && r2_y1 >= r_y1 &&  r2_y2 <= r_y2 && r2_z1 >= r_z1 &&  r2_z2 <= r_z2);
+}
 
 
 static public final float _sign (float x1, float y1, float x2, float y2, float x3, float y3) {
@@ -590,7 +613,13 @@ static public final boolean point_outside_aabb(float x, float y, float x1, float
     return x < x1 || x > x2  || y < y1 || y > y2;
 }
 
+static public final boolean point_inside_aabb(float x, float y, float z, float x1, float y1, float z1, float x2, float y2, float z2) {
+    return !(x < x1 || x > x2  || y < y1 || y > y2 || z < z1 || z > z2);
+}
 
+static public final boolean point_outside_aabb(float x, float y, float z, float x1, float y1, float z1, float x2, float y2, float z2) {
+    return x < x1 || x > x2  || y < y1 || y > y2 || z < z1 || z > z2;
+}
 
 // ----------------------------------------------------------------------------------------------------------------
 
@@ -621,20 +650,143 @@ static public final float dist_sq_point_to_aabb(float px, float py, float x1, fl
     }
 }
 
+// return 0 if the point is inside the aabb
+static public final float dist_sq_point_to_aabb(float px, float py, float pz, float x1, float y1, float z1, float x2, float y2, float z2) {
+        
+    if (px < x1) { 
+        if (py < y1) { 
+            if (pz < z1) {
+                return dist_sq(px, py, pz, x1, y1, z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(px, py, pz, x1, y1, z2);
+            }
+            else {
+                return dist_sq(px, py, x1, y1);
+            }
+        }
+        else if (py > y2) {
+            if (pz < z1) {
+                return dist_sq(px, py, pz, x1, y2, z1); 
+            }
+            else if (pz > z2) {
+                return dist_sq(px, py, pz, x1, y2, z2); 
+            }
+            else {
+                return dist_sq(px, py, x1, y2); 
+            }
+        }
+        else {
+            if (pz < z1) {
+                return dist_sq(px, pz, x1, z1); 
+            }
+            else if (pz > z2) {
+                return dist_sq(px, pz, x1, z2); 
+            }
+            else {
+                return sq(x1 - px);
+            }
+        }
+    }
+    else if (px > x2) {
+        if (py < y1) {
+            if (pz < z1) {
+                return dist_sq(px, py, pz, x2, y1, z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(px, py, pz, x2, y1, z2);
+            }
+            else {
+                return dist_sq(px, py, x2, y1);
+            }
+        }
+        else if (py > y2) { 
+            if (pz < z1) {
+                return dist_sq(px, py, pz, x2, y2, z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(px, py, pz, x2, y2, z2);
+            }
+            else {
+                return dist_sq(px, py, x2, y2);
+            }
+        }
+        else {
+            if (pz < z1) {
+                return dist_sq(px, pz, x2,  z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(px, pz, x2, z2);
+            }
+            else {
+                return sq(px - x2);
+            }
+        }
+    }
+    else {
+        if (py < y1) { 
+            if (pz < z1) {
+                return dist_sq(py, pz, y1, z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(py, pz, y1, z2);
+            }
+            else {
+                return sq(y1 - py);
+            }
+        }
+        else if (py > y2) { 
+            if (pz < z1) {
+                return dist_sq(py, pz, y2, z1);
+            }
+            else if (pz > z2) {
+                return dist_sq(py, pz, y2, z2);
+            }
+            else {
+                return sq(py - y2);
+            }
+        }
+        else {
+            if (pz < z1) {
+                return sq(z1-pz);
+            }
+            else if (pz > z2) {
+                return sq(pz - z2);
+            }
+            else {
+                return 0f;
+            }
+        }
+    }
+
+
+}
+
 
 static public final float max_dist_sq_point_to_corner_aabb(float x, float y, float x1, float y1, float x2, float y2) {
-    
     float far_x = abs(x-x1) > abs(x-x2) ? x1 : x2;
     float far_y = abs(y-y1) > abs(y-y2) ? y1 : y2;
     return dist_sq(x, y, far_x, far_y);
 }
 
+static public final float max_dist_sq_point_to_corner_aabb(float x, float y, float z, float x1, float y1, float z1, float x2, float y2, float z2) {
+    float far_x = abs(x-x1) > abs(x-x2) ? x1 : x2;
+    float far_y = abs(y-y1) > abs(y-y2) ? y1 : y2;
+    float far_z = abs(z-z1) > abs(z-z2) ? z1 : z2;
+    return dist_sq(x, y, z, far_x, far_y, far_z);
+}
 
 static public final float min_dist_sq_point_to_corner_aabb(float x, float y, float x1, float y1, float x2, float y2) {
-
     float close_x = abs(x-x1) < abs(x-x2) ? x1 : x2;
     float close_y = abs(y-y1) < abs(y-y2) ? y1 : y2;
     return dist_sq(x, y, close_x, close_y);
+}
+
+static public final float min_dist_sq_point_to_corner_aabb(float x, float y, float z, float x1, float y1, float z1, float x2, float y2, float z2) {
+    float close_x = abs(x-x1) < abs(x-x2) ? x1 : x2;
+    float close_y = abs(y-y1) < abs(y-y2) ? y1 : y2;
+    float close_z = abs(z-z1) < abs(z-z2) ? z1 : z2;
+    return dist_sq(x, y, z, close_x, close_y, close_z);
 }
 
 
@@ -701,6 +853,7 @@ static public Vec2 pointy_hex_to_pixel(Vec2 hex, float size) {
 }
 /**
 revision history:
+    0.55  (2022-02-04) added a lot of functions for 3d that where already there in 2d
     0.54  (2020-08-25) added lerp
     0.53  (2020-08-18) Vec3 and hexagon functions
     0.52  (2020-08-17) toString and mat3_to_rotation_mat3
