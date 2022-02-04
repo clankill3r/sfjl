@@ -1,4 +1,4 @@
-/** SFJL_FNV_Hash - v0.51
+/** SFJL_FNV_Hash - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -188,14 +188,14 @@ static public int fnv_hash_32(String s) {
     return h;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public long fnv_hash_32(long   ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(double ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(int    ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(float  ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(byte   ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(short  ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(char   ...p) { return fnv_hash_32(0, p.length, p); }
-static public long fnv_hash_32(String ...p) { 
+static public int fnv_hash_32(long   ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(double ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(int    ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(float  ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(byte   ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(short  ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(char   ...p) { return fnv_hash_32(0, p.length, p); }
+static public int fnv_hash_32(String ...p) { 
     
     int h = FNV_START_HASH_32;
     for (String s : p) {
@@ -210,6 +210,7 @@ static public long fnv_hash_32(String ...p) {
 /**
 revision history:
 
+    0.52  (2022-02-04) fnv_hash_32 return a int now instead of a long...
     0.51  (2022-02-04) allowed for varargs for easier use
     0.50  (2020-08-12) first numbered version
 
