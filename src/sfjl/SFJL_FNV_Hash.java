@@ -1,4 +1,4 @@
-/** SFJL_FNV_Hash - v0.50
+/** SFJL_FNV_Hash - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -33,112 +33,107 @@ static public final int FNV_START_HASH_64 = FNV_START_HASH_32;
 static public final long _FNV_64_MULTIPLIER = 1099511628211L;
 static public final int  _FNV_32_MULTIPLIER = 16777619;
 
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public long fnv_hash_64b_to_n_bits(long hash_64, int n_bits) {
     long MASK_X = (1L<<n_bits)-1;
     return (hash_64>>>n_bits) ^ (hash_64 & MASK_X);
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public int fnv_hash_32b_to_n_bits(int hash_32, int n_bits) {
     int MASK_X = (1<<n_bits)-1;
     return (hash_32>>>n_bits) ^ (hash_32 & MASK_X);
 }
-
-// -----------------------------------------------------------------
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 // start with anything but 0, START_HASH_64 is a good start
 static public long fnv_hash_64_builder(long h, long i) {
     assert h != 0;
     h = ( h ^ i ) * _FNV_64_MULTIPLIER;
     return h;
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 // start with anything but 0, START_HASH_32 is a good start
 static public int fnv_hash_32_builder(int h, int i) {
     assert h != 0;
     h = ( h ^ i ) * _FNV_32_MULTIPLIER;
     return h;
 }
-
-// -----------------------------------------------------------------
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 //
 // 64
 //
-
-static public long fnv_hash_64(long[] p, int length) {
+static public long fnv_hash_64(int start, int length, long[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ p[i] ) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(double[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, double[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ Double.doubleToLongBits(p[i])) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(int[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, int[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ p[i] ) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(float[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, float[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ Float.floatToIntBits(p[i])) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(byte[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, byte[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(short[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, short[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(char[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, char[] p) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < length; i++ ) {
+    for (int i = start; i < length; i++ ) {
         h = ( h ^ p[i]) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(String s) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(int start, int length, String s) {
     long h = FNV_START_HASH_64;
-    for (int i = 0; i < s.length(); i++ ) {
+    for (int i = start; i < length; i++ ) {
         int c = s.charAt(i);
         h = ( h ^ c ) * _FNV_64_MULTIPLIER;
     }
     return h;
 }
-
-static public long fnv_hash_64(long   []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(double []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(int    []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(float  []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(byte   []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(short  []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(char   []p) { return fnv_hash_64(p, p.length); }
-static public long fnv_hash_64(String []p) { 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_64(long   ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(double ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(int    ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(float  ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(byte   ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(short  ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(char   ...p) { return fnv_hash_64(0, p.length, p); }
+static public long fnv_hash_64(String ...p) {
     long h = FNV_START_HASH_64;
     for (String s : p) {
         for (int i = 0; i < s.length(); i++) {
@@ -147,38 +142,35 @@ static public long fnv_hash_64(String []p) {
     }
     return h;
 }
-
-// -----------------------------------------------------------------
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 //
 // 32
 //
-
-static public int fnv_hash_32(long[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+static public int fnv_hash_32(int start, int length, long[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(double[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, double[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(int[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, int[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(float[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, float[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(byte[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, byte[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(short[] p, int length) {
-    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(p, length), 32);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, short[] p) {
+    return (int) fnv_hash_64b_to_n_bits(fnv_hash_64(start, length, p), 32);
 }
-
-static public int fnv_hash_32(char[] p, int length) {
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public int fnv_hash_32(int start, int length, char[] p) {
     // Note(Doeke): hash to match String, therefor we don't reduce
     int h = FNV_START_HASH_32;
     for (int i = 0; i < length; i++) {
@@ -186,7 +178,7 @@ static public int fnv_hash_32(char[] p, int length) {
     }
     return h;
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public int fnv_hash_32(String s) {
     int h = FNV_START_HASH_32;
     for (int i = 0; i < s.length(); i++) {
@@ -195,16 +187,15 @@ static public int fnv_hash_32(String s) {
     }
     return h;
 }
-
-
-static public long fnv_hash_32(long   []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(double []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(int    []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(float  []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(byte   []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(short  []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(char   []p) { return fnv_hash_32(p, p.length); }
-static public long fnv_hash_32(String []p) { 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public long fnv_hash_32(long   ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(double ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(int    ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(float  ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(byte   ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(short  ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(char   ...p) { return fnv_hash_32(0, p.length, p); }
+static public long fnv_hash_32(String ...p) { 
     
     int h = FNV_START_HASH_32;
     for (String s : p) {
@@ -214,12 +205,13 @@ static public long fnv_hash_32(String []p) {
     }
     return h;
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
+    0.51  (2022-02-04) allowed for varargs for easier use
+    0.50  (2020-08-12) first numbered version
 
 */
 

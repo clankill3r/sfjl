@@ -1,4 +1,4 @@
-/** SFJL_Base64_Example - v0.50
+/** SFJL_Base64_Example - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -33,7 +33,7 @@ public static void main(String[] args) {
         "64b from []long    "+fnv_hash_64(some_longs),
         "64b from []int     "+fnv_hash_64(some_ints),
         "64b from []byte    "+fnv_hash_64(some_bytes),
-        "64b from []shor    "+fnv_hash_64(some_shors),
+        "64b from []short   "+fnv_hash_64(some_shors),
         "64b from []double  "+fnv_hash_64(some_doubles),
         "64b from []float   "+fnv_hash_64(some_floats),
         "64b from []string  "+fnv_hash_64(some_strings),
@@ -44,7 +44,7 @@ public static void main(String[] args) {
         "32b from []long    "+fnv_hash_32(some_longs),
         "32b from []int     "+fnv_hash_32(some_ints),
         "32b from []byte    "+fnv_hash_32(some_bytes),
-        "32b from []shor    "+fnv_hash_32(some_shors),
+        "32b from []short   "+fnv_hash_32(some_shors),
         "32b from []double  "+fnv_hash_32(some_doubles),
         "32b from []float   "+fnv_hash_32(some_floats),
         "32b from []string  "+fnv_hash_32(some_strings),
@@ -86,12 +86,27 @@ public static void main(String[] args) {
         "16b from 32b"+fnv_hash_32b_to_n_bits(h32, 16)
     ));
 
+    //
+    // Varargs
+    //
+    System.out.println(String.join("\n", "\n",
+        "32b from []long    "+fnv_hash_32(1L, 2L, 3L),
+        "32b from []int     "+fnv_hash_32(1, 2, 3),
+        "32b from []byte    "+fnv_hash_32(0xb1, 0xb2, 0xb3),
+        "32b from []short   "+fnv_hash_32(1, 2, 3),
+        "32b from []double  "+fnv_hash_32(1., 2., 3.),
+        "32b from []float   "+fnv_hash_32(1f, 2f, 3f),
+        "32b from []string  "+fnv_hash_32("12", "3"),
+        "32b from []char    "+fnv_hash_32('1', '2', '3')
+    ));
+    // same for _64
 }
 
 }
 /**
 revision history:
 
+   0.51  (2022-02-04) varargs examples
    0.50  (2020-08-12) first numbered version
 
 */
