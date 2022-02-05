@@ -27,7 +27,7 @@
 [SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
 
 
-# sfjl
+# SFJL
 Collection of single-file java libraries with minimal to no dependencies, inspired by the [stb](https://github.com/nothings/stb) libraries.
 
 Too quote [Sean Barrett](http://nothings.org/) on his philosophy of the stb libraries:
