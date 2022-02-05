@@ -11,7 +11,12 @@ package sfjl_examples;
 
 import java.util.ArrayList;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PVector;
+import processing.opengl.PGL;
+import processing.opengl.PGraphicsOpenGL;
+import processing.opengl.PShader;
+import processing.opengl.Texture;
 import sfjl.SFJL_Quad_Tree;
 import static sfjl.SFJL_Quad_Tree.*;
 
@@ -24,19 +29,20 @@ public static void main(String[] args) {
 Quad_Tree<PVector> tree;
 ArrayList<PVector> within = new ArrayList<>();
 
+PShader many_points_shader;
+PImage points_map;
 
 @Override
 public void settings() {     
-    size(800, 800, P2D);
+    size(1024, 1024, P2D);
     pixelDensity(2);
-    
 }
 
 
 @Override
 public void setup() {
 
-    frameRate(60);
+    frameRate(999);
 
     int plot_x1 = 50;
     int plot_x2 = width - 50;
@@ -47,16 +53,13 @@ public void setup() {
 
     tree = new Quad_Tree<>((v)-> v.x, (v)->v.y, 96, plot_x1, plot_y1, plot_x2, plot_y2);
 
-    for (int y = plot_y1; y <  plot_y2; y += 3) {
-        for (int x = plot_x1; x < plot_x2; x += 3) {
+    for (int y = plot_y1; y <  plot_y2; y += 1) {
+        for (int x = plot_x1; x < plot_x2; x += 1) {
 
             float n = dist(x, y, width/2, height/2) / max(plot_width, plot_height);
             
             if (n < 0.5f) {
-                if (noise(x * 0.025f, y * 0.025f) < 0.4) {
-                    add(tree, new PVector(x, y, random(9)));
-                    add(tree, new PVector(x, y, random(9)));
-                    add(tree, new PVector(x, y, random(9)));
+                if (noise(x * 0.025f, y * 0.025f) < 0.6) {
                     add(tree, new PVector(x, y, random(9)));
                 }
             }
@@ -67,6 +70,12 @@ public void setup() {
     for (int i = 0; i < precomputed_random_sequence.length; i++) {
         precomputed_random_sequence[i] = random(-1, 1);
     }
+
+    many_points_shader = loadShader("quadtree_example_many_points.glsl");
+
+    points_map = createImage(width/16, height, ARGB); // nocheckin, variable size
+    points_map.loadPixels();
+    gl_nearest_for_texture(this, points_map);
 
 }
 
@@ -83,12 +92,21 @@ public void draw() {
 
     surface.setTitle("fps: "+(int)frameRate);
 
-    background(0);
+    // background(0);
 
-    noFill();
-    stroke(255);
-    strokeWeight(0.5f);
-    if (draw_quad_tree) draw_quad_tree(tree);
+    shader(many_points_shader);
+    many_points_shader.set("iResolution", (float) width, (float) height);
+    many_points_shader.set("points_map", points_map);
+    rectMode(CORNER);
+    noStroke();
+    fill(0);
+    rect(0, 0, width, height);
+    resetShader();
+
+    // noFill();
+    // stroke(255);
+    // strokeWeight(0.5f);
+    // if (draw_quad_tree) draw_quad_tree(tree);
     
     within.clear();
 
@@ -114,7 +132,7 @@ public void draw() {
     stroke(255,0,0);
     strokeWeight(1f);
     for (PVector v2 : within) {
-        if (draw_points) point(v2.x, v2.y);
+        // if (draw_points) point(v2.x, v2.y);
         if (move_points) {
             v2.x += fast_random() * abs(v2.z) * abs(v2.z);
             v2.y += fast_random() * abs(v2.z) * abs(v2.z);
@@ -125,17 +143,17 @@ public void draw() {
     ArrayList<PVector> out_of_bounds = new ArrayList<>();
     update(tree, update_helper, out_of_bounds);
     
-    strokeCap(SQUARE);
-    stroke(255,255,0);
-    strokeWeight(1f);
-    for (PVector v : tree) {
-        if (v.z >= 0) {
-            if (draw_points) point(v.x, v.y);
-        }
-        else {
-            v.z = -v.z; // reset for next frame
-        }
-    }
+    // strokeCap(SQUARE);
+    // stroke(255,255,0);
+    // strokeWeight(1f);
+    // for (PVector v : tree) {
+    //     if (v.z >= 0) {
+    //         if (draw_points) point(v.x, v.y);
+    //     }
+    //     else {
+    //         v.z = -v.z; // reset for next frame
+    //     }
+    // }
 
     PVector v = get_closest(tree, mouseX, mouseY);
     if (v != null) {
@@ -152,6 +170,38 @@ public void draw() {
         rect(min_x(tree).x, min_y(tree).y, max_x(tree).x, max_y(tree).y);
     }
 
+    //
+    // shader!!!
+    //
+
+    // reset points_map
+    for (int i = 0; i < points_map.pixels.length; i++) {
+        points_map.pixels[i] = 0;
+    }
+
+    // update points_map
+    // each color can set the points for 24 pixels
+    for (PVector v2 : tree) {
+        int x = (int) v2.x;
+        int y = (int) v2.y;
+        int index_here = (y * width + x);
+        int index_in_map = index_here / 16;
+        int bit = 1 << (x & 0xF);
+        // index = (index-bit) / 16;
+        points_map.pixels[index_in_map] |= bit;
+        
+    }
+
+    points_map.updatePixels();
+
+    // points_map.save("debug_points_map.png");
+
+   
+
+    // image(points_map, 0, 0);
+
+    // noLoop();
+    //////
     fill(255);
     text(size(tree), 20, 20);
     text("highest_depth_with_leafs: "+highest_depth_with_leafs(tree), 20, 80);
@@ -225,8 +275,17 @@ float fast_random() {
     }
     return r;
 }
-
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public void gl_nearest_for_texture(PApplet p, PImage image) {
+    PGL pgl = p.beginPGL();
+    Texture image_tex = ((PGraphicsOpenGL)p.g).getTexture(image);
+    pgl.bindTexture(PGL.TEXTURE_2D, image_tex.glName);
+    pgl.texParameteri(PGL.TEXTURE_2D, PGL.TEXTURE_MIN_FILTER, PGL.NEAREST);
+    pgl.texParameteri(PGL.TEXTURE_2D, PGL.TEXTURE_MAG_FILTER, PGL.NEAREST);
+    pgl.bindTexture(PGL.TEXTURE_2D, 0);
+    p.endPGL();
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }
 /**
 revision history:
