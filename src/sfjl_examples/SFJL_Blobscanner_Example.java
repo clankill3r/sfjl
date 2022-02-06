@@ -21,24 +21,48 @@ Blobscanner_Context blobscanner_context;
 
 @Override
 public void settings() {
-    size(640, 640, P2D);
+    size(640, 640);
+    noSmooth();
 }
 
 @Override
 public void setup() {
 
+    // img = create_image_from_string( 
+    //     "########",
+    //     "###  ###",
+    //     "##    ##",
+    //     "#     ##",
+    //     "##   ###",
+    //     "###  ###",
+    //     "#    ###",
+    //     "########"
+    // );
+
     img = create_image_from_string( 
-        "########",
-        "###  ###",
-        "##    ##",
-        "#     ##",
-        "##   ###",
-        "###  ###",
-        "#    ###",
-        "########"
+        "####################################################################",
+        "####                                                               #",
+        "################################################################   #",
+        "###########      ################            ###################   #",
+        "#   ####            ##########      #####    ######     ########   #",
+        "#   #####          ##########    ###   ####    ###      ########   #",
+        "#   #######       #######      ####   ###      #####    ########   #",
+        "#   #########    ##########     #######          ###############   #",
+        "#   #########################                   ################   #",
+        "#   ####   ####################       ####      ################   #",
+        "#   ####   ####################       ####      ################   #",
+        "#   ####   ####################       ####      ################   #",
+        "#   ####   ####################       ####      ################   #",
+        "#   ####   ####################       ####      ################   #",
+        "#   ####          #################            #################   #",
+        "#   ####         ###################            ############ ###   #",
+        "#   ############################################################   #",
+        "#                                                                  #",
+        "####################################################################"
     );
 
-    gl_nearest_for_texture(this, img);
+    
+    // gl_nearest_for_texture(this, img);
 
     blobscanner_context = new Blobscanner_Context();
     blobscanner_context.blobscan_method = Border_Handling.BORDER_REPLACE_AND_RESTORE;
@@ -56,6 +80,8 @@ int draw_index = 0;
 @Override
 public void draw() {
 
+    surface.setTitle(""+frameRate);
+
     dbg = "";
 
     float sx = (float)  width / img.width;
@@ -67,6 +93,7 @@ public void draw() {
 
     draw_index = 0;
 
+    
     find_blobs(blobscanner_context, img.pixels, img.width, img.height, (c)-> {
         // beginShape();
         // noFill();
@@ -81,8 +108,7 @@ public void draw() {
         
         // return true;
 
-        draw_index++;
-        // if (draw_index != 4) return true;
+        
         
         Vec2 last = null;
         for (int i = 0; i < c.contour_length; i++) {
@@ -105,9 +131,13 @@ public void draw() {
         }
 
         dbg += c.contour_length + "\n";
+
+        draw_index++;
+        // if (draw_index == 9) return false;
         
         return true;
     });
+    
     
     fill(255);
     text(dbg, 25, 25);

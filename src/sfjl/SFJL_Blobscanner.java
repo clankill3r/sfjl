@@ -13,10 +13,6 @@ public enum Border_Handling {
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public class Contour_Buffer {
-    // public int[][] corners;
-    // public int     corners_length;
-    // public int[][] contour;
-    // public int     contour_length;
     public Vec2[] contour = new Vec2[0];
     public int    contour_length;
 }
@@ -44,8 +40,9 @@ static public class Blobscanner_Context {
     public Threshold_Checker threshold_checker;
     public float threshold;
     public int y_increment = 1;
-    public int[] contour_to_blob_index_map = new int[0]; // nocheckin remove?
     public Contour_Buffer contour_buffer = new Contour_Buffer();
+    public byte[] contour_already_scanned_lookup = new byte[0];
+    public byte   contour_already_exists_number;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public void make_roi_in_pixels(AABB roi, int w, int h) {
@@ -178,8 +175,9 @@ static public void find_blobs(Blobscanner_Context ctx, int[] pixels, int w, int 
     boolean do_backup_border = ctx.blobscan_method == Border_Handling.BORDER_REPLACE || ctx.blobscan_method == Border_Handling.BORDER_REPLACE_AND_RESTORE;
     prepare_border(pixels, w, h, ctx.roi, ctx.border_color, do_backup_border, ctx.border_backup);
 
-    if (ctx.contour_to_blob_index_map.length < pixels.length) {
-        ctx.contour_to_blob_index_map = new int[pixels.length];
+    if (ctx.contour_already_scanned_lookup.length < pixels.length) {
+        ctx.contour_already_scanned_lookup = new byte[pixels.length];
+        ctx.contour_already_exists_number = 1;
     }
 
     // TODO, we need fewer then pixels.length
@@ -196,72 +194,67 @@ static public void find_blobs(Blobscanner_Context ctx, int[] pixels, int w, int 
     //
     // Scan in lines untill we hit and edge, then walk the contour
     //
-
     int x1 = (int) ctx.roi.x1;
     int y1 = (int) ctx.roi.y1;
     int x2 = (int) ctx.roi.x2;
     int y2 = (int) ctx.roi.y2;
 
-    
     outer:
     for (int y = y1; y < y2; y += ctx.y_increment) {
-
         boolean prev_is_walkable = false;
 
         for (int x = x1; x < x2; x++) {
-
             int index = y * w + x;
             boolean current_is_walkable = ctx.threshold_checker.is_walkable(pixels[index], ctx.threshold);
 
             if (current_is_walkable && !prev_is_walkable) {
-                walk_contour(pixels, w, h, index, ctx.contour_buffer, ctx.threshold_checker, ctx.threshold);
-                boolean keep_going = process_contour.process_contour(ctx.contour_buffer);
+                
+                boolean blob_is_new = walk_contour(ctx, pixels, w, h, x, y, ctx.contour_buffer, ctx.threshold_checker, ctx.threshold);
+                boolean keep_going = true;
+                
+                if (blob_is_new) {
+                    keep_going = process_contour.process_contour(ctx.contour_buffer);
+                }
                 
                 if (!keep_going) {
                     break outer;
                 }
-            }
 
+                for (int i = 0; i < ctx.contour_buffer.contour_length; i++) {
+                    Vec2 v = ctx.contour_buffer.contour[i];
+                    int lookup_index = (int) (v.y * w + v.x);
+                    ctx.contour_already_scanned_lookup[lookup_index] = ctx.contour_already_exists_number;
+                }
+                
+            }
             prev_is_walkable = current_is_walkable;
         }
     }
-
 
     if (ctx.blobscan_method == Border_Handling.BORDER_REPLACE_AND_RESTORE) {
         restore_border_from_backup(pixels, w, h, ctx.roi, ctx.border_backup);
     }
 
+    ctx.contour_already_exists_number += 1;
+    if (ctx.contour_already_exists_number == 0)  {
+        for (int i = 0; i < ctx.contour_already_scanned_lookup.length; i++) {
+            ctx.contour_already_scanned_lookup[i] = 0;
+        }
+        ctx.contour_already_exists_number = 1;
+    }
+
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public class Move_Info {
-    public int move_dir;
-    public int check_dir;
-    public int x_move_change;
-    public int y_move_change;
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// static public void set_move_dir_to_chekc_dir(Move_Info move_info) {
-//     move_info.move_dir = move_info.check_dir;
-//     if (move_info.check_dir == 1) {
-//         move_info.move_dir == 
-//     }
-// }
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public void walk_contour(int[] pixels, int w, int h, int start_index, Contour_Buffer contour_buffer, Threshold_Checker threshold_checker, float threshold) {
+// returns true if the blob is new
+// ctx can be null
+static public boolean walk_contour(Blobscanner_Context ctx, int[] pixels, int w, int h, int x, int y, Contour_Buffer contour_buffer, Threshold_Checker threshold_checker, float threshold) {
 
     final int LEFT  = -1;
     final int RIGHT =  1;
     final int UP    = -w;
     final int DOWN  =  w;
 
-    int current = start_index;
-    int x = current % w;
-    int y = (current - x) / w;
-
-    int start_x = x;
-    int start_y = y;
+    int current = y * w + x;
 
     int move_dir;
     int check_dir;
@@ -276,13 +269,14 @@ static public void walk_contour(int[] pixels, int w, int h, int start_index, Con
     boolean up_walkable    = threshold_checker.is_walkable(pixels[current + UP], threshold);
     boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
 
+    if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
+        return false; // single pixel
+    }
+
     if (!left_walkable)       move_dir = up_walkable    ? UP    : right_walkable ? RIGHT : DOWN;
     else if (!up_walkable)    move_dir = right_walkable ? RIGHT : down_walkable  ? DOWN  : LEFT;
     else if (!right_walkable) move_dir = down_walkable  ? DOWN  : left_walkable  ? LEFT  : UP;
-    else if (!down_walkable)  move_dir = left_walkable  ? LEFT  : up_walkable    ? UP    : RIGHT;
-    else {
-        throw new RuntimeException("TODO single pixel"); // nocheckin
-    }
+    else                      move_dir = left_walkable  ? LEFT  : up_walkable    ? UP    : RIGHT;
 
     //////
     
@@ -292,24 +286,35 @@ static public void walk_contour(int[] pixels, int w, int h, int start_index, Con
     else  /*             UP */  { check_dir = LEFT;  x_mov_change =  0; y_mov_change = -1;}
 
     //
-    // start walking the contour untill where done
+    // start walking the contour until we are done
     //
     // int[][] corners = ctx.contour_buffer.corners;
     // int[][] contour = ctx.contour_buffer.contour;
     Vec2[] contour = contour_buffer.contour;
 
 
-    // corners[0][0] = x;
-    // corners[0][1] = y;
-    // contour[0][0] = x;
-    // contour[0][1] = y;
-    contour[0].x = x;
-    contour[0].y = y;
-    // int corner_index  = 1;
-    int contour_index = 1;
 
+    // contour[0].x = x;
+    // contour[0].y = y;
+    // int corner_index  = 1;
+    int contour_index = 0;
+
+    int move_dir_at_start = move_dir;
+    
 
     while (true) {     
+
+        //
+        // exist check
+        //
+        if (contour_index == 1 && ctx != null) {
+            Vec2 v = contour[0];
+            int lookup_index = (int) (v.y * w + v.x);
+            byte b = ctx.contour_already_scanned_lookup[lookup_index];
+            if (b == ctx.contour_already_exists_number) {
+                return false;
+            }
+        }
         
         //
         // move in current move direction if possible
@@ -320,18 +325,30 @@ static public void walk_contour(int[] pixels, int w, int h, int start_index, Con
             x += x_mov_change;
             y += y_mov_change;
 
-            contour[contour_index].x = x;
-            contour[contour_index].y = y;
-            contour_index += 1;
+            // contour[contour_index].x = x;
+            // contour[contour_index].y = y;
+            // contour_index += 1;
             //
             // move in check direction if possible
             //
             if (threshold_checker.is_walkable(pixels[current + check_dir], threshold)) {
+
+                contour[contour_index].x = x;
+                contour[contour_index].y = y;
+                contour_index += 1;
+
+                if (contour_index > 1 && 
+                    move_dir == move_dir_at_start &&
+                    contour[contour_index-1].x == contour[0].x && 
+                    contour[contour_index-1].y == contour[0].y) {
+                    break;
+                }
+
                 //
                 // change the direction
                 //
                 if (check_dir == RIGHT) { // move dir was down
-                    // corners[corner_index].x= x + 1;
+                    // corners[corner_index].x = x + 1;
                     // corners[corner_index].y = y + 0;
                     // corner_index += 1;
                     current += check_dir;
@@ -375,22 +392,37 @@ static public void walk_contour(int[] pixels, int w, int h, int start_index, Con
                     y -= 1;
                 }
                 
-                contour[contour_index].x = x;
-                contour[contour_index].y = y;
-                contour_index += 1;
+                // contour[contour_index].x = x;
+                // contour[contour_index].y = y;
+                // contour_index += 1;
 
                 // if (corners[corner_index-1].x == start_x && corners[corner_index-1].y == start_y) {
                 //     break;
                 // }
-                if (contour[contour_index-1].x == start_x && contour[contour_index-1].y == start_y) {
-                    break;
-                }
             }
         }
         else {
+
             //
             // we have hit a wall
-            // 
+            //
+            if (contour_index == 0 || 
+                contour[contour_index-1].x != contour[contour_index].x || 
+                contour[contour_index-1].y != contour[contour_index].y) {
+
+                contour[contour_index].x = x;
+                contour[contour_index].y = y;
+                contour_index += 1;
+            }
+            //////
+
+            if (contour_index > 1 && 
+                move_dir == move_dir_at_start &&
+                contour[contour_index-1].x == contour[0].x && 
+                contour[contour_index-1].y == contour[0].y) {
+                break;
+            }
+             
             if (move_dir == UP) {    
                 // corners[corner_index++] = current;
                 move_dir  = RIGHT; 
@@ -420,24 +452,23 @@ static public void walk_contour(int[] pixels, int w, int h, int start_index, Con
                 y_mov_change = -1;
             }    
             
+            
             // contour[contour_index++] = current;
-            contour[contour_index].x = x;
-            contour[contour_index].y = y;
-            contour_index += 1;
 
+            
+            
+            
             // if (corners[corner_index-1] == start_index) {
-            //     break;
-            // }
-            if (contour[contour_index-1].x == start_x && contour[contour_index-1].y == start_y) {
-                break;
-            }
-
+                //     break;
+                // }
+                
         }
     }
 
     // ctx.contour_buffer.corners_length = corner_index;
     contour_buffer.contour_length = contour_index;
 
+    return true;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }
