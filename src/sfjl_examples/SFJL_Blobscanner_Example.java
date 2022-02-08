@@ -179,6 +179,7 @@ public void draw() {
     });
     // }
 
+    blobscanner_context.contour_settings = Contour_Settings.ALL_PIXELS;
     find_blobs_index(blobscanner_context, img.pixels, img.width, img.height, (c)-> {
         pushMatrix();
         translate(sx/2, sy/2);

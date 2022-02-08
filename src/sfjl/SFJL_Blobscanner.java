@@ -9,7 +9,6 @@ public class SFJL_Blobscanner {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public enum Border_Handling {
     DONT_BORDER,
-    BORDER_CHECK_BOUNDS,
     REPLACE_BORDER,
     REPLACE_BORDER_AND_RESTORE_BORDER
 }
@@ -347,38 +346,42 @@ static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] p
     int n_wall_hits_in_a_row = 0;
     contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-    if (contour_settings == Contour_Settings.ONLY_CORNERS) {
+    final boolean ALL_PIXELS   = contour_settings == Contour_Settings.ALL_PIXELS;
+    final boolean ONLY_CORNERS = contour_settings == Contour_Settings.ONLY_CORNERS;
 
-        while (true) {     
-          
-            if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
+    while (true) {     
+        
+        if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
+            if (ONLY_CORNERS) contour_helper.add_to_contour(contour_buffer, current, x, y);
+            xx += 1;
+            xx &= 0x3;
+            current += move_dirs[xx];
+            x += move_change_x[xx];
+            y += move_change_y[xx];
+            contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            if (ALL_PIXELS) contour_helper.add_to_contour(contour_buffer, current, x, y);
+        }
+        else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
+            n_wall_hits_in_a_row = 0;
+            current += move_dirs[xx];
+            x += move_change_x[xx];
+            y += move_change_y[xx];
+            contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            if (ALL_PIXELS) contour_helper.add_to_contour(contour_buffer, current, x, y);
+        }
+        else {
+            n_wall_hits_in_a_row += 1;
+
+            if (ONLY_CORNERS && n_wall_hits_in_a_row != 2) {
                 contour_helper.add_to_contour(contour_buffer, current, x, y);
-                xx += 1;
-                xx &= 0x3;
-                current += move_dirs[xx];
-                x += move_change_x[xx];
-                y += move_change_y[xx];
-                contour_exist_map.pixels[current] = contour_exist_map.write_index;
             }
-            else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
-                n_wall_hits_in_a_row = 0;
-                current += move_dirs[xx];
-                x += move_change_x[xx];
-                y += move_change_y[xx];
-                contour_exist_map.pixels[current] = contour_exist_map.write_index;
-            }
-            else {
-                n_wall_hits_in_a_row += 1;
-
-                if (n_wall_hits_in_a_row != 2) {
-                    contour_helper.add_to_contour(contour_buffer, current, x, y);
-                }
-                xx -= 1;
-                xx &= 0x3;
-            }
-            if (x == start_x && y == start_y && move_dirs[xx] == move_dir_at_start) {
-                break;
-            }
+            xx -= 1;
+            xx &= 0x3;
+        }
+        if (x == start_x && y == start_y && move_dirs[xx] == move_dir_at_start) {
+            break;
         }
     }
 }
