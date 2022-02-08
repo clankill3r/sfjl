@@ -178,6 +178,21 @@ public void draw() {
         return true;
     });
     // }
+
+    find_blobs_index(blobscanner_context, img.pixels, img.width, img.height, (c)-> {
+        pushMatrix();
+        translate(sx/2, sy/2);
+        for (int i = 0; i < c.contour_length; i++) {
+            int index = c.contour[i];
+            int x = index % img.width;
+            int y = (index-x) / img.width;
+            fill(0xffff0000);
+            ellipse(x * sx, y * sy, sx, sy);
+        }
+        popMatrix();
+
+        return true;
+    });
     
     
     fill(255);

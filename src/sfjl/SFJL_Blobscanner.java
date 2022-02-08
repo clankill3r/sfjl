@@ -211,23 +211,15 @@ static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int 
 
     Contour_Buffer<int[]> contour_buffer = ctx.contour_buffer_index;
 
-    // // TODO, we need fewer then pixels.length
-    // if (contour_buffer.contour == null) {
-    //     contour_buffer.contour = new int[pixels.length];
-    //     for (int i = 0; i < pixels.length; i++) {
-    //         contour_buffer.contour[i] = new Vec2();
-    //     }
-    // }
-    // else if (contour_buffer.contour.length < pixels.length) {
-    //     int old_length = contour_buffer.contour.length;
-    //     int new_length = pixels.length;
-    //     contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, new_length);
-    //     for (int i = old_length; i < new_length; i++) {
-    //         contour_buffer.contour[i] = new Vec2();
-    //     }
-    // }
+    // TODO, we need fewer then pixels.length
+    if (contour_buffer.contour == null) {
+        contour_buffer.contour = new int[pixels.length];
+    }
+    else if (contour_buffer.contour.length < pixels.length) {
+        contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, pixels.length);
+    }
 
-    // _find_blobs(ctx, pixels, w, h, contour_helper_vec2, contour_buffer, process_contour);
+    _find_blobs(ctx, pixels, w, h, contour_helper_index, contour_buffer, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -305,7 +297,18 @@ static public Contour_Helper<Vec2[]> contour_helper_vec2 = new Contour_Helper<>(
     public void reset(Contour_Buffer<Vec2[]> contour_buffer) {
         contour_buffer.contour_length = 0;
     }
-    
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Contour_Helper<int[]> contour_helper_index = new Contour_Helper<>() {
+
+    public void add_to_contour(Contour_Buffer<int[]> contour_buffer, int index, int x, int y) {
+        contour_buffer.contour[contour_buffer.contour_length] = index;
+        contour_buffer.contour_length += 1;
+    }
+
+    public void reset(Contour_Buffer<int[]> contour_buffer) {
+        contour_buffer.contour_length = 0;
+    }
 };
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
