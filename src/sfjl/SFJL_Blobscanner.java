@@ -241,32 +241,27 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
 
             if (current_is_walkable && !prev_is_walkable) {
                 
-                boolean blob_is_new = walk_contour(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
-                boolean keep_going = true;
-                
-                if (blob_is_new) {
-                    // we don't know beforehand if the user will continue
-                    // with scanning blobs. If not we technically don't
-                    // have to store this one. But if we do then the user is free
-                    // to modify the x and y values. Which I guess is more friendly.
-                    // for (int i = 0; i < contour_buffer.contour_length; i++) {
-                    //     Vec2 v = contour_buffer.contour[i];
-                    //     int lookup_index = (int) (v.y * w + v.x);
-                    //     ctx.contour_already_scanned_lookup[lookup_index] = ctx.contour_already_exists_number;
-                    // }
-                    contour_helper.update_exist_map(contour_buffer, ctx.contour_exist_map);
-
-                    keep_going = process_contour.process_contour(contour_buffer);
+                if (ctx.contour_exist_map.pixels[index] != ctx.contour_exist_map.write_index) {
+                    
+                    // glitches   47fps - 60fps
+                    // walk_contour(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
+                    
+                    // glitches   47fps - 60fps
+                    // walk_contour_func_calls_where_removed(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
+                    
+                    // glitches   47fps - 60fps
+                    // walk_contour_arrays(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
+                    
+                    // !!!!!!!   
+                    // walk_contour_faster(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
+                    
+                    walk_contour_slower(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper);
+                    boolean keep_going = process_contour.process_contour(contour_buffer);
+                    
+                    if (!keep_going) {
+                        break outer;
+                    }
                 }
-                
-                if (!keep_going) {
-                    break outer;
-                }
-                // if (walk_contour(ctx.contour_already_scanned_lookup, ctx.contour_already_exists_number, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper)) {
-                //     if (!process_contour.process_contour(contour_buffer)) {
-                //         break;
-                //     }
-                // }
             }
             prev_is_walkable = current_is_walkable;
         }
@@ -289,7 +284,6 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
 interface Contour_Helper<T> {
     void reset(Contour_Buffer<T> contour_buffer);
     void add_to_contour(Contour_Buffer<T> contour_buffer, int index, int x, int y);
-    void update_exist_map(Contour_Buffer<T> contour_buffer, Contour_Exist_Map map);
 }
 
 static public Contour_Helper<Vec2> contour_helper_vec2 = new Contour_Helper<Vec2>() {
@@ -305,23 +299,15 @@ static public Contour_Helper<Vec2> contour_helper_vec2 = new Contour_Helper<Vec2
     public void reset(Contour_Buffer<Vec2> contour_buffer) {
         contour_buffer.contour_length = 0;
     }
-
-    @Override
-    public void update_exist_map(Contour_Buffer<Vec2> contour_buffer, Contour_Exist_Map map) {
-        for (int i = 0; i < contour_buffer.contour_length; i++) {
-            Vec2 v = contour_buffer.contour[i];
-            int index = (int) (v.y * map.width + v.x);
-            map.pixels[index] = map.write_index;
-        }
-    }
     
 };
 
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // returns true if the blob is new
 // ctx can be null
-static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
+static public <T> void walk_contour_slower(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
 
     final int LEFT  = -1;
     final int RIGHT =  1;
@@ -344,7 +330,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
     boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
 
     if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
-        return false; // single pixel
+        return; // single pixel
     }
 
     if (!left_walkable)       move_dir = up_walkable    ? UP    : right_walkable ? RIGHT : DOWN;
@@ -366,7 +352,484 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
     int start_y = y;
 
     int n_wall_hits_in_a_row = 0;
-    boolean did_exist_check = false;
+
+    contour_exist_map.pixels[current] = contour_exist_map.write_index;
+    
+    if (contour_settings == Contour_Settings.ONLY_CORNERS) {
+
+        while (true) {     
+            
+            //
+            // move in check direction if possible
+            //
+            if (check_dir == RIGHT && threshold_checker.is_walkable(pixels[current + RIGHT], threshold)) {
+                contour_helper.add_to_contour(contour_buffer, current, x, y); // corner
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+                move_dir  = RIGHT;
+                check_dir = UP;
+                current += move_dir;
+                x += 1;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (check_dir == DOWN && threshold_checker.is_walkable(pixels[current + DOWN], threshold)) {
+                contour_helper.add_to_contour(contour_buffer, current, x, y); // corner
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+                move_dir  = DOWN;
+                check_dir = RIGHT;
+                current += move_dir;
+                y += 1;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (check_dir == LEFT && threshold_checker.is_walkable(pixels[current + LEFT], threshold)) {
+                contour_helper.add_to_contour(contour_buffer, current, x, y); // corner
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+                move_dir  = LEFT;
+                check_dir = DOWN;
+                current += move_dir;
+                x -= 1;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (check_dir == UP && threshold_checker.is_walkable(pixels[current + UP], threshold)) {
+                contour_helper.add_to_contour(contour_buffer, current, x, y); // corner
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+                move_dir  = UP;  
+                check_dir = LEFT;
+                current += move_dir;
+                y -= 1;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (move_dir == RIGHT && threshold_checker.is_walkable(pixels[current + RIGHT], threshold)) {
+                x += 1;
+                current += RIGHT;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (move_dir == DOWN && threshold_checker.is_walkable(pixels[current + DOWN], threshold)) {
+                y += 1;
+                current += DOWN;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (move_dir == LEFT && threshold_checker.is_walkable(pixels[current + LEFT], threshold)) {
+                x -= 1;
+                current += LEFT;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (move_dir == UP && threshold_checker.is_walkable(pixels[current + UP], threshold)) {
+                y -= 1;
+                current += UP;
+                if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                    break;
+                }
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else {
+
+                if (move_dir == RIGHT) { // wall
+                    move_dir = DOWN;
+                    check_dir = RIGHT;
+                }
+                else if (move_dir == DOWN) {
+                    move_dir = LEFT;
+                    check_dir = DOWN;
+                }
+                else if (move_dir == LEFT) {
+                    move_dir = UP;
+                    check_dir = LEFT;
+                }
+                else if (move_dir == UP) {
+                    move_dir = RIGHT;
+                    check_dir = UP;
+                }
+
+                if (threshold_checker.is_walkable(pixels[current + move_dir], threshold)) {
+                    // we will make this move next iteration but we store it now
+                    contour_helper.add_to_contour(contour_buffer, current, x, y); // corner
+
+                    if (move_dir == move_dir_at_start && x == start_x && y == start_y) {
+                        break;
+                    }
+                }
+
+            }
+
+
+
+            // else if (threshold_checker.is_walkable(pixels[current + move_dir], threshold)) {
+            //     //
+            //     // move in current move direction if possible
+            //     //
+            //     n_wall_hits_in_a_row = 0;
+
+            //     current += move_dir;
+            //     x += x_mov_change;
+            //     y += y_mov_change;
+            // }
+            // else {
+            //     //
+            //     // we have hit a wall
+            //     //
+            //     n_wall_hits_in_a_row += 1;
+
+            //     if (n_wall_hits_in_a_row != 2) {
+            //         contour_helper.add_to_contour(contour_buffer, current, x, y);
+            //         contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            //     }
+                 
+            // }
+            
+        }
+    }
+}
+
+
+
+static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
+
+    final int LEFT  = -1;
+    final int RIGHT =  1;
+    final int UP    = -w;
+    final int DOWN  =  w;
+
+    int current = y * w + x;
+
+    int[] move_dirs =     {RIGHT, UP,  LEFT, DOWN};
+    int[] check_dirs =    {UP,    LEFT, DOWN, RIGHT};
+    int[] move_change_x = {1,     0,    -1,     0};
+    int[] move_change_y = {0,     -1,     0,    1};
+
+    int xx;
+
+    //
+    // set start direction
+    //
+    boolean left_walkable  = threshold_checker.is_walkable(pixels[current + LEFT], threshold);
+    boolean right_walkable = threshold_checker.is_walkable(pixels[current + RIGHT], threshold);
+    boolean up_walkable    = threshold_checker.is_walkable(pixels[current + UP], threshold);
+    boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
+
+    if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
+        return; // single pixel
+    }
+
+    if (!left_walkable)       xx = up_walkable    ? 1 : right_walkable ? 0 : 3;
+    else if (!up_walkable)    xx = right_walkable ? 0 : down_walkable  ? 3 : 2;
+    else if (!right_walkable) xx = down_walkable  ? 3 : left_walkable  ? 2 : 1;
+    else                      xx = left_walkable  ? 2 : up_walkable    ? 1 : 0;
+
+    //////
+    
+
+    contour_helper.reset(contour_buffer);
+
+    int move_dir_at_start = move_dirs[xx];
+    int start_x = x;
+    int start_y = y;
+
+    int n_wall_hits_in_a_row = 0;
+
+    contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+    
+    if (contour_settings == Contour_Settings.ONLY_CORNERS) {
+
+        while (true) {     
+          
+            if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
+
+                // contour_buffer.contour[contour_buffer.contour_length].x = x;
+                // contour_buffer.contour[contour_buffer.contour_length].y = y;
+                // contour_buffer.contour_length += 1;
+                contour_helper.add_to_contour(contour_buffer, current, x, y);
+                
+                xx += 1;
+                xx &= 0x3;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
+                n_wall_hits_in_a_row = 0;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            }
+            else {
+                n_wall_hits_in_a_row += 1;
+
+                if (n_wall_hits_in_a_row != 2) {
+                    // contour_buffer.contour[contour_buffer.contour_length].x = x;
+                    // contour_buffer.contour[contour_buffer.contour_length].y = y;
+                    // contour_buffer.contour_length += 1;
+                    contour_helper.add_to_contour(contour_buffer, current, x, y);
+                }
+                
+                xx -= 1;
+                xx &= 0x3;
+            }
+            if (x == start_x && y == start_y && move_dirs[xx] == move_dir_at_start) {
+                break;
+            }
+        }
+    }
+}
+
+// function calls removed
+static public <T> void walk_contour_func_calls_where_removed(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
+
+    final int LEFT  = -1;
+    final int RIGHT =  1;
+    final int UP    = -w;
+    final int DOWN  =  w;
+
+    int current = y * w + x;
+
+    int[] move_dirs =     {RIGHT, UP,  LEFT, DOWN};
+    int[] check_dirs =    {UP,    LEFT, DOWN, RIGHT};
+    int[] move_change_x = {1,     0,    -1,     0};
+    int[] move_change_y = {0,     -1,     0,    1};
+
+    int xx;
+
+    //
+    // set start direction
+    //
+    boolean left_walkable  = threshold_checker.is_walkable(pixels[current + LEFT], threshold);
+    boolean right_walkable = threshold_checker.is_walkable(pixels[current + RIGHT], threshold);
+    boolean up_walkable    = threshold_checker.is_walkable(pixels[current + UP], threshold);
+    boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
+
+    if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
+        return; // single pixel
+    }
+
+    if (!left_walkable)       xx = up_walkable    ? 1 : right_walkable ? 0 : 3;
+    else if (!up_walkable)    xx = right_walkable ? 0 : down_walkable  ? 3 : 2;
+    else if (!right_walkable) xx = down_walkable  ? 3 : left_walkable  ? 2 : 1;
+    else                      xx = left_walkable  ? 2 : up_walkable    ? 1 : 0;
+
+    //////
+    
+
+    contour_helper.reset(contour_buffer);
+
+    int move_dir_at_start = move_dirs[xx];
+    int start_x = x;
+    int start_y = y;
+
+    int n_wall_hits_in_a_row = 0;
+
+    contour_exist_map.pixels[current] = contour_exist_map.write_index;
+    
+    if (contour_settings == Contour_Settings.ONLY_CORNERS) {
+
+        while (true) {     
+          
+            if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
+
+                contour_helper.add_to_contour(contour_buffer, current, x, y);
+                
+
+                xx += 1;
+                xx &= 0x3;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            }
+            else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
+                n_wall_hits_in_a_row = 0;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            }
+            else {
+                n_wall_hits_in_a_row += 1;
+
+                if (n_wall_hits_in_a_row != 2) {
+                    contour_helper.add_to_contour(contour_buffer, current, x, y);
+                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
+                }
+                
+                xx -= 1;
+                xx &= 0x3;
+            }
+            if (move_dirs[xx] == move_dir_at_start && x == start_x && y == start_y) {
+                break;
+            }
+        }
+    }
+}
+
+
+
+static public <T> void walk_contour_arrays(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
+
+    final int LEFT  = -1;
+    final int RIGHT =  1;
+    final int UP    = -w;
+    final int DOWN  =  w;
+
+    int current = y * w + x;
+
+    int[] move_dirs =     {RIGHT, UP,  LEFT, DOWN};
+    int[] check_dirs =    {UP,    LEFT, DOWN, RIGHT};
+    int[] move_change_x = {1,     0,    -1,     0};
+    int[] move_change_y = {0,     -1,     0,    1};
+
+    int xx;
+
+    //
+    // set start direction
+    //
+    boolean left_walkable  = threshold_checker.is_walkable(pixels[current + LEFT], threshold);
+    boolean right_walkable = threshold_checker.is_walkable(pixels[current + RIGHT], threshold);
+    boolean up_walkable    = threshold_checker.is_walkable(pixels[current + UP], threshold);
+    boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
+
+    if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
+        return; // single pixel
+    }
+
+    if (!left_walkable)       xx = up_walkable    ? 1 : right_walkable ? 0 : 3;
+    else if (!up_walkable)    xx = right_walkable ? 0 : down_walkable  ? 3 : 2;
+    else if (!right_walkable) xx = down_walkable  ? 3 : left_walkable  ? 2 : 1;
+    else                      xx = left_walkable  ? 2 : up_walkable    ? 1 : 0;
+
+    //////
+    
+
+    contour_helper.reset(contour_buffer);
+
+    int move_dir_at_start = move_dirs[xx];
+    int start_x = x;
+    int start_y = y;
+
+    int n_wall_hits_in_a_row = 0;
+
+    contour_exist_map.pixels[current] = contour_exist_map.write_index;
+    
+    if (contour_settings == Contour_Settings.ONLY_CORNERS) {
+
+        while (true) {     
+          
+            if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
+
+                contour_helper.add_to_contour(contour_buffer, current, x, y);
+
+                xx += 1;
+                xx &= 0x3;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+            }
+            else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
+                n_wall_hits_in_a_row = 0;
+
+                current += move_dirs[xx];
+                x += move_change_x[xx];
+                y += move_change_y[xx];
+
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
+
+            }
+            else {
+                n_wall_hits_in_a_row += 1;
+
+                if (n_wall_hits_in_a_row != 2) {
+                    contour_helper.add_to_contour(contour_buffer, current, x, y);
+                }
+                
+                xx -= 1;
+                xx &= 0x3;
+            }
+            if (move_dirs[xx] == move_dir_at_start && x == start_x && y == start_y) {
+                break;
+            }
+        }
+    }
+}
+
+
+// returns true if the blob is new
+// ctx can be null
+static public <T> void walk_contour_faster(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Helper<T> contour_helper) {
+
+    final int LEFT  = -1;
+    final int RIGHT =  1;
+    final int UP    = -w;
+    final int DOWN  =  w;
+
+    int current = y * w + x;
+
+    int move_dir;
+    int check_dir;
+    int x_mov_change;
+    int y_mov_change;
+
+    //
+    // set start direction
+    //
+    boolean left_walkable  = threshold_checker.is_walkable(pixels[current + LEFT], threshold);
+    boolean right_walkable = threshold_checker.is_walkable(pixels[current + RIGHT], threshold);
+    boolean up_walkable    = threshold_checker.is_walkable(pixels[current + UP], threshold);
+    boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
+
+    if (!left_walkable)       move_dir = up_walkable    ? UP    : right_walkable ? RIGHT : DOWN;
+    else if (!up_walkable)    move_dir = right_walkable ? RIGHT : down_walkable  ? DOWN  : LEFT;
+    else if (!right_walkable) move_dir = down_walkable  ? DOWN  : left_walkable  ? LEFT  : UP;
+    else                      move_dir = left_walkable  ? LEFT  : up_walkable    ? UP    : RIGHT;
+
+    //////
+    
+    if      (move_dir == RIGHT) { check_dir = UP;    x_mov_change =  1; y_mov_change =  0;}
+    else if (move_dir == DOWN)  { check_dir = RIGHT; x_mov_change =  0; y_mov_change =  1;}
+    else if (move_dir == LEFT)  { check_dir = DOWN;  x_mov_change = -1; y_mov_change =  0;}
+    else  /*             UP */  { check_dir = LEFT;  x_mov_change =  0; y_mov_change = -1;}
+
+    contour_helper.reset(contour_buffer);
+
+    int move_dir_at_start = move_dir;
+    int start_x = x;
+    int start_y = y;
+
+    int n_wall_hits_in_a_row = 0;
+
+    contour_exist_map.pixels[current] = contour_exist_map.write_index;
     
     if (contour_settings == Contour_Settings.ONLY_CORNERS) {
 
@@ -377,13 +840,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
             //
             if (threshold_checker.is_walkable(pixels[current + check_dir], threshold)) {
 
-                if (!did_exist_check) {
-                    if (contour_exist_map.pixels[current] == contour_exist_map.write_index) return false;
-                    did_exist_check = true;
-                }
-
                 contour_helper.add_to_contour(contour_buffer, current, x, y);
-                contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
                 //
                 // change the direction
@@ -395,6 +852,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
                     x_mov_change = 1;
                     y_mov_change = 0;
                     x += 1;
+                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
                 }
                 else if (check_dir == DOWN)  { // move dir was left
                     current += check_dir;
@@ -403,6 +861,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
                     x_mov_change = 0;
                     y_mov_change = 1;
                     y += 1;
+                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
                 }
                 else if (check_dir == LEFT)  { // move dir was up
                     current += check_dir;
@@ -411,6 +870,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
                     x_mov_change = -1;
                     y_mov_change = 0;
                     x -= 1;
+                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
                 }
                 else { // if (check_dir == UP)    { // move dir was right
                     current += check_dir;
@@ -419,6 +879,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
                     x_mov_change = 0;
                     y_mov_change = -1;
                     y -= 1;
+                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
                 }
             }
             else if (threshold_checker.is_walkable(pixels[current + move_dir], threshold)) {
@@ -430,6 +891,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
                 current += move_dir;
                 x += x_mov_change;
                 y += y_mov_change;
+                contour_exist_map.pixels[current] = contour_exist_map.write_index;
             }
             else {
                 //
@@ -439,7 +901,6 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
 
                 if (n_wall_hits_in_a_row != 2) {
                     contour_helper.add_to_contour(contour_buffer, current, x, y);
-                    contour_exist_map.pixels[current] = contour_exist_map.write_index;
                 }
                  
                 if (move_dir == UP) {    
@@ -472,7 +933,6 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
             }
         }
     }
-    return true;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
