@@ -181,16 +181,15 @@ static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w
 
     Contour_Buffer<Vec2[]> contour_buffer = ctx.contour_buffer_vec2;
 
-    // TODO, we need fewer then pixels.length
     if (contour_buffer.contour == null) {
-        contour_buffer.contour = new Vec2[pixels.length];
-        for (int i = 0; i < pixels.length; i++) {
+        contour_buffer.contour = new Vec2[pixels.length/2];
+        for (int i = 0; i < pixels.length/2; i++) {
             contour_buffer.contour[i] = new Vec2();
         }
     }
-    else if (contour_buffer.contour.length < pixels.length) {
+    else if (contour_buffer.contour.length < pixels.length/2) {
         int old_length = contour_buffer.contour.length;
-        int new_length = pixels.length;
+        int new_length = pixels.length/2;
         contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, new_length);
         for (int i = old_length; i < new_length; i++) {
             contour_buffer.contour[i] = new Vec2();
@@ -205,12 +204,11 @@ static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int 
 
     Contour_Buffer<int[]> contour_buffer = ctx.contour_buffer_index;
 
-    // TODO, we need fewer then pixels.length
     if (contour_buffer.contour == null) {
-        contour_buffer.contour = new int[pixels.length];
+        contour_buffer.contour = new int[pixels.length/2];
     }
-    else if (contour_buffer.contour.length < pixels.length) {
-        contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, pixels.length);
+    else if (contour_buffer.contour.length < pixels.length/2) {
+        contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, pixels.length/2);
     }
 
     _find_blobs(ctx, pixels, w, h, contour_helper_index, contour_buffer, process_contour);
