@@ -34,6 +34,7 @@ static public class Border_Backup {
     public int[] top     = new int[0];
     public int[] right   = new int[0];
     public int[] bottom  = new int[0];
+    public int[] left    = new int[0];
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public interface Threshold_Checker {
@@ -94,7 +95,8 @@ static public void prepare_border(int[] pixels, int w, int h, AABB roi_in_pixels
             border_backup.top    = new int[x2-x1+1];
             border_backup.bottom = new int[x2-x1+1];
         }
-        if (border_backup.right.length < (y2 - y1)) {
+        if (border_backup.left.length < (y2 - y1)) {
+            border_backup.left   = new int[y2-y1+1];
             border_backup.right  = new int[y2-y1+1];
         }
     }
@@ -113,12 +115,13 @@ static public void prepare_border(int[] pixels, int w, int h, AABB roi_in_pixels
         pixels[pixel_index] = border_color;
         pixel_index += 1;
     }
-    // right edge
+    // left and right edge
     backup_index = 0;
     int pixel_index_left  = x1 + ((y1+1) * w);
     int pixel_index_right = x2 + ((y1+1) * w);
     for (int y = y1+1; y < y2; y++) { 
         if (do_backup_border) {
+            border_backup.left[backup_index]  = pixels[pixel_index_left];
             border_backup.right[backup_index] = pixels[pixel_index_right];
             backup_index += 1;
         }
@@ -160,10 +163,13 @@ static public void restore_border_from_backup(int[] pixels, int w, int h, AABB r
     }
     // left and right edge
     backup_index = 0;
+    int pixel_index_left  = x1 + ((y1+1) * w);
     int pixel_index_right = x2 + ((y1+1) * w);
     for (int y = y1+1; y < y2; y++) { 
+        pixels[pixel_index_left] = border_backup.left[backup_index];
         pixels[pixel_index_right] = border_backup.right[backup_index];
         backup_index += 1;
+        pixel_index_left  += w;
         pixel_index_right += w;
     }
     // bottom edge
