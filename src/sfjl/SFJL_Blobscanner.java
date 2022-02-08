@@ -20,7 +20,7 @@ public enum Contour_Settings {
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public class Contour_Buffer<T> {
-    public T[] contour;
+    public T   contour;
     public int contour_length;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -54,10 +54,8 @@ static public class Blobscanner_Settings {
     public float threshold;
     public int y_increment = 1;
     public Contour_Settings contour_settings = Contour_Settings.ONLY_CORNERS;
-    public Contour_Buffer<Vec2> contour_buffer_vec2   = new Contour_Buffer<>();
+    public Contour_Buffer<Vec2[]> contour_buffer_vec2   = new Contour_Buffer<>();
     public Contour_Buffer<int[]> contour_buffer_index = new Contour_Buffer<>();
-    // public byte[] contour_already_scanned_lookup = new byte[0];
-    // public byte   contour_already_exists_number;
     public Contour_Exist_Map contour_exist_map = new Contour_Exist_Map();
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -185,9 +183,9 @@ static public void restore_border_from_backup(int[] pixels, int w, int h, AABB r
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w, int h, Process_Contour<Vec2> process_contour) {
+static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w, int h, Process_Contour<Vec2[]> process_contour) {
 
-    Contour_Buffer<Vec2> contour_buffer = ctx.contour_buffer_vec2;
+    Contour_Buffer<Vec2[]> contour_buffer = ctx.contour_buffer_vec2;
 
     // TODO, we need fewer then pixels.length
     if (contour_buffer.contour == null) {
@@ -206,6 +204,30 @@ static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w
     }
 
     _find_blobs(ctx, pixels, w, h, contour_helper_vec2, contour_buffer, process_contour);
+
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int w, int h, Process_Contour<int[]> process_contour) {
+
+    Contour_Buffer<int[]> contour_buffer = ctx.contour_buffer_index;
+
+    // // TODO, we need fewer then pixels.length
+    // if (contour_buffer.contour == null) {
+    //     contour_buffer.contour = new int[pixels.length];
+    //     for (int i = 0; i < pixels.length; i++) {
+    //         contour_buffer.contour[i] = new Vec2();
+    //     }
+    // }
+    // else if (contour_buffer.contour.length < pixels.length) {
+    //     int old_length = contour_buffer.contour.length;
+    //     int new_length = pixels.length;
+    //     contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, new_length);
+    //     for (int i = old_length; i < new_length; i++) {
+    //         contour_buffer.contour[i] = new Vec2();
+    //     }
+    // }
+
+    // _find_blobs(ctx, pixels, w, h, contour_helper_vec2, contour_buffer, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -272,15 +294,15 @@ interface Contour_Helper<T> {
     void add_to_contour(Contour_Buffer<T> contour_buffer, int index, int x, int y);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Contour_Helper<Vec2> contour_helper_vec2 = new Contour_Helper<Vec2>() {
+static public Contour_Helper<Vec2[]> contour_helper_vec2 = new Contour_Helper<>() {
 
-    public void add_to_contour(Contour_Buffer<Vec2> contour_buffer, int index, int x, int y) {
+    public void add_to_contour(Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y) {
         contour_buffer.contour[contour_buffer.contour_length].x = x;
         contour_buffer.contour[contour_buffer.contour_length].y = y;
         contour_buffer.contour_length += 1;
     }
 
-    public void reset(Contour_Buffer<Vec2> contour_buffer) {
+    public void reset(Contour_Buffer<Vec2[]> contour_buffer) {
         contour_buffer.contour_length = 0;
     }
     
