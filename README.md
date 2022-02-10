@@ -11,6 +11,7 @@
 [SFJL_Doeke]:           src/sfjl/SFJL_Doeke.java
 [SFJL_Spatial_Map]:     src/sfjl/SFJL_Spatial_Map.java
 [SFJL_Intergral_Image]: src/sfjl/SFJL_Intergral_Image.java
+[SFJL_Blobscanner]:     src/sfjl/SFJL_Blobscanner.java
 
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
@@ -25,6 +26,7 @@
 [SFJL_Doeke_Ex]:           src/sfjl_examples/SFJL_Doeke_Example.java
 [SFJL_Spatial_Map_Ex]:     src/sfjl_examples/SFJL_Spatial_Map_Example.java
 [SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
+[SFJL_Blobscanner_Ex_1]:     src/sfjl/SFJL_Blobscanner_Example_Heightmap.java
 
 
 # SFJL
@@ -60,13 +62,14 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Print][SFJL_Print]**                     | v0.51          | utility            | 180  | print and println without the need of System.out  |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.51          | utility            | 136  | base64 encoder and decoder functions              |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.52          | utility            | 148  | [FNV hash][fnv_link] implementation               |
-| **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics           | 187  | tween functions                                   |
-| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics           | 179  | line based curve decimator for 2d and 3d          |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.53          | graphics           | 885  | fast quad_tree implementation, with lots of optimized functions to get points |
-| **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics           | 91   | simple intergral image |
+| **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics / utility | 187  | tween functions                                   |
+| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics / utility | 179  | line based curve decimator for 2d and 3d          |
+| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.53          | graphics / utility | 885  | fast quad_tree implementation, with lots of optimized functions to get points |
+| **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.5           | graphics / utility | 91   | simple intergral image |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
+| **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.5           | graphics / utility | 304  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 3089 |                                                                                                                                 |
+|                                                  |                | **sum**            | 3393 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -89,10 +92,13 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;              |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;              | -->
 
-## Dependencies Libraries Examples
+## Dependencies
 
+Most of the examples use [processing](www.processing.org) as a dependency.
+At this time no other libraries are being used.
+
+<!-- 
 > &#x26A0; All the dependencies required are included in this repository
-
 > &#x26A0; SFJL_* dependencies are not listed
 
 | example                                                     | dependencies                     |
@@ -105,20 +111,20 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Douglas_Peucker_Example][SFJL_Douglas_Peucker_Ex]** | [processing](www.processing.org) |
 | **[SFJL_Quad_Tree_Example][SFJL_Quad_Tree_Ex]**             | [processing](www.processing.org) |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image_Ex]**         | [processing](www.processing.org) |
-| **[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**         | [processing](www.processing.org) |
+| **[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**         | [processing](www.processing.org) | -->
 
 <!-- | **[SFJL_Doeke_Example][SFJL_Doeke_Ex]**                     | &#x274c;     | -->
 <!-- | **[SFJL_Math_Example][SFJL_Math_Ex]**                       | &#x274c;     | -->
 
 
-# Soon to come libraries
+# Soon(?) to come libraries
 More libraries are coming (soon?), I'm in the process of wrapping them up.
 Here a list of what is coming for sure:
 | library               | category | description                                    |
 | --------------------- | -------- | ---------------------------------------------- |
-| SFJL_Blobscanner      | graphics | blobscanner to get contours from images        |
-| SFJL_Spatial_Hash_Map | data structure | store points based on hashes |
-| SFJL_????_Tree           | data structure | quadtree for 4th dimensions
+| SFJL_Spatial_Hash_Map | data structure | store points based on hashes
+| SFJL_Octree           | data structure | store points in boxes
+| SFJL_????_Tree        | data structure | quadtree for 4th dimensions
 
 
 # Never Asked FAQ
