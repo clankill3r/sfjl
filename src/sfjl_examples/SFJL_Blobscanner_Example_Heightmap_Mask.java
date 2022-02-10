@@ -25,8 +25,6 @@ public void setup() {
     noise = createImage(250, 250, RGB);
     noise.loadPixels();
 
-  
-
     blobscanner_context = new Blobscanner_Settings();
     blobscanner_context.threshold = 128;
     blobscanner_context.threshold_checker = (clr, threshold)-> { return (clr & 0xff) > threshold;};
@@ -38,42 +36,30 @@ public void setup() {
     mask.beginDraw();
     mask.background(255,255,0);
     mask.fill(255);
-    // mask.ellipse(125, 125, 240, 240);
-    
     mask.textAlign(LEFT, TOP);
-    // printArray(PFont.list());
-    mask.textFont(createFont("SourceSansPro-Bold", 100));
-    
-    String txt = String.join("\n",
-    "+----+",
-    "|SFJL|",
-    "+----+"
-    );
-    mask.textSize(90);
-    mask.textLeading(50);
-    mask.text(txt, 10, -10);
+    mask.textSize(170);
+    mask.text("SF", -5, -50);
+    mask.text("JL", 80, 75);
+    mask.noStroke();
+    mask.rectMode(CORNERS);
+    mask.rect(250-8, 8, 250-8-64, 8+64);
+    mask.rect(8, 250-8, 8+64, 250-8-64);
     mask.endDraw();
-    mask.loadPixels(); // makes it black with P2D
+    mask.loadPixels();
 
-    contour_helper_vec2 = new Contour_Worker<>() {
-
-        public void add_to_contour(Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour) {
-
-            if (mask.pixels[index] != white) {
-                process_contour.process_contour(contour_buffer);
-                reset(contour_buffer);
-            }
-            else {
-                contour_buffer.contour[contour_buffer.contour_length].x = x;
-                contour_buffer.contour[contour_buffer.contour_length].y = y;
-                contour_buffer.contour_length += 1;
-            }
+    // 
+    add_to_contour_vec2 = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour) -> {
+        if (mask.pixels[index] != white) {
+            process_contour.exe(contour_buffer);
+            reset_contour_buffer_vec2.exe(contour_buffer);
         }
-    
-        public void reset(Contour_Buffer<Vec2[]> contour_buffer) {
-            contour_buffer.contour_length = 0;
+        else {
+            contour_buffer.contour[contour_buffer.contour_length].x = x;
+            contour_buffer.contour[contour_buffer.contour_length].y = y;
+            contour_buffer.contour_length += 1;
         }
     };
+    
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 void update_noise(PImage img, int seed) {
@@ -99,7 +85,7 @@ public void draw() {
     background(0);
 
     pushMatrix();
-    translate(width/2, height * 0.7f, -500);
+    translate(width/2, height * 0.5f, -500);
     // rotateX(map(mouseY, 0, height, 0, TWO_PI));
     // rotateZ(map(mouseX, 0, width, 0, TWO_PI));
 
@@ -108,7 +94,7 @@ public void draw() {
 
     blobscanner_context.y_increment = 16;
     
-    for (int l = 1; l < levels-1; l++) { // nocheckin, one is not allowed
+    for (int l = 0; l < levels; l++) {
         
         noFill();
         stroke(l, 50, 50);
@@ -140,7 +126,6 @@ public void draw() {
                 
             }
             endShape();
-            return true;
         });
         
         blobscanner_context.border_handling = Border_Handling.DONT_BORDER;

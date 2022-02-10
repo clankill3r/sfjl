@@ -7,10 +7,8 @@ public static void main(String[] args) {
     PApplet.main(SFJL_Blobscanner_Example_Heightmap.class, args);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 PImage noise;
 Blobscanner_Settings blobscanner_context;
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void settings() {
     size(1024, 768, P3D);
@@ -44,11 +42,11 @@ void update_noise(PImage img, int seed) {
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void draw() {
-    surface.setTitle(""+frameRate);
-
     update_noise(noise, frameCount*4);
 
     background(0);
+
+    pushMatrix();
     translate(width/2, height * 0.7f, -500);
     rotateX(map(0.14f, 0, 1, 0, TWO_PI));
     rotateZ(map(mouseX, 0, width, 0, TWO_PI));
@@ -58,53 +56,41 @@ public void draw() {
 
     blobscanner_context.y_increment = 16;
     
-    // Illegal lambda expression: Method  of type  is generic
-
-    for (int l = 1; l < levels-1; l++) { // nocheckin, one is not allowed
-        
+    for (int l = 0; l <= levels; l++) {
         noFill();
         stroke(l, 50, 50);
-        float z = map(l, 0, levels-1, 0, 250) * scale;
+        float z = map(l, 0, levels, 0, 250) * scale;
         blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
         blobscanner_context.threshold = l;
         find_blobs_vec2(blobscanner_context, noise.pixels, noise.width, noise.height, (c)-> {
             beginShape();
             noFill();
-            stroke(blobscanner_context.threshold, 50, 50);
-
-            for (int i = 0; i < c.contour_length; i++) {
+            for (int i = 1; i < c.contour_length; i++) {
                 Vec2 v = c.contour[i];
-                // border check (hangs sometimes... wtf)
-                // if (i+2 < c.contour_length && (v.x == 1 || v.x == 248 || v.y == 1 || v.y == 248)) {
-                //     Vec2 next = c.contour[i+1];
-                //     if (next.x == 1 || next.x == 248 || next.y == 1 || next.y == 248) {
-                //         endShape();
-                //         beginShape();
-                       
-                //         continue;
-                //     }
-                // }
-                if ((v.x == 1 || v.x == 248 || v.y == 1 || v.y == 248)) {
+                if ((v.x == 1 || v.x == noise.width-2 || v.y == 1 || v.y == noise.height-2)) {
                     stroke(0);
                 }
                 else {
                     stroke(blobscanner_context.threshold, 50, 50);
                 }
-                
                 v.x -= 250/2;
                 v.y -= 250/2;
                 v.x *= scale;
                 v.y *= scale;
                 vertex(v.x, v.y, z);
-
-                
             }
             endShape();
-            return true;
         });
-        
+        // prevent replacing the border with another color 255 times each frame
         blobscanner_context.border_handling = Border_Handling.DONT_BORDER;
+
+        
     }
+    popMatrix();
+
+    fill(255);
+    textSize(20);
+    text("fps: "+((int)frameRate), 10, 20);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }

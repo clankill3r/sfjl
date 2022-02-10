@@ -1,3 +1,16 @@
+/** SFJL_Quad_Tree - v0.50
+ 
+LICENSE:
+    See end of file for license information.
+
+REVISION HISTORY:
+    See end of file for revision information.
+
+EXAMPLE:
+    See SFJL_Blobscanner_Example.java
+        SFJL_Blobscanner_Example_Heightmap.java
+
+*/
 package sfjl;
 import static java.lang.Math.*;
 import static sfjl.SFJL_Math.*;
@@ -13,22 +26,6 @@ public enum Border_Handling {
     REPLACE_BORDER_AND_RESTORE_BORDER
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-public enum Contour_Settings {
-    ALL_PIXELS,
-    ONLY_CORNERS,
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public class Contour_Buffer<T> {
-    public T   contour;
-    public int contour_length;
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public class Contour_Exist_Map {
-    byte[] pixels = new byte[0];
-    byte write_index;
-    int width;
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public class Border_Backup {
     public int[] top     = new int[0];
     public int[] right   = new int[0];
@@ -40,9 +37,52 @@ public interface Threshold_Checker {
     boolean is_walkable(int color, float threshold); 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-public interface Process_Contour<T> {
-    boolean process_contour(Contour_Buffer<T> contour_buffer);
+static public class Contour_Exist_Map {
+    public byte[] pixels = new byte[0];
+    public byte write_index;
+    public int width;
 }
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+public enum Contour_Settings {
+    ALL_PIXELS,
+    ONLY_CORNERS,
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public class Contour_Buffer<T> {
+    public T   contour;
+    public int contour_length;
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+public interface Add_To_Contour<T> {
+    void exe(Contour_Buffer<T> contour_buffer, int index, int x, int y, Process_Contour<T> process_contour);
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+public interface Process_Contour<T> {
+    void exe(Contour_Buffer<T> contour_buffer);
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+public interface Reset_Contour_Buffer<T> {
+    void exe(Contour_Buffer<T> contour_buffer);
+}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Add_To_Contour<Vec2[]> add_to_contour_vec2 = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour)-> {
+    contour_buffer.contour[contour_buffer.contour_length].x = x;
+    contour_buffer.contour[contour_buffer.contour_length].y = y;
+    contour_buffer.contour_length += 1;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Reset_Contour_Buffer<Vec2[]> reset_contour_buffer_vec2 = (Contour_Buffer<Vec2[]> contour_buffer)-> {
+    contour_buffer.contour_length = 0;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Add_To_Contour<int[]> add_to_contour_index = (Contour_Buffer<int[]> contour_buffer, int index, int x, int y, Process_Contour<int[]> process_contour)-> {
+    contour_buffer.contour[contour_buffer.contour_length] = index;
+    contour_buffer.contour_length += 1;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Reset_Contour_Buffer<int[]> reset_contour_buffer_index = (Contour_Buffer<int[]> contour_buffer)-> {
+    contour_buffer.contour_length = 0;
+};
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public class Blobscanner_Settings {
     public Border_Handling border_handling = Border_Handling.REPLACE_BORDER_AND_RESTORE_BORDER;
@@ -201,7 +241,7 @@ static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w
         }
     }
 
-    _find_blobs(ctx, pixels, w, h, contour_helper_vec2, contour_buffer, process_contour);
+    _find_blobs(ctx, pixels, w, h, contour_buffer, add_to_contour_vec2, reset_contour_buffer_vec2, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -216,11 +256,11 @@ static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int 
         contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, pixels.length/2);
     }
 
-    _find_blobs(ctx, pixels, w, h, contour_helper_index, contour_buffer, process_contour);
+    _find_blobs(ctx, pixels, w, h, contour_buffer, add_to_contour_index, reset_contour_buffer_index, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w, int h, Contour_Worker<T> contour_helper, Contour_Buffer<T> contour_buffer, Process_Contour<T> process_contour) {
+static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w, int h, Contour_Buffer<T> contour_buffer, Add_To_Contour<T> add_to_contour, Reset_Contour_Buffer<T> reset_contour_buffer, Process_Contour<T> process_contour) {
     
     make_roi_in_pixels(ctx.roi, w, h);
 
@@ -242,7 +282,6 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
     int x2 = (int) ctx.roi.x2;
     int y2 = (int) ctx.roi.y2;
 
-    outer:
     for (int y = y1; y < y2; y += ctx.y_increment) {
         boolean prev_is_walkable = false;
 
@@ -252,13 +291,7 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
 
             if (current_is_walkable && !prev_is_walkable) {
                 if (ctx.contour_exist_map.pixels[index] != ctx.contour_exist_map.write_index) {
-                    boolean keep_going = walk_contour(ctx.contour_exist_map, pixels, w, h, x, y, ctx.contour_settings, contour_buffer, ctx.threshold_checker, ctx.threshold, contour_helper, process_contour);
-                    // boolean keep_going = process_contour.process_contour(contour_buffer);
-                    // boolean keep_going = contour_helper.process_contour(contour_buffer, process_contour);
-                    
-                    if (!keep_going) {
-                        break outer;
-                    }
+                    walk_contour(ctx.contour_exist_map, pixels, w, h, x, y, ctx.threshold_checker, ctx.threshold, ctx.contour_settings, contour_buffer, add_to_contour, reset_contour_buffer, process_contour);
                 }
             }
             prev_is_walkable = current_is_walkable;
@@ -279,41 +312,9 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-public interface Contour_Worker<T> {
-    void reset(Contour_Buffer<T> contour_buffer);
-    void add_to_contour(Contour_Buffer<T> contour_buffer, int index, int x, int y, Process_Contour<T> process_contour);
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Contour_Worker<Vec2[]> contour_helper_vec2 = new Contour_Worker<>() {
+static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Threshold_Checker threshold_checker, float threshold, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Add_To_Contour<T> add_to_contour, Reset_Contour_Buffer<T> reset_contour_buffer,  Process_Contour<T> process_contour) {
 
-    public void add_to_contour(Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour) {
-        contour_buffer.contour[contour_buffer.contour_length].x = x;
-        contour_buffer.contour[contour_buffer.contour_length].y = y;
-        contour_buffer.contour_length += 1;
-    }
-
-    public void reset(Contour_Buffer<Vec2[]> contour_buffer) {
-        contour_buffer.contour_length = 0;
-    }
-
-};
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Contour_Worker<int[]> contour_helper_index = new Contour_Worker<>() {
-
-    public void add_to_contour(Contour_Buffer<int[]> contour_buffer, int index, int x, int y, Process_Contour<int[]> process_contour) {
-        contour_buffer.contour[contour_buffer.contour_length] = index;
-        contour_buffer.contour_length += 1;
-    }
-
-    public void reset(Contour_Buffer<int[]> contour_buffer) {
-        contour_buffer.contour_length = 0;
-    }
-
-};
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Threshold_Checker threshold_checker, float threshold, Contour_Worker<T> contour_helper, Process_Contour<T> process_contour) {
-
-    contour_helper.reset(contour_buffer);
+    reset_contour_buffer.exe(contour_buffer);
 
     final int LEFT  = -1;
     final int RIGHT =  1;
@@ -328,7 +329,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
     boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
 
     if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
-        return true; // single pixel
+        return; // single pixel
     }
 
     int[] move_dirs =     {RIGHT, UP,  LEFT, DOWN};
@@ -355,7 +356,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
     while (true) {     
         
         if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
-            if (ONLY_CORNERS) contour_helper.add_to_contour(contour_buffer, current, x, y, process_contour);
+            if (ONLY_CORNERS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
             xx += 1;
             xx &= 0x3;
             current += move_dirs[xx];
@@ -363,7 +364,7 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
             y += move_change_y[xx];
             contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-            if (ALL_PIXELS) contour_helper.add_to_contour(contour_buffer, current, x, y, process_contour);
+            if (ALL_PIXELS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
         }
         else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
             n_wall_hits_in_a_row = 0;
@@ -372,13 +373,13 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
             y += move_change_y[xx];
             contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-            if (ALL_PIXELS) contour_helper.add_to_contour(contour_buffer, current, x, y, process_contour);
+            if (ALL_PIXELS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
         }
         else {
             n_wall_hits_in_a_row += 1;
 
             if (ONLY_CORNERS && n_wall_hits_in_a_row != 2) {
-                contour_helper.add_to_contour(contour_buffer, current, x, y, process_contour);
+                add_to_contour.exe(contour_buffer, current, x, y, process_contour);
             }
             xx -= 1;
             xx &= 0x3;
@@ -388,10 +389,55 @@ static public <T> boolean walk_contour(Contour_Exist_Map contour_exist_map, int[
         }
     }
 
-    process_contour.process_contour(contour_buffer);
-
-    return true; // nocheckin
+    process_contour.exe(contour_buffer);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }
+/**
+revision history:
 
+    0.50  (2022-02-10) first numbered version
+
+*/
+
+/**
+------------------------------------------------------------------------------
+This software is available under 2 licenses -- choose whichever you prefer.
+------------------------------------------------------------------------------
+ALTERNATIVE A - MIT License
+Copyright (c) 2020 Doeke Wartena
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+------------------------------------------------------------------------------
+ALTERNATIVE B - Public Domain (www.unlicense.org)
+This is free and unencumbered software released into the public domain.
+Anyone is free to copy, modify, publish, use, compile, sell, or distribute this
+software, either in source code form or as a compiled binary, for any purpose,
+commercial or non-commercial, and by any means.
+In jurisdictions that recognize copyright laws, the author or authors of this
+software dedicate any and all copyright interest in the software to the public
+domain. We make this dedication for the benefit of the public at large and to
+the detriment of our heirs and successors. We intend this dedication to be an
+overt act of relinquishment in perpetuity of all present and future rights to
+this software under copyright law.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+------------------------------------------------------------------------------
+*/
