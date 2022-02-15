@@ -1,4 +1,4 @@
-/** SFJL_Base64_Example - v0.50
+/** SFJL_Integral_Image_Example - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -6,59 +6,80 @@ LICENSE:
 REVISION HISTORY:
     See end of file for revision information.
 
+NOTES:
+    The following functions are not used in this example:
+        - rgb_normalized_bounds
+        - integral_image_value_normalized_bounds
+        - integral_image_value_width_height
+
 */
 package sfjl_examples;
-
 import processing.core.*;
 import static sfjl.SFJL_Integral_Image.*;
-
-
 public class SFJL_Intergral_Image_Example extends PApplet {
-
 public static void main(String[] args) {
     PApplet.main(SFJL_Intergral_Image_Example.class, args);
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 PGraphics pg;
 
-Integral_Image[] rgb;
 
+Integral_Image[] integral_rgb;
+Integral_Image integral_brightness;
 
-@Override
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void settings() {
     size(640, 640, P3D);
 }
-
-@Override
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void setup() {
-    pg = create_some_graphics();
+    pg = create_some_graphics(640, 640);
     pg.loadPixels();
-    rgb = make_integral_image_from_rgb(pg.pixels, pg.width, pg.height);
+    // we have some built in functions for rgb
+    integral_rgb = make_integral_image_from_rgb(pg.pixels, pg.width, pg.height);
+    // here we show how to make a custom one just for brightness
+    integral_brightness = new Integral_Image(pg.width, pg.height);
+    // we have to extract the value(s), and store them in the array.
+    // since we only pass one Integral Image, the array has a dimension of one.
+    // If we would pass in an array of 3 integral images for example, as we
+    // would with RGB, then the array for the values would have a size of 3.
+    // One for red, one for green and one for blue.
+    update_integral_image(integral_brightness, pg.pixels, (c, v)-> {v[0] = (int)brightness(c);});
 }
-
-
-@Override
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void draw() {
     background(0);
 
-    int offset_x = 64;
-    int offset_y = 64;
-
-    image(pg, offset_x, offset_y);
+    image(pg, 0, 0);
 
     int size = 128;
     int h_size = size/2;
+
+    int x1 = mouseX-h_size;
+    int y1 = mouseY-h_size;
+    int x2 = mouseX+h_size;
+    int y2 = mouseY+h_size;
     
-    fill(rgb_for_aabb(rgb, mouseX-offset_x-h_size, mouseY-offset_y-h_size, mouseX-offset_x+h_size, mouseY-offset_y+h_size));
+    x1 = constrain(x1, 0, width);
+    y1 = constrain(y1, 0, height);
+    x2 = constrain(x2, 0, width);
+    y2 = constrain(y2, 0, height);
+
+    fill(rgb(integral_rgb, x1, y1, x2, y2));
     rectMode(CENTER);
     noStroke();
     rect(mouseX, mouseY, size, size);
+    
+    float brightness = integral_image_value(integral_brightness, x1, y1, x2, y2);
+    fill(255);
+    text("brightness: "+(int)brightness, 10, 10);
+
+
 }
-
-
-PGraphics create_some_graphics() {
-    PGraphics pg = createGraphics(512, 512, P3D);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+PGraphics create_some_graphics(int width, int height) {
+    PGraphics pg = createGraphics(width, height, P3D);
     
     pg.loadPixels(); // work around processing loadPixel bug
 
@@ -74,11 +95,11 @@ PGraphics create_some_graphics() {
     pg.endDraw();
     return pg;
 }
-
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 }
 /**
 revision history:
-
+   0.51  (2022-02-15) new functions
    0.50  (2020-08-12) first numbered version
 
 */
