@@ -1,7 +1,6 @@
 [SFJL_Java_Tokenizer]:  src/sfjl/SFJL_Java_Tokenizer.java
 [SFJL_Quad_Tree]:       src/sfjl/SFJL_Quad_Tree.java
 [SFJL_Math]:            src/sfjl/SFJL_Math.java
-[SFJL_PCB_Tree]:        src/sfjl/SFJL_PCB_Tree.java
 [SFJL_Terminal_IO]:     src/sfjl/SFJL_Terminal_IO.java
 [SFJL_Tween]:           src/sfjl/SFJL_Tween.java
 [SFJL_Douglas_Peucker]: src/sfjl/SFJL_Douglas_Peucker.java
@@ -16,7 +15,6 @@
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
 [SFJL_Math_Ex]:            src/sfjl_examples/SFJL_Math_Example.java
-[SFJL_PCB_Tree_Ex]:        src/sfjl_examples/SFJL_PCB_Tree_Example.java
 [SFJL_Terminal_IO_Ex]:     src/sfjl_examples/SFJL_Terminal_IO_Example.java
 [SFJL_Tween_Ex]:           src/sfjl_examples/SFJL_Tween_Example.java
 [SFJL_Douglas_Peucker_Ex]: src/sfjl_examples/SFJL_Douglas_Peucker_Example.java
@@ -58,7 +56,6 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | library                                          | latest version | category           | LoC: | description                                       |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------- |
 | **[SFJL_Math][SFJL_Math]**                       | v0.55          | math               | 589  | the math I keep reusing                           |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | v0.51          | utility            | 356  | tree data structure that avoids using arrays      |
 | **[SFJL_Print][SFJL_Print]**                     | v0.51          | utility            | 180  | print and println without the need of System.out  |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.51          | utility            | 136  | base64 encoder and decoder functions              |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.52          | utility            | 148  | [FNV hash][fnv_link] implementation               |
@@ -69,7 +66,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.5           | graphics / utility | 304  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 3451 |                                                                                                                                 |
+|                                                  |                | **sum**            | 3095 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -81,7 +78,6 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | library                                          | dependencies          |
 | ------------------------------------------------ | :-------------------- |
 | **[SFJL_Math][SFJL_Math]**                       | &#x274c;              |
-| **[SFJL_PCB_Tree][SFJL_PCB_Tree]**               | &#x274c;              |
 | **[SFJL_Print][SFJL_Print]**                     | &#x274c;              |
 | **[SFJL_Base64][SFJL_Base64]**                   | &#x274c;              |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | &#x274c;              |
@@ -103,7 +99,6 @@ At this time no other libraries are being used.
 
 | example                                                     | dependencies                     |
 | ----------------------------------------------------------- | :------------------------------- |
-| **[SFJL_PCB_Tree_Example][SFJL_PCB_Tree_Ex]**               | &#x274c;                         |
 | **[SFJL_Print_Example][SFJL_Print_Ex]**                     | &#x274c;                         |
 | **[SFJL_Base64_Example][SFJL_Base64_Ex]**                   | &#x274c;                         |
 | **[SFJL_FNV_Hash_Example][SFJL_FNV_Hash_Ex]**               | &#x274c;                         |
