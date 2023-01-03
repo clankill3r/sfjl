@@ -1477,7 +1477,6 @@ static public <T> boolean intersects_cube(Octree_Node<T> tree, float x1, float y
 }
 /**
 revision history:
-    0.51  (2022-01-30) fixed bug in comparator
     0.50  (2022-01-06) first numbered version
 
 */
