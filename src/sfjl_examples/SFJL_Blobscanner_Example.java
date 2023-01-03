@@ -23,7 +23,6 @@ PImage input;
 Blobscanner_Settings blobscanner_context;
 
 
-
 static class Blur_Pass {
     static PGraphics pg_blurred;
     static PShader s_blur;
