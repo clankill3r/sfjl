@@ -66,7 +66,7 @@ public void setup() {
     }
     println("points: "+tree.size);
 
-    many_points_shader = loadShader("quadtree_example_many_points.glsl");
+    many_points_shader = loadShader("shaders/quadtree_example_many_points.glsl");
     points_map = createImage(pow_2_ceil(width/16), pow_2_ceil(height), ARGB);
     points_map.loadPixels();
     gl_nearest_for_texture(this, points_map);
