@@ -25,6 +25,8 @@
 [SFJL_Spatial_Map_Ex]:     src/sfjl_examples/SFJL_Spatial_Map_Example.java
 [SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
 [SFJL_Blobscanner_Ex_1]:     src/sfjl/SFJL_Blobscanner_Example_Heightmap.java
+[SFJL_Blobscanner_Ex_2]:     src/sfjl/SFJL_Blobscanner_Example_Heightmap_Mask.java
+[SFJL_Blobscanner_Ex_3]:     src/sfjl/SFJL_Blobscanner_Example.java
 
 
 # SFJL
