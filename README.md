@@ -1,5 +1,6 @@
 [SFJL_Java_Tokenizer]:  src/sfjl/SFJL_Java_Tokenizer.java
 [SFJL_Quad_Tree]:       src/sfjl/SFJL_Quad_Tree.java
+[SFJL_Octree]:          src/sfjl/SFJL_Octree.java
 [SFJL_Math]:            src/sfjl/SFJL_Math.java
 [SFJL_Terminal_IO]:     src/sfjl/SFJL_Terminal_IO.java
 [SFJL_Tween]:           src/sfjl/SFJL_Tween.java
@@ -14,6 +15,7 @@
 
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
+[SFJL_Octree_Ex]:       src/sfjl_examples/SFJL_Octree_Example.java
 [SFJL_Math_Ex]:            src/sfjl_examples/SFJL_Math_Example.java
 [SFJL_Terminal_IO_Ex]:     src/sfjl_examples/SFJL_Terminal_IO_Example.java
 [SFJL_Tween_Ex]:           src/sfjl_examples/SFJL_Tween_Example.java
@@ -64,11 +66,12 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Tween][SFJL_Tween]**                     | v0.5           | graphics / utility | 187  | tween functions                                   |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.5           | graphics / utility | 179  | line based curve decimator for 2d and 3d          |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.53          | graphics / utility | 885  | fast quad_tree implementation, with lots of optimized functions to get points |
+| **[SFJL_Octree][SFJL_Octree]**                   | v0.50          | graphics / utility | 1126  | fast octree implementation, with lots of optimized functions to get points |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.52          | graphics / utility | 149   | simple intergral image |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.5           | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.5           | graphics / utility | 304  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 3095 |                                                                                                                                 |
+|                                                  |                | **sum**            | 4221 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
@@ -120,7 +123,6 @@ Here a list of what is coming for sure:
 | library               | category | description                                    |
 | --------------------- | -------- | ---------------------------------------------- |
 | SFJL_Spatial_Hash_Map | data structure | store points based on hashes
-| SFJL_Octree           | data structure | store points in boxes
 | SFJL_????_Tree        | data structure | quadtree for 4th dimensions
 
 
