@@ -13,6 +13,8 @@ EXAMPLE:
 package sfjl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -657,178 +659,9 @@ static public <T> void get_outside_aabb(Octree_Node<T> qtn, float _r_x1, float _
 }
 
 
-static public ArrayList<?> debug;
+static public <T> void get_closest_n(Octree_Node<T> qtn, float x, float y, float z, int n, List<T> result, ArrayList<T> buffer) {
 
-static public <T> void get_closest_n(Octree_Node<T> qtn, float x, float y, float z, int n, List<T> result) {
-
-    if (n <= 0)
-        return;
-
-    if (n >= qtn.octree.size) {
-        get_all(qtn, result);
-        return;
-    }
-
-    if (n == 1) {
-        T t = get_closest(qtn, x, y, z);
-        if (t != null)
-            result.add(t);
-        return;
-    }
-
-    ArrayList<Octree_Node<T>> open = new ArrayList<>();
-    open.add(qtn);
-
-    ArrayList<Octree_Node<T>> leafs = new ArrayList<>();
-    int items_in_leafs = 0;
-
-    Octree_Node<T> current = null;
-
-    //
-    // find closest leafs till we hit N without checking individual points
-    //
-    boolean do_add_containing = true;
-
-    // TODO check if correct and comment why we do certain things
-    Comparator<Octree_Node<T>> comparator_desc = new Comparator<Octree_Node<T>>() {
-        @Override
-        public int compare(Octree_Node<T> o1, Octree_Node<T> o2) {
-
-            float d1 = Float.MAX_VALUE;
-            if (has_children(o1)) {
-                if (point_outside_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2)) {
-                    d1 = max_dist_sq_point_to_corner_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2);
-                }
-            } else {
-                d1 = dist_sq_point_to_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2);
-            }
-
-            float d2 = Float.MAX_VALUE;
-            if (has_children(o2)) {
-                if (point_outside_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2)) {
-                    d2 = max_dist_sq_point_to_corner_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2);
-                }
-            } else {
-                d2 = dist_sq_point_to_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2);
-            }
-
-            if (d1 < d2)
-                return 1;
-            if (d1 > d2)
-                return -1;
-            return 0;
-        }
-    };
-
-    while (open.size() > 0) {
-
-        open.sort(comparator_desc);
-
-        current = remove_last(open);
-
-        if (has_children(current)) {
-            open.add(current.children[0]);
-            open.add(current.children[1]);
-            open.add(current.children[2]);
-            open.add(current.children[3]);
-            open.add(current.children[4]);
-            open.add(current.children[5]);
-            open.add(current.children[6]);
-            open.add(current.children[7]);
-        } else {
-
-            leafs.add(current);
-            items_in_leafs += current.data.size();
-
-            if (items_in_leafs >= n) {
-                // what?
-                if (leafs.size() <= 8) {
-                    do_add_containing = false;
-                }
-                break;
-            }
-        }
-    }
-
-    // we now know a minimum radius before we overflow N, now we can add quads if
-    // they are fully contained in this radius
-    if (do_add_containing) {
-        float dist_point_to_overflow_leaf = dist_sq_point_to_aabb(x, y, z, current.x1, current.y1, current.z1, current.x2,
-                current.y2, current.z2);
-
-        for (int i = leafs.size() - 1; i >= 0; i--) {
-
-            Octree_Node<T> leaf = leafs.get(i);
-            float max_dist_point_to_leaf = max_dist_sq_point_to_corner_aabb(x, y, z, leaf.x1, leaf.y1, leaf.z1, leaf.x2,
-                    leaf.y2, leaf.z2);
-
-            if (max_dist_point_to_leaf <= dist_point_to_overflow_leaf) {
-                result.addAll(leaf.data);
-                leafs.remove(i);
-            }
-        }
-    }
-
-    ArrayList<T> buffer = new ArrayList<>((n - result.size()) * 2);
-
-    for (Octree_Node<T> tree : leafs) {
-        buffer.addAll(tree.data);
-    }
-
-    float add_all_quads_within_this_radius_sq = max_dist_sq_point_to_corner_aabb(x, y, z, current.x1, current.y1, current.z1,
-            current.x2, current.y2, current.z2);
-
-    while (open.size() > 0) {
-
-        open.sort(comparator_desc); // NOCHECKIN, I added this 7 jan 2022
-
-        Octree_Node<T> tree = remove_last(open);
-        if (has_children(tree)) {
-
-            float d = dist_sq_point_to_aabb(x, y, z, tree.x1, tree.y1, tree.z1, tree.x2, tree.y2, tree.z2);
-            if (d <= add_all_quads_within_this_radius_sq) {
-                open.add(tree.children[0]);
-                open.add(tree.children[1]);
-                open.add(tree.children[2]);
-                open.add(tree.children[3]);
-                open.add(tree.children[4]);
-                open.add(tree.children[5]);
-                open.add(tree.children[6]);
-                open.add(tree.children[7]);
-            }
-        } else {
-            float d = dist_sq_point_to_aabb(x, y, z, tree.x1, tree.y1, tree.z1, tree.x2, tree.y2, tree.z2);
-            if (d <= add_all_quads_within_this_radius_sq) {
-                buffer.addAll(tree.data);
-            }
-        }
-    }
-
-    buffer.sort(new Comparator<T>() {
-        @Override
-        public int compare(T o1, T o2) {
-            float d1 = dist_sq(x, y, z, x(qtn, o1), y(qtn, o1), z(qtn, o1));
-            float d2 = dist_sq(x, y, z, x(qtn, o2), y(qtn, o2), z(qtn, o2));
-            if (d1 < d2)
-                return -1;
-            if (d1 > d2)
-                return 1;
-            return 0;
-        }
-    });
-
-    int max = n - result.size();
-    for (int i = 0; i < max; i++) {
-        T t = buffer.get(i);
-        result.add(t);
-    }
-
-    debug = buffer;
-
-}
-
-
-static public <T> void get_closest_n2(Octree_Node<T> qtn, float x, float y, float z, int n, List<T> result) {
+    int incoming_result_size = result.size();
 
     if (n <= 0)
         return;
@@ -852,48 +685,21 @@ static public <T> void get_closest_n2(Octree_Node<T> qtn, float x, float y, floa
     int items_in_leafs = 0;
 
     Octree_Node<T> current = null;
+    Octree_Node<T> overflow = null;
 
-    //
-    // find closest leafs till we hit N without checking individual points
-    //
-    boolean do_add_containing = true;
-
-    // we should be able to store max_dist_sq_point_to_corner_aabb / dist_sq_point_to_aabb
-    // instead of recalculating
-
-    Comparator<Octree_Node<T>> comparator_desc = new Comparator<Octree_Node<T>>() {
-        @Override
-        public int compare(Octree_Node<T> o1, Octree_Node<T> o2) {
-
-            float d1 = -1;
-            if (has_children(o1)) {
-                if (point_outside_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2)) {
-                    d1 = max_dist_sq_point_to_corner_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2);
-                }
-            } else {
-                d1 = dist_sq_point_to_aabb(x, y, z, o1.x1, o1.y1, o1.z1, o1.x2, o1.y2, o1.z2);
-            }
-
-            float d2 = -1;
-            if (has_children(o2)) {
-                if (point_outside_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2)) {
-                    d2 = max_dist_sq_point_to_corner_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2);
-                }
-            } else {
-                d2 = dist_sq_point_to_aabb(x, y, z, o2.x1, o2.y1, o2.z1, o2.x2, o2.y2, o2.z2);
-            }
-
-            if (d1 < d2)
-                return 1;
-            if (d1 > d2)
-                return -1;
-            return 0;
-        }
-    };
-
+    // We wan't to find leafs till we hit N,
+    // without looking at the individual elements
+    // Therefor we keep getting the closest tree
+    // till we hit N
     while (open.size() > 0) {
 
-        open.sort(comparator_desc);
+        Collections.sort(open, (a, b)-> {
+            float dist_a = dist_sq_point_to_aabb(x, y, z, a.x1, a.y1, a.z1, a.x2, a.y2, a.z2);
+            float dist_b = dist_sq_point_to_aabb(x, y, z, b.x1, b.y1, b.z1, b.x2, b.y2, b.z2);
+            if (dist_a < dist_b) return 1;
+            if (dist_a > dist_b) return -1;
+            return 0;
+        });
 
         current = remove_last(open);
 
@@ -906,96 +712,88 @@ static public <T> void get_closest_n2(Octree_Node<T> qtn, float x, float y, floa
             open.add(current.children[5]);
             open.add(current.children[6]);
             open.add(current.children[7]);
-        } else {
+        }
+        else {
+
+            if (items_in_leafs + current.data.size() >= n) {
+                overflow = current;
+                open.add(current); // we add it back for later
+                break;
+            }
 
             leafs.add(current);
             items_in_leafs += current.data.size();
-
-            if (items_in_leafs >= n) {
-                // what?
-                if (leafs.size() <= 8) {
-                    do_add_containing = false;
-                }
-                break;
-            }
         }
     }
 
-    // we now know a minimum radius before we overflow N, now we can add quads if
-    // they are fully contained in this radius
-    if (do_add_containing) {
-        float dist_point_to_overflow_leaf = dist_sq_point_to_aabb(x, y, z, current.x1, current.y1, current.z1, current.x2,
-                current.y2, current.z2);
+    // Now we know at which node we overflowed, we can add
+    // from every leaf as long as the furtherest point of that
+    // leaf is closer then the closest point of the overflow leaf
 
-        for (int i = leafs.size() - 1; i >= 0; i--) {
+    float overflow_leaf_dist_sq = dist_sq_point_to_aabb(x, y, z, overflow.x1, overflow.y1, overflow.z1, overflow.x2, overflow.y2, overflow.z2);
 
-            Octree_Node<T> leaf = leafs.get(i);
-            float max_dist_point_to_leaf = max_dist_sq_point_to_corner_aabb(x, y, z, leaf.x1, leaf.y1, leaf.z1, leaf.x2,
-                    leaf.y2, leaf.z2);
-
-            if (max_dist_point_to_leaf <= dist_point_to_overflow_leaf) {
-                result.addAll(leaf.data);
-                leafs.remove(i);
-            }
+    for (Octree_Node<T> node : leafs) {
+        float furtherest_point_sq = max_dist_sq_point_to_corner_aabb(x, y, z, node.x1, node.y1, node.z1, node.x2, node.y2, node.z2);
+        if (furtherest_point_sq <= overflow_leaf_dist_sq) {
+            result.addAll(node.data);
+        }
+        else {
+            open.add(node);
         }
     }
 
-    ArrayList<T> buffer = new ArrayList<>((n - result.size()) * 2);
-
-    for (Octree_Node<T> tree : leafs) {
-        buffer.addAll(tree.data);
+    // Now we need to check points individually, but we also might need more leafs
+    // We can ignore all leafs that have the closest point further away then
+    // furthest point in the overflow leaf
+    float max_dist_sq_to_overflow_point = -1;
+    for (T t : overflow) {
+        float vx = x(overflow, t);
+        float vy = y(overflow, t);
+        float vz = z(overflow, t);
+        float dist_sq = dist_sq(x, y,z, vx, vy, vz);
+        if (dist_sq > max_dist_sq_to_overflow_point) max_dist_sq_to_overflow_point = dist_sq;
     }
 
-    float add_all_quads_within_this_radius_sq = max_dist_sq_point_to_corner_aabb(x, y, z, current.x1, current.y1, current.z1,
-            current.x2, current.y2, current.z2);
+    // We will fill a buffer with points that we need to check individually
+    buffer.clear();
 
     while (open.size() > 0) {
+        current = remove_last(open);
+        float closest_dist_sq = dist_sq_point_to_aabb(x, y, z, current.x1, current.y1, current.z1, current.x2, current.y2, current.z2);
+        if (closest_dist_sq > max_dist_sq_to_overflow_point) {
+            continue;
+        }
 
-        open.sort(comparator_desc); // NOCHECKIN, I added this 7 jan 2022
-
-        Octree_Node<T> tree = remove_last(open);
-        if (has_children(tree)) {
-
-            float d = dist_sq_point_to_aabb(x, y, z, tree.x1, tree.y1, tree.z1, tree.x2, tree.y2, tree.z2);
-            if (d <= add_all_quads_within_this_radius_sq) {
-                open.add(tree.children[0]);
-                open.add(tree.children[1]);
-                open.add(tree.children[2]);
-                open.add(tree.children[3]);
-                open.add(tree.children[4]);
-                open.add(tree.children[5]);
-                open.add(tree.children[6]);
-                open.add(tree.children[7]);
-            }
-        } else {
-            float d = dist_sq_point_to_aabb(x, y, z, tree.x1, tree.y1, tree.z1, tree.x2, tree.y2, tree.z2);
-            if (d <= add_all_quads_within_this_radius_sq) {
-                buffer.addAll(tree.data);
-            }
+        if (has_children(current)) {
+            open.add(current.children[0]);
+            open.add(current.children[1]);
+            open.add(current.children[2]);
+            open.add(current.children[3]);
+            open.add(current.children[4]);
+            open.add(current.children[5]);
+            open.add(current.children[6]);
+            open.add(current.children[7]);            
+        }
+        else {
+            buffer.addAll(current.data);
         }
     }
 
-    buffer.sort(new Comparator<T>() {
-        @Override
-        public int compare(T o1, T o2) {
-            float d1 = dist_sq(x, y, z, x(qtn, o1), y(qtn, o1), z(qtn, o1));
-            float d2 = dist_sq(x, y, z, x(qtn, o2), y(qtn, o2), z(qtn, o2));
-            if (d1 < d2)
-                return -1;
-            if (d1 > d2)
-                return 1;
-            return 0;
-        }
+    // Sort the buffer
+    Collections.sort(buffer, (a, b)-> {
+        float dist_a = dist_sq(x, y, z, x(qtn, a), y(qtn, a), z(qtn, a));
+        float dist_b = dist_sq(x, y, z, x(qtn, b), y(qtn, b), z(qtn, b));
+        if (dist_a < dist_b) return -1;
+        if (dist_a > dist_b) return  1;
+        return 0;
     });
 
-    int max = n - result.size();
-    for (int i = 0; i < max; i++) {
-        T t = buffer.get(i);
-        result.add(t);
+
+    int remaining_n = n - (result.size() - incoming_result_size);
+
+    for (int i = 0; i < remaining_n; i++) {
+        result.add(buffer.get(i));
     }
-
-    debug = buffer;
-
 }
 
 
@@ -1534,7 +1332,7 @@ static public <T> Iterator<Octree_Node<T>> get_iterator(Octree_Node<T> qtn, Iter
             }
         };
     }
-    if (iterator_type == Iterator_Type.BREADTH_FIRST) {
+    else if (iterator_type == Iterator_Type.BREADTH_FIRST) {
 
         ArrayList<Octree_Node<T>> _current_depth = new ArrayList<>();
         _current_depth.add(qtn);
@@ -1574,7 +1372,7 @@ static public <T> Iterator<Octree_Node<T>> get_iterator(Octree_Node<T> qtn, Iter
         };
 
     }
-    if (iterator_type == Iterator_Type.LEAFS) {
+    else if (iterator_type == Iterator_Type.LEAFS) {
 
         ArrayList<Octree_Node<T>> open       = new ArrayList<>();
         ArrayList<Octree_Node<T>> open_leafs = new ArrayList<>();
