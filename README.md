@@ -12,6 +12,8 @@
 [SFJL_Spatial_Map]:     src/sfjl/SFJL_Spatial_Map.java
 [SFJL_Intergral_Image]: src/sfjl/SFJL_Intergral_Image.java
 [SFJL_Blobscanner]:     src/sfjl/SFJL_Blobscanner.java
+[SFJL_K_D_Tree]:        src/sfjl/SFJL_K_D_Tree.java
+
 
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
@@ -25,10 +27,11 @@
 [SFJL_Base64_Ex]:          src/sfjl_examples/SFJL_Base64_Example.java
 [SFJL_Doeke_Ex]:           src/sfjl_examples/SFJL_Doeke_Example.java
 [SFJL_Spatial_Map_Ex]:     src/sfjl_examples/SFJL_Spatial_Map_Example.java
-[SFJL_Intergral_Image_Ex]: src/sfjl/SFJL_Intergral_Image_Example.java
-[SFJL_Blobscanner_Ex_1]:     src/sfjl/SFJL_Blobscanner_Example_Heightmap.java
-[SFJL_Blobscanner_Ex_2]:     src/sfjl/SFJL_Blobscanner_Example_Heightmap_Mask.java
-[SFJL_Blobscanner_Ex_3]:     src/sfjl/SFJL_Blobscanner_Example.java
+[SFJL_Intergral_Image_Ex]: src/sfjl_examples/SFJL_Intergral_Image_Example.java
+[SFJL_Blobscanner_Ex_1]:   src/sfjl_examples/SFJL_Blobscanner_Example_Heightmap.java
+[SFJL_Blobscanner_Ex_2]:   src/sfjl_examples/SFJL_Blobscanner_Example_Heightmap_Mask.java
+[SFJL_Blobscanner_Ex_3]:   src/sfjl_examples/SFJL_Blobscanner_Example.java
+[SFJL_K_D_Tree_Ex]:        src/sfjl_examples/SFJL_K_D_Tree_Example.java
 
 
 # SFJL
@@ -67,6 +70,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.50          | graphics / utility | 179  | line based curve decimator for 2d and 3d          |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.53          | graphics / utility | 885  | fast quad_tree implementation, with lots of optimized functions to get points |
 | **[SFJL_Octree][SFJL_Octree]**                   | v0.50          | graphics / utility | 1126  | fast octree implementation, with lots of optimized functions to get points |
+| **[SFJL_K_D_Tree][SFJL_K_D_Tree]**               | v0.50          | graphics / utility | 108  | minimal k-d tree implementation lacking a lot of functionality |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.52          | graphics / utility | 149   | simple intergral image |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.50          | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.50          | graphics / utility | 304  | Contour scanner based on a threshold |
@@ -123,7 +127,6 @@ Here a list of what is coming for sure:
 | library               | category | description                                    |
 | --------------------- | -------- | ---------------------------------------------- |
 | SFJL_Spatial_Hash_Map | data structure | store points based on hashes
-| SFJL_????_Tree        | data structure | quadtree for 4th dimensions
 
 
 # Never Asked FAQ
