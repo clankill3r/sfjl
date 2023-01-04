@@ -75,7 +75,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.50          | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.50          | graphics / utility | 304  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 4221 |                                                                                                                                 |
+|                                                  |                | **sum**            | 4329 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
