@@ -66,7 +66,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Print][SFJL_Print]**                     | v0.51          | utility            | 180  | print and println without the need of System.out  |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.51          | utility            | 136  | base64 encoder and decoder functions              |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.52          | utility            | 148  | [FNV hash][fnv_link] implementation               |
-| **[SFJL_Tween][SFJL_Tween]**                     | v0.50          | graphics / utility | 187  | tween functions                                   |
+| **[SFJL_Tween][SFJL_Tween]**                     | v0.51          | graphics / utility | 226  | tween functions                                   |
 | **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | v0.50          | graphics / utility | 179  | line based curve decimator for 2d and 3d          |
 | **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | v0.53          | graphics / utility | 885  | fast quad_tree implementation, with lots of optimized functions to get points |
 | **[SFJL_Octree][SFJL_Octree]**                   | v0.50          | graphics / utility | 1126  | fast octree implementation, with lots of optimized functions to get points |
@@ -75,7 +75,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.50          | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.50          | graphics / utility | 304  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 4329 |                                                                                                                                 |
+|                                                  |                | **sum**            | 4260 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
