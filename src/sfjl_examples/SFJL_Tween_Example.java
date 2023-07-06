@@ -1,4 +1,4 @@
-/** SFJL_Tween_Example - v0.50
+/** SFJL_Tween_Example - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -9,44 +9,10 @@ REVISION HISTORY:
 */
 package sfjl_examples;
 
-import processing.core.PApplet;
-import processing.core.PVector;
+import processing.core.*;
 import static sfjl.SFJL_Tween.*;
 
 public class SFJL_Tween_Example extends PApplet {
-
-
-Ease_In_Out_Type[] ease_in_out_types = {
-    Ease_In_Out_Type.EASE_IN,
-    Ease_In_Out_Type.EASE_OUT,
-    Ease_In_Out_Type.EASE_IN_OUT
-};
-
-int ease_in_out_type_index = 0;
-
-
-Ease_Type[] ease_types = {
-    Ease_Type.SINE,
-    Ease_Type.LINEAR,
-    Ease_Type.BOUNCE,
-    Ease_Type.CIRC,
-    Ease_Type.CUBIC,
-    Ease_Type.EXPO,
-    Ease_Type.QUAD,
-    Ease_Type.QUART,
-    Ease_Type.QUINT
-};
-
-int ease_type_index = 0;
-
-
-PVector pos = new PVector();
-PVector target_pos = new PVector();
-
-int start_time_for_tween;
-float duration = 1000;
-
-
 
 public static void main(String[] args) {
     PApplet.main(SFJL_Tween_Example.class, args);
@@ -54,81 +20,99 @@ public static void main(String[] args) {
 
 @Override
 public void settings() {
-    size(800, 600);
+    size(1080, 360+3, P2D);
 }
 
 @Override
 public void setup() {
-    
+    surface.setResizable(true);
 }
+
 
 @Override
 public void draw() {
-    background(0);
-
-    Ease_In_Out_Type in_out_type = ease_in_out_types[ease_in_out_type_index];
-    Ease_Type ease_type = ease_types[ease_type_index];
-
-    float time = min(duration, millis()-start_time_for_tween);
-
-    float x = ease(in_out_type, ease_type, time, pos.x, target_pos.x, duration);
-    float y = ease(in_out_type, ease_type, time, pos.y, target_pos.y, duration);
-
-    if (time == duration) {
-        pos.x = x;
-        pos.y = y;
-    }
-    
-    fill(255,255,0);
-    ellipse(x, y, 125, 125);
-
-    if (mousePressed) {
-        pos.x = x;
-        pos.y = y;
-        target_pos.x = mouseX;
-        target_pos.y = mouseY;
-        start_time_for_tween = millis();
-    }
-
-    fill(255);
-    textSize(40);
-    text(""+in_out_type+"\n"+ease_type, 50, 50);
+    draw(g, 0, 0, width, height);
 }
 
-@Override
-public void keyPressed() {
-    
-    if (key == 'q') {
-        ease_in_out_type_index--;
-        if (ease_in_out_type_index < 0) {
-            ease_in_out_type_index = ease_in_out_types.length;
-        }
-    }
-    if (key == 'w') {
-        ease_in_out_type_index++;
-        if (ease_in_out_type_index == ease_in_out_types.length) {
-            ease_in_out_type_index = 0;
-        }
-    }
-    if (key == 'a') {
-        ease_type_index--;
-        if (ease_type_index < 0) {
-            ease_type_index = ease_types.length;
-        }
-    }
-    if (key == 's') {
-        ease_type_index++;
-        if (ease_type_index == ease_types.length) {
-            ease_type_index = 0;
-        }
-    }
+public void draw(PGraphics pg, int _x1, int _y1, int _x2, int _y2) {
+    pg.pushMatrix();
+    pg.translate(_x1, _y1);
+    draw(pg, _x2-_x1, _y2-_y1);
+    pg.popMatrix();
 }
-   
+
+
+public void draw(PGraphics pg, int width, int height) {
+
+    pg.fill(30);
+    pg.noStroke();
+    pg.rect(0, 0, width, height);
+
+    int N_EASE_IN_OUT_TYPES = In_Out_Type.values().length;
+    int N_EASE_TYPES = Ease_Type.values().length;
+
+    for (int i = 0; i < N_EASE_IN_OUT_TYPES; i++) { // y-axis
+        In_Out_Type in_out_type = In_Out_Type.values()[i];
+        for (int j = 0; j < N_EASE_TYPES; j++) { // x-axis
+            Ease_Type ease_type = Ease_Type.values()[j];
+            
+            var x1 = map(j, 0, N_EASE_TYPES, 0, width);
+            var y1 = map(i, 0, N_EASE_IN_OUT_TYPES, 0, height);
+            int w = round((float) width / N_EASE_TYPES);
+            int h = round((float) height / N_EASE_IN_OUT_TYPES);
+
+            int margin = 10;
+            x1 += margin;
+            y1 += margin;
+            w -= margin * 2;
+            h -= margin * 2;
+
+            int n_points = w / 2;
+            
+            draw_graph(pg, x1, y1, x1+w, y1+h, n_points, in_out_type, ease_type);
+            
+            pg.fill(255);
+            pg.textAlign(LEFT, TOP);
+            pg.text(in_out_type+"\n"+ease_type, x1, y1);
+        }
+    }
+
+}
+
+
+void draw_graph(PGraphics pg, float plot_x1, float plot_y1, float plot_x2, float plot_y2, int n_points, In_Out_Type in_out_type, Ease_Type ease_type) {
+    
+    pg.pushMatrix();
+
+    pg.fill(50);
+    pg.rectMode(CORNERS);
+    pg.noStroke();
+    pg.rect(plot_x1, plot_y1, plot_x2, plot_y2);
+
+    pg.noFill();
+    pg.stroke(255);
+
+    pg.beginShape();
+
+    for (int x = 0; x < n_points; x++) {
+        float t = (float) x / n_points;
+        float mx = map(x, 0, n_points-1, plot_x1, plot_x2);
+        float my = ease(in_out_type, ease_type, plot_y1, plot_y2, t);
+        pg.vertex(mx, my);
+    }
+    pg.endShape(OPEN);
+
+    pg.popMatrix();
+}
+
+
+
 }
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
+    0.51  (2023-06-06) displaying a grid with all the options
+    0.50  (2020-08-12) first numbered version
 
 */
 
