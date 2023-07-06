@@ -62,7 +62,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 
 | library                                          | latest version | category           | LoC: | description                                       |
 | ------------------------------------------------ | -------------- | ------------------ | ---- | ------------------------------------------------- |
-| **[SFJL_Math][SFJL_Math]**                       | v0.55          | math               | 589  | the math I keep reusing                           |
+| **[SFJL_Math][SFJL_Math]**                       | v0.56          | math               | 589  | the math I keep reusing                           |
 | **[SFJL_Print][SFJL_Print]**                     | v0.51          | utility            | 180  | print and println without the need of System.out  |
 | **[SFJL_Base64][SFJL_Base64]**                   | v0.51          | utility            | 136  | base64 encoder and decoder functions              |
 | **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | v0.52          | utility            | 148  | [FNV hash][fnv_link] implementation               |

@@ -1,4 +1,4 @@
-/** SFJL_Math - v0.55
+/** SFJL_Math - v0.56
  
 LICENSE:
     See end of file for license information.
@@ -558,7 +558,7 @@ static public int test_matrix_axis_aligned(Mat3 m) {
 // -----------------------------------------------------------------------------
 
 
-public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_x2, float a_y2, float b_x1, float b_y1, float b_x2, float b_y2) {
+static public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_x2, float a_y2, float b_x1, float b_y1, float b_x2, float b_y2) {
     return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2);
 }
 
@@ -567,7 +567,7 @@ static public boolean aabb_contains_aabb(float r_x1, float r_y1, float r_x2, flo
 }
 
 
-public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_z1, float a_x2, float a_y2, float a_z2, float b_x1, float b_y1, float b_z1, float b_x2, float b_y2, float b_z2) {
+static public boolean aabb_intersects_aabb(float a_x1, float a_y1, float a_z1, float a_x2, float a_y2, float a_z2, float b_x1, float b_y1, float b_z1, float b_x2, float b_y2, float b_z2) {
     return !(a_x2 < b_x1 || a_x1 > b_x2 || a_y2 < b_y1 || a_y1 > b_y2 || a_z2 < b_z1 || a_z1 > b_z2);
 }
 
@@ -853,6 +853,7 @@ static public Vec2 pointy_hex_to_pixel(Vec2 hex, float size) {
 }
 /**
 revision history:
+    0.56  (2023-06-06) made aabb_intersects_aabb static
     0.55  (2022-02-04) added a lot of functions for 3d that where already there in 2d
     0.54  (2020-08-25) added lerp
     0.53  (2020-08-18) Vec3 and hexagon functions
