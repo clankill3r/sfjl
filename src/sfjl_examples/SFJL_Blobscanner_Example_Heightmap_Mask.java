@@ -1,4 +1,4 @@
-/** SFJL_Blobscanner_Example_Heightmap_Mask - v0.5
+/** SFJL_Blobscanner_Example_Heightmap_Mask - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -41,7 +41,7 @@ public void setup() {
     blobscanner_context.border_color = color(0);
     blobscanner_context.contour_settings = Contour_Settings.ALL_PIXELS;
 
-    mask = createGraphics(250, 250);
+    mask = createGraphics(250, 250, P2D);
     mask.beginDraw();
     mask.background(255,255,0);
     mask.fill(255);
@@ -138,7 +138,8 @@ public void draw() {
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
+    0.51  (2023-08-10) createGraphics using P2D now (reason: https://github.com/processing/processing4/issues/768)
+    0.50  (2020-08-12) first numbered version
 
 */
 
