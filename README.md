@@ -99,7 +99,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 
 ## Dependencies
 
-Most of the examples use [processing](www.processing.org) as a dependency.
+Most of the examples use [processing](www.processing.org) as a dependency, which is included in this repository.
 At this time no other libraries are being used.
 
 <!-- 
@@ -119,6 +119,12 @@ At this time no other libraries are being used.
 
 <!-- | **[SFJL_Doeke_Example][SFJL_Doeke_Ex]**                     | &#x274c;     | -->
 <!-- | **[SFJL_Math_Example][SFJL_Math_Ex]**                       | &#x274c;     | -->
+
+# Screenshots
+
+**[SFJL_Tween_Example][SFJL_Tween_Ex]**
+![Drag Racing](data/screenshots/SFJL_Tween_Example.png)
+
 
 
 # Soon(?) to come libraries
