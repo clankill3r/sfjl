@@ -51,7 +51,7 @@ int N = 15_000;
 @Override
 public void settings() {     
     size(1200, 800, P3D);
-    pixelDensity(2);
+    // pixelDensity(2);
     
 }
 
@@ -74,7 +74,7 @@ public void draw_setup() {
     ps_points = createShape();
 
     ps_points.beginShape(POINTS);
-    ps_points.stroke(255);
+    ps_points.stroke(0, 255, 0);
     for (PVector v : tree) {
         ps_points.vertex(v.x, v.y, v.z);
     }
@@ -85,7 +85,7 @@ public void draw_setup() {
 
     ps_boxes.beginShape(QUADS);
     ps_boxes.noFill();
-    ps_boxes.stroke(0);
+    ps_boxes.stroke(50);
 
     var itr = SFJL_Octree.get_iterator(tree.root, Iterator_Type.DEPTH_FIRST);
     while (itr.hasNext()) {
@@ -173,15 +173,12 @@ public void draw() {
         if (key == ']') N += 100;
         if (N < 0) N = 0;
     }
-    background(50);
+    background(0);
 
     pushMatrix();
     translate(width/2, height/2, 100);
     
     rotateY(rot_y);
-
-    noFill();
-    stroke(0);
 
     pushMatrix();
     scale(scale);
