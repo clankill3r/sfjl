@@ -17,7 +17,7 @@
 
 [SFJL_Java_Tokenizer_Ex]:  src/sfjl_examples/SFJL_Java_Tokenizer_Example.java
 [SFJL_Quad_Tree_Ex]:       src/sfjl_examples/SFJL_Quad_Tree_Example.java
-[SFJL_Octree_Ex]:       src/sfjl_examples/SFJL_Octree_Example.java
+[SFJL_Octree_Ex]:          src/sfjl_examples/SFJL_Octree_Example.java
 [SFJL_Math_Ex]:            src/sfjl_examples/SFJL_Math_Example.java
 [SFJL_Terminal_IO_Ex]:     src/sfjl_examples/SFJL_Terminal_IO_Example.java
 [SFJL_Tween_Ex]:           src/sfjl_examples/SFJL_Tween_Example.java
@@ -80,59 +80,43 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
 
-<!-- 
-# Dependencies
-
-## Dependencies Libraries
-| library                                          | dependencies          |
-| ------------------------------------------------ | :-------------------- |
-| **[SFJL_Math][SFJL_Math]**                       | &#x274c;              |
-| **[SFJL_Print][SFJL_Print]**                     | &#x274c;              |
-| **[SFJL_Base64][SFJL_Base64]**                   | &#x274c;              |
-| **[SFJL_FNV_Hash][SFJL_FNV_Hash]**               | &#x274c;              |
-| **[SFJL_Tween][SFJL_Tween]**                     | &#x274c;              |
-| **[SFJL_Douglas_Peucker][SFJL_Douglas_Peucker]** | &#x274c;              |
-| **[SFJL_Quad_Tree][SFJL_Quad_Tree]**             | SFJL_Doeke, SFJL_Math |
-| **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | &#x274c;              |
-| **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | &#x274c;              |
-| **[SFJL_Doeke][SFJL_Doeke]**                     | &#x274c;              | -->
-
 ## Dependencies
 
 Most of the examples use [processing](www.processing.org) as a dependency, which is included in this repository.
 At this time no other libraries are being used.
 
-<!-- 
-> &#x26A0; All the dependencies required are included in this repository
-> &#x26A0; SFJL_* dependencies are not listed
 
-| example                                                     | dependencies                     |
-| ----------------------------------------------------------- | :------------------------------- |
-| **[SFJL_Print_Example][SFJL_Print_Ex]**                     | &#x274c;                         |
-| **[SFJL_Base64_Example][SFJL_Base64_Ex]**                   | &#x274c;                         |
-| **[SFJL_FNV_Hash_Example][SFJL_FNV_Hash_Ex]**               | &#x274c;                         |
-| **[SFJL_Tween_Example][SFJL_Tween_Ex]**                     | [processing](www.processing.org) |
-| **[SFJL_Douglas_Peucker_Example][SFJL_Douglas_Peucker_Ex]** | [processing](www.processing.org) |
-| **[SFJL_Quad_Tree_Example][SFJL_Quad_Tree_Ex]**             | [processing](www.processing.org) |
-| **[SFJL_Intergral_Image][SFJL_Intergral_Image_Ex]**         | [processing](www.processing.org) |
-| **[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**         | [processing](www.processing.org) | -->
+<!-- > &#x26A0; All the dependencies required are included in this repository -->
 
-<!-- | **[SFJL_Doeke_Example][SFJL_Doeke_Ex]**                     | &#x274c;     | -->
-<!-- | **[SFJL_Math_Example][SFJL_Math_Ex]**                       | &#x274c;     | -->
 
 # Screenshots
 
+> &#x26A0; Not every example is suited for a screenshot!
+
+
+**[SFJL_Blobscanner_Example_Heightmap][SFJL_Blobscanner_Ex_1]**
+![](data/screenshots/SFJL_Blobscanner_Example_Heightmap.gif)
+
+**[SFJL_Blobscanner_Example_Heightmap_Mask][SFJL_Blobscanner_Ex_2]**
+![](data/screenshots/SFJL_Blobscanner_Example_Heightmap_Mask.gif)
+
+**[SFJL_Douglas_Peucker_Example][SFJL_Douglas_Peucker_Ex]**
+![](data/screenshots/SFJL_Douglas_Peucker_Example.gif)
+
+**[SFJL_Intergral_Image_Example][SFJL_Intergral_Image_Ex]**
+![](data/screenshots/SFJL_Intergral_Image_Example.gif)
+
+**[SFJL_Octree_Example][SFJL_Octree_Ex]**
+![](data/screenshots/SFJL_Octree_Example.gif)
+
+**[SFJL_Quad_Tree_Example][SFJL_Quad_Tree_Ex]**
+![](data/screenshots/SFJL_Quad_Tree_Example.gif)
+
+**[SFJL_Terminal_IO_Example][SFJL_Terminal_IO_Ex]**
+![](data/screenshots/SFJL_Terminal_IO_Example.gif)
+
 **[SFJL_Tween_Example][SFJL_Tween_Ex]**
-![Drag Racing](data/screenshots/SFJL_Tween_Example.png)
-
-
-
-# Soon(?) to come libraries
-More libraries are coming (soon?), I'm in the process of wrapping them up.
-Here a list of what is coming for sure:
-| library               | category | description                                    |
-| --------------------- | -------- | ---------------------------------------------- |
-| SFJL_Spatial_Hash_Map | data structure | store points based on hashes
+![](data/screenshots/SFJL_Tween_Example.png)
 
 
 # Never Asked FAQ

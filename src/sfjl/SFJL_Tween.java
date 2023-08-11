@@ -220,7 +220,6 @@ static public final class Circ {
     }
 }
 
-// if ((t/2) < 1) return -c/2 * ((float)Math.sqrt(1 - t*t) - 1) + b;
 
 // Cubic
 

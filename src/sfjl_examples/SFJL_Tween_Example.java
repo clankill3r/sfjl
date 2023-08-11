@@ -1,4 +1,4 @@
-/** SFJL_Tween_Example - v0.51
+/** SFJL_Tween_Example - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -10,6 +10,9 @@ REVISION HISTORY:
 package sfjl_examples;
 
 import processing.core.*;
+import sfjl.SFJL_Tween.Ease_Type;
+import sfjl.SFJL_Tween.In_Out_Type;
+
 import static sfjl.SFJL_Tween.*;
 
 public class SFJL_Tween_Example extends PApplet {
@@ -18,9 +21,15 @@ public static void main(String[] args) {
     PApplet.main(SFJL_Tween_Example.class, args);
 }
 
+int N_EASE_IN_OUT_TYPES = In_Out_Type.values().length;
+int N_EASE_TYPES = Ease_Type.values().length;
+int MARGIN = 2;
+int HEADER_HEIGHT = 20;
+
+
 @Override
 public void settings() {
-    size(1080, 360+3, P2D);
+    size(512, 192, P2D);
 }
 
 @Override
@@ -31,50 +40,49 @@ public void setup() {
 
 @Override
 public void draw() {
-    draw(g, 0, 0, width, height);
-}
 
-public void draw(PGraphics pg, int _x1, int _y1, int _x2, int _y2) {
-    pg.pushMatrix();
-    pg.translate(_x1, _y1);
-    draw(pg, _x2-_x1, _y2-_y1);
-    pg.popMatrix();
-}
+    background(0);
 
+    float plot_x1 = 50;
+    float plot_x2 = width;
 
-public void draw(PGraphics pg, int width, int height) {
+    float plot_y1 = HEADER_HEIGHT;
+    float plot_y2 = height;
 
-    pg.fill(30);
-    pg.noStroke();
-    pg.rect(0, 0, width, height);
+    float plot_width = (plot_x2-plot_x1);
+    float plot_height = (plot_y2-plot_y1);
 
-    int N_EASE_IN_OUT_TYPES = In_Out_Type.values().length;
-    int N_EASE_TYPES = Ease_Type.values().length;
+    float graph_width = round((float) plot_width / N_EASE_TYPES);
+    float graph_height = round((float) plot_height / N_EASE_IN_OUT_TYPES);
 
-    for (int i = 0; i < N_EASE_IN_OUT_TYPES; i++) { // y-axis
-        In_Out_Type in_out_type = In_Out_Type.values()[i];
-        for (int j = 0; j < N_EASE_TYPES; j++) { // x-axis
-            Ease_Type ease_type = Ease_Type.values()[j];
-            
-            var x1 = map(j, 0, N_EASE_TYPES, 0, width);
-            var y1 = map(i, 0, N_EASE_IN_OUT_TYPES, 0, height);
-            int w = round((float) width / N_EASE_TYPES);
-            int h = round((float) height / N_EASE_IN_OUT_TYPES);
+    float x1 = plot_x1;
+    float y1 = plot_y1;
 
-            int margin = 10;
-            x1 += margin;
-            y1 += margin;
-            w -= margin * 2;
-            h -= margin * 2;
-
-            int n_points = w / 2;
-            
-            draw_graph(pg, x1, y1, x1+w, y1+h, n_points, in_out_type, ease_type);
-            
-            pg.fill(255);
-            pg.textAlign(LEFT, TOP);
-            pg.text(in_out_type+"\n"+ease_type, x1, y1);
+    for (Ease_Type ease_type : Ease_Type.values()) { // x-axis
+        for (In_Out_Type in_out_type : In_Out_Type.values()) { // y-axis
+            draw_graph(g, x1 + MARGIN, y1 + MARGIN, x1+graph_width - MARGIN, y1+graph_height - MARGIN, (int)(graph_width/2), in_out_type, ease_type);
+            y1 += graph_height;
         }
+        x1 += graph_width;
+        y1 = plot_y1;
+    }
+
+    // draw labels on the top
+    x1 = plot_x1;
+    for (Ease_Type ease_type : Ease_Type.values()) { // x-axis
+        fill(255);
+        textAlign(LEFT, TOP);
+        text(""+ease_type, x1 + MARGIN, 2);
+        x1 += graph_width;
+    }
+
+    // draw labels on the side
+    y1 = plot_y1;
+    for (In_Out_Type in_out_type : In_Out_Type.values()) { // y-axis
+        fill(255);
+        textAlign(RIGHT, TOP);
+        text(""+in_out_type, plot_x1 - MARGIN, y1 + MARGIN);
+        y1 += graph_height;
     }
 
 }
@@ -111,6 +119,7 @@ void draw_graph(PGraphics pg, float plot_x1, float plot_y1, float plot_x2, float
 /**
 revision history:
 
+    0.52  (2023-08-11) simplified example
     0.51  (2023-06-06) displaying a grid with all the options
     0.50  (2020-08-12) first numbered version
 
