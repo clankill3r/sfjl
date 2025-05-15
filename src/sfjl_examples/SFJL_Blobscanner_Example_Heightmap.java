@@ -1,4 +1,4 @@
-/** SFJL_Blobscanner_Example_Heightmap - v0.5
+/** SFJL_Blobscanner_Example_Heightmap - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -9,15 +9,18 @@ REVISION HISTORY:
 */
 package sfjl_examples;
 import processing.core.*;
-import sfjl.SFJL_Math.Vec2;
+import static sfjl.SFJL_Math.*;
 import static sfjl.SFJL_Blobscanner.*;
+
 public class SFJL_Blobscanner_Example_Heightmap extends PApplet {    
 public static void main(String[] args) {
     PApplet.main(SFJL_Blobscanner_Example_Heightmap.class, args);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 PImage noise;
-Blobscanner_Settings blobscanner_context;
+Blobscanner_Context<Vec2[]> blobscanner_context;
+Add_To_Contour_Buffer<Vec2[]> add_to_contour_heightmap;
+Process_Contour<Vec2[]> process_contour;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void settings() {
     size(1024, 768, P3D);
@@ -28,11 +31,36 @@ public void setup() {
     noise = createImage(250, 250, RGB);
     noise.loadPixels();
 
-    blobscanner_context = new Blobscanner_Settings();
+    blobscanner_context = new Blobscanner_Context<>();
     blobscanner_context.threshold = 128;
     blobscanner_context.threshold_checker = (clr, threshold)-> {return (clr & 0xff) > threshold;};
     blobscanner_context.y_increment = 1;
     blobscanner_context.border_color = color(0);
+
+    Contour_Context<Vec2[]> contour_ctx = new Contour_Context<>();
+    contour_ctx.store_settings = Contour_Store_Settings.ALL_PIXELS;
+    contour_ctx.reset_contour_buffer = reset_contour_buffer_vec2;
+    contour_ctx.add_to_contour_buffer = add_to_contour_vec2;
+
+    blobscanner_context.contour_ctx = contour_ctx;
+
+    add_to_contour_heightmap =  (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y) -> {
+
+        // Drawing the border looks rather ugly, therefor if we hit the border
+        //  we process what we had and start a new contour.
+        // (You can disable the whole if block to see how it would look otherwise)
+        if (x == 1 || y == 1 || x == 248 || y == 248) {
+            if (contour_buffer.contour_length >= 2) {
+                process_contour.exe(contour_buffer);                
+            }
+            reset_contour_buffer_vec2.exe(contour_buffer);
+        }
+        contour_buffer.contour[contour_buffer.contour_length].x = x;
+        contour_buffer.contour[contour_buffer.contour_length].y = y;
+        contour_buffer.contour_length += 1;
+    };
+
+    contour_ctx.add_to_contour_buffer = add_to_contour_heightmap;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 void update_noise(PImage img, int seed) {
@@ -51,6 +79,7 @@ void update_noise(PImage img, int seed) {
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void draw() {
+
     update_noise(noise, frameCount*4);
 
     background(0);
@@ -60,28 +89,35 @@ public void draw() {
     rotateX(map(0.14f, 0, 1, 0, TWO_PI));
     rotateZ(map(mouseX, 0, width, 0, TWO_PI));
 
+    blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
+
     int levels = 255;
     float scale = 3;
 
-    blobscanner_context.y_increment = 16;
-    
     for (int l = 0; l <= levels; l++) {
         noFill();
-        stroke(l, 50, 50);
         float z = map(l, 0, levels, 0, 250) * scale;
-        blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
         blobscanner_context.threshold = l;
-        find_blobs_vec2(blobscanner_context, noise.pixels, noise.width, noise.height, (c)-> {
+        // Notice we assign the lambda callback to process_contour
+        // so we can refer to it in add_to_contour_heightmap
+        find_blobs_vec2(blobscanner_context, noise.pixels, noise.width, noise.height, process_contour = (c)-> {
+
+            if (c.contour_length < 2) return;
+
             beginShape();
             noFill();
-            for (int i = 1; i < c.contour_length; i++) {
+
+            float scan_z = map(frameCount % levels, levels, 0, 0, 250) * scale;
+
+            if (z == scan_z) {
+                stroke(50,200,200);
+            }
+            else {
+                stroke(blobscanner_context.threshold, 50, 50);
+            }
+
+            for (int i = 0; i < c.contour_length; i++) {
                 Vec2 v = c.contour[i];
-                if ((v.x == 1 || v.x == noise.width-2 || v.y == 1 || v.y == noise.height-2)) {
-                    stroke(0);
-                }
-                else {
-                    stroke(blobscanner_context.threshold, 50, 50);
-                }
                 v.x -= 250/2;
                 v.y -= 250/2;
                 v.x *= scale;
@@ -92,9 +128,8 @@ public void draw() {
         });
         // prevent replacing the border with another color 255 times each frame
         blobscanner_context.border_handling = Border_Handling.DONT_BORDER;
-
-        
     }
+
     popMatrix();
 
     fill(255);
@@ -106,7 +141,8 @@ public void draw() {
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
+    0.51  (2025-05-12) minor improvements
+    0.50  (2020-08-12) first numbered version
 
 */
 

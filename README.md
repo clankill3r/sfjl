@@ -73,9 +73,9 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_K_D_Tree][SFJL_K_D_Tree]**               | v0.50          | graphics / utility | 108  | minimal k-d tree implementation lacking a lot of functionality |
 | **[SFJL_Intergral_Image][SFJL_Intergral_Image]** | v0.52          | graphics / utility | 149   | simple intergral image |
 | **[SFJL_Terminal_IO][SFJL_Terminal_IO]**         | v0.50          | graphics / utility | 246  | (hacky!) functions for getting things like rows, columns, key pressed, and functions for setting the cursor, the color and more |
-| **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.50          | graphics / utility | 304  | Contour scanner based on a threshold |
+| **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.51          | graphics / utility | 328  | Contour scanner based on a threshold |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 4260 |                                                                                                                                 |
+|                                                  |                | **sum**            | 4284 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 

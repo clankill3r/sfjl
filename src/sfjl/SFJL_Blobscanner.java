@@ -1,4 +1,4 @@
-/** SFJL_Quad_Tree - v0.50
+/** SFJL_Blobscanner - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -13,8 +13,9 @@ EXAMPLE:
 */
 package sfjl;
 import static java.lang.Math.*;
-import static sfjl.SFJL_Math.*;
 import java.util.Arrays;
+
+import sfjl.SFJL_Math.AABB;
 import sfjl.SFJL_Math.Vec2;
 public class SFJL_Blobscanner {
      private SFJL_Blobscanner() {}
@@ -43,18 +44,13 @@ static public class Contour_Exist_Map {
     public int width;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-public enum Contour_Settings {
-    ALL_PIXELS,
-    ONLY_CORNERS,
-}
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public class Contour_Buffer<T> {
     public T   contour;
     public int contour_length;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-public interface Add_To_Contour<T> {
-    void exe(Contour_Buffer<T> contour_buffer, int index, int x, int y, Process_Contour<T> process_contour);
+public interface Add_To_Contour_Buffer<T> {
+    void exe(Contour_Buffer<T> contour_buffer, int index, int x, int y);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public interface Process_Contour<T> {
@@ -65,26 +61,20 @@ public interface Reset_Contour_Buffer<T> {
     void exe(Contour_Buffer<T> contour_buffer);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Add_To_Contour<Vec2[]> add_to_contour_vec2 = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour)-> {
-    contour_buffer.contour[contour_buffer.contour_length].x = x;
-    contour_buffer.contour[contour_buffer.contour_length].y = y;
-    contour_buffer.contour_length += 1;
-};
+public enum Contour_Store_Settings {
+    ALL_PIXELS,
+    ONLY_CORNERS,
+}
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Reset_Contour_Buffer<Vec2[]> reset_contour_buffer_vec2 = (Contour_Buffer<Vec2[]> contour_buffer)-> {
-    contour_buffer.contour_length = 0;
-};
+static public class Contour_Context<T> {
+    public Contour_Store_Settings store_settings = Contour_Store_Settings.ONLY_CORNERS;
+    public Contour_Exist_Map contour_exist_map = new Contour_Exist_Map();
+    public Contour_Buffer<T> buffer = new Contour_Buffer<>();
+    public Reset_Contour_Buffer<T> reset_contour_buffer;
+    public Add_To_Contour_Buffer<T> add_to_contour_buffer;
+}
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Add_To_Contour<int[]> add_to_contour_index = (Contour_Buffer<int[]> contour_buffer, int index, int x, int y, Process_Contour<int[]> process_contour)-> {
-    contour_buffer.contour[contour_buffer.contour_length] = index;
-    contour_buffer.contour_length += 1;
-};
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public Reset_Contour_Buffer<int[]> reset_contour_buffer_index = (Contour_Buffer<int[]> contour_buffer)-> {
-    contour_buffer.contour_length = 0;
-};
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public class Blobscanner_Settings {
+static public class Blobscanner_Context<T> {
     public Border_Handling border_handling = Border_Handling.REPLACE_BORDER_AND_RESTORE_BORDER;
     public Border_Backup border_backup = new Border_Backup();
     public int border_color;
@@ -92,10 +82,7 @@ static public class Blobscanner_Settings {
     public Threshold_Checker threshold_checker;
     public float threshold;
     public int y_increment = 1;
-    public Contour_Settings contour_settings = Contour_Settings.ONLY_CORNERS;
-    public Contour_Buffer<Vec2[]> contour_buffer_vec2   = new Contour_Buffer<>();
-    public Contour_Buffer<int[]> contour_buffer_index = new Contour_Buffer<>();
-    public Contour_Exist_Map contour_exist_map = new Contour_Exist_Map();
+    public Contour_Context<T> contour_ctx;
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 static public void make_roi_in_pixels(AABB roi, int w, int h) {
@@ -222,9 +209,9 @@ static public void restore_border_from_backup(int[] pixels, int w, int h, AABB r
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w, int h, Process_Contour<Vec2[]> process_contour) {
+static public void find_blobs_vec2(Blobscanner_Context<Vec2[]> ctx, int[] pixels, int w, int h, Process_Contour<Vec2[]> process_contour) {
 
-    Contour_Buffer<Vec2[]> contour_buffer = ctx.contour_buffer_vec2;
+    Contour_Buffer<Vec2[]> contour_buffer = ctx.contour_ctx.buffer;
 
     if (contour_buffer.contour == null) {
         contour_buffer.contour = new Vec2[pixels.length/2];
@@ -241,13 +228,13 @@ static public void find_blobs_vec2(Blobscanner_Settings ctx, int[] pixels, int w
         }
     }
 
-    _find_blobs(ctx, pixels, w, h, contour_buffer, add_to_contour_vec2, reset_contour_buffer_vec2, process_contour);
+    _find_blobs(ctx, pixels, w, h, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int w, int h, Process_Contour<int[]> process_contour) {
+static public void find_blobs_index(Blobscanner_Context<int[]> ctx, int[] pixels, int w, int h,Process_Contour<int[]> process_contour) {
 
-    Contour_Buffer<int[]> contour_buffer = ctx.contour_buffer_index;
+    Contour_Buffer<int[]> contour_buffer = ctx.contour_ctx.buffer;
 
     if (contour_buffer.contour == null) {
         contour_buffer.contour = new int[pixels.length/2];
@@ -256,11 +243,11 @@ static public void find_blobs_index(Blobscanner_Settings ctx, int[] pixels, int 
         contour_buffer.contour = Arrays.copyOf(contour_buffer.contour, pixels.length/2);
     }
 
-    _find_blobs(ctx, pixels, w, h, contour_buffer, add_to_contour_index, reset_contour_buffer_index, process_contour);
+    _find_blobs(ctx, pixels, w, h, process_contour);
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w, int h, Contour_Buffer<T> contour_buffer, Add_To_Contour<T> add_to_contour, Reset_Contour_Buffer<T> reset_contour_buffer, Process_Contour<T> process_contour) {
+static public <T> void _find_blobs(Blobscanner_Context<T> ctx, int[] pixels, int w, int h, Process_Contour<T> process_contour) {
     
     make_roi_in_pixels(ctx.roi, w, h);
 
@@ -268,11 +255,11 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
         prepare_border(pixels, w, h, ctx.roi, ctx.border_color, ctx.border_handling, ctx.border_backup);
     }
 
-    if (ctx.contour_exist_map.pixels.length < pixels.length) {
-        ctx.contour_exist_map.pixels = new byte[pixels.length];
-        ctx.contour_exist_map.write_index = 1;
+    if (ctx.contour_ctx.contour_exist_map.pixels.length < pixels.length) {
+        ctx.contour_ctx.contour_exist_map.pixels = new byte[pixels.length];
+        ctx.contour_ctx.contour_exist_map.write_index = 1;
     }
-    ctx.contour_exist_map.width = w;
+    ctx.contour_ctx.contour_exist_map.width = w;
 
     //
     // Scan in lines untill we hit and edge, then walk the contour
@@ -282,6 +269,8 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
     int x2 = (int) ctx.roi.x2;
     int y2 = (int) ctx.roi.y2;
 
+    if (y1 == 0) y1 = 1; // nothing is walkable on the edge
+
     for (int y = y1; y < y2; y += ctx.y_increment) {
         boolean prev_is_walkable = false;
 
@@ -290,8 +279,10 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
             boolean current_is_walkable = ctx.threshold_checker.is_walkable(pixels[index], ctx.threshold);
 
             if (current_is_walkable && !prev_is_walkable) {
-                if (ctx.contour_exist_map.pixels[index] != ctx.contour_exist_map.write_index) {
-                    walk_contour(ctx.contour_exist_map, pixels, w, h, x, y, ctx.threshold_checker, ctx.threshold, ctx.contour_settings, contour_buffer, add_to_contour, reset_contour_buffer, process_contour);
+                boolean has_not_been_walked = ctx.contour_ctx.contour_exist_map.pixels[index] != ctx.contour_ctx.contour_exist_map.write_index;
+                if (has_not_been_walked) {
+                    walk_contour(ctx, pixels, w, h, x, y, ctx.threshold_checker, ctx.threshold, false);
+                    process_contour.exe(ctx.contour_ctx.buffer);
                 }
             }
             prev_is_walkable = current_is_walkable;
@@ -301,20 +292,23 @@ static public <T> void _find_blobs(Blobscanner_Settings ctx, int[] pixels, int w
     if (ctx.border_handling == Border_Handling.REPLACE_BORDER_AND_RESTORE_BORDER) {
         restore_border_from_backup(pixels, w, h, ctx.roi, ctx.border_backup);
     }
-
-    ctx.contour_exist_map.write_index += 1;
-    if (ctx.contour_exist_map.write_index == 0)  {
-        for (int i = 0; i < ctx.contour_exist_map.pixels.length; i++) {
-            ctx.contour_exist_map.pixels[i] = 0;
+    ctx.contour_ctx.contour_exist_map.write_index += 1;
+    // reset on overflow
+    if (ctx.contour_ctx.contour_exist_map.write_index == 0)  {
+        for (int i = 0; i < ctx.contour_ctx.contour_exist_map.pixels.length; i++) {
+            ctx.contour_ctx.contour_exist_map.pixels[i] = 0;
         }
-        ctx.contour_exist_map.write_index = 1;
+        ctx.contour_ctx.contour_exist_map.write_index = 1;
     }
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] pixels, int w, int h, int x, int y, Threshold_Checker threshold_checker, float threshold, Contour_Settings contour_settings, Contour_Buffer<T> contour_buffer, Add_To_Contour<T> add_to_contour, Reset_Contour_Buffer<T> reset_contour_buffer,  Process_Contour<T> process_contour) {
+static public <T> void walk_contour(Blobscanner_Context<T> ctx, int[] pixels, int w, int h, int x, int y, Threshold_Checker threshold_checker, float threshold, boolean ccw) {
 
-    reset_contour_buffer.exe(contour_buffer);
+    var contour_ctx = ctx.contour_ctx;
+    var contour_exist_map = contour_ctx.contour_exist_map;
+
+    contour_ctx.reset_contour_buffer.exe(contour_ctx.buffer);
 
     final int LEFT  = -1;
     final int RIGHT =  1;
@@ -332,70 +326,114 @@ static public <T> void walk_contour(Contour_Exist_Map contour_exist_map, int[] p
         return; // single pixel
     }
 
-    int[] move_dirs =     {RIGHT, UP,  LEFT, DOWN};
-    int[] move_change_x = {1,      0,    -1,    0};
-    int[] move_change_y = {0,     -1,     0,    1};
-    int[] check_dirs =    {UP,   LEFT, DOWN, RIGHT};
+    int[] move_dirs;
+    int[] move_change_x;
+    int[] move_change_y;
+    int[] check_dirs;
 
-    int xx;
+    int dir_index; 
 
-    if (!left_walkable)       xx = up_walkable    ? 1 : right_walkable ? 0 : 3;
-    else if (!up_walkable)    xx = right_walkable ? 0 : down_walkable  ? 3 : 2;
-    else if (!right_walkable) xx = down_walkable  ? 3 : left_walkable  ? 2 : 1;
-    else                      xx = left_walkable  ? 2 : up_walkable    ? 1 : 0;
+    if (!ccw) {
+        move_dirs     = new int[] {RIGHT, UP,  LEFT, DOWN};
+        move_change_x = new int[] {1,      0,    -1,    0};
+        move_change_y = new int[] {0,     -1,     0,    1};
+        check_dirs    = new int[] {UP,   LEFT, DOWN, RIGHT};
 
-    int move_dir_at_start = move_dirs[xx];
+        if (!left_walkable)       dir_index = up_walkable    ? 1 : right_walkable ? 0 : 3;
+        else if (!up_walkable)    dir_index = right_walkable ? 0 : down_walkable  ? 3 : 2;
+        else if (!right_walkable) dir_index = down_walkable  ? 3 : left_walkable  ? 2 : 1;
+        else                      dir_index = left_walkable  ? 2 : up_walkable    ? 1 : 0;
+
+    }
+    else {
+        move_dirs =     new int[]{RIGHT, DOWN,  LEFT, UP};
+        move_change_x = new int[]{1,     0,    -1,    0};
+        move_change_y = new int[]{0,     1,     0,   -1};
+        check_dirs =    new int[]{DOWN,  LEFT,  UP,   RIGHT};
+
+        if (!left_walkable)       dir_index = down_walkable  ? 1 : right_walkable ? 0 : 3;
+        else if (!down_walkable)  dir_index = right_walkable ? 0 : up_walkable    ? 3 : 2;
+        else if (!right_walkable) dir_index = up_walkable    ? 3 : left_walkable  ? 2 : 1;
+        else                      dir_index = left_walkable  ? 2 : down_walkable  ? 1 : 0;
+    }
+
+    int move_dir_at_start = move_dirs[dir_index];
     int start_x = x;
     int start_y = y;
     int n_wall_hits_in_a_row = 0;
     contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-    final boolean ALL_PIXELS   = contour_settings == Contour_Settings.ALL_PIXELS;
-    final boolean ONLY_CORNERS = contour_settings == Contour_Settings.ONLY_CORNERS;
+    final boolean ALL_PIXELS   = contour_ctx.store_settings == Contour_Store_Settings.ALL_PIXELS;
+    final boolean ONLY_CORNERS = contour_ctx.store_settings == Contour_Store_Settings.ONLY_CORNERS;
 
     while (true) {     
         
-        if (threshold_checker.is_walkable(pixels[current + check_dirs[xx]], threshold)) {
-            if (ONLY_CORNERS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
-            xx += 1;
-            xx &= 0x3;
-            current += move_dirs[xx];
-            x += move_change_x[xx];
-            y += move_change_y[xx];
+        if (threshold_checker.is_walkable(pixels[current + check_dirs[dir_index]], threshold)) {
+            if (ONLY_CORNERS) contour_ctx.add_to_contour_buffer.exe(contour_ctx.buffer, current, x, y);
+
+            dir_index += 1;
+            dir_index &= 0x3;
+            current += move_dirs[dir_index];
+            x += move_change_x[dir_index];
+            y += move_change_y[dir_index];
             contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-            if (ALL_PIXELS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
+            if (ALL_PIXELS) contour_ctx.add_to_contour_buffer.exe(contour_ctx.buffer, current, x, y);
         }
-        else if (threshold_checker.is_walkable(pixels[current + move_dirs[xx]], threshold)) {
+        else if (threshold_checker.is_walkable(pixels[current + move_dirs[dir_index]], threshold)) {
             n_wall_hits_in_a_row = 0;
-            current += move_dirs[xx];
-            x += move_change_x[xx];
-            y += move_change_y[xx];
+            current += move_dirs[dir_index];
+            x += move_change_x[dir_index];
+            y += move_change_y[dir_index];
             contour_exist_map.pixels[current] = contour_exist_map.write_index;
 
-            if (ALL_PIXELS) add_to_contour.exe(contour_buffer, current, x, y, process_contour);
+            if (ALL_PIXELS) contour_ctx.add_to_contour_buffer.exe(contour_ctx.buffer, current, x, y);
         }
         else {
             n_wall_hits_in_a_row += 1;
 
             if (ONLY_CORNERS && n_wall_hits_in_a_row != 2) {
-                add_to_contour.exe(contour_buffer, current, x, y, process_contour);
+                contour_ctx.add_to_contour_buffer.exe(contour_ctx.buffer, current, x, y);
             }
-            xx -= 1;
-            xx &= 0x3;
+            dir_index -= 1;
+            dir_index &= 0x3;
         }
-        if (x == start_x && y == start_y && move_dirs[xx] == move_dir_at_start) {
+        if (x == start_x && y == start_y && move_dirs[dir_index] == move_dir_at_start) {
             break;
         }
     }
-
-    process_contour.exe(contour_buffer);
 }
+//
+// Default implementations
+//
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Add_To_Contour_Buffer<Vec2[]> add_to_contour_vec2 = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y)-> {
+    contour_buffer.contour[contour_buffer.contour_length].x = x;
+    contour_buffer.contour[contour_buffer.contour_length].y = y;
+    contour_buffer.contour_length += 1;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Reset_Contour_Buffer<Vec2[]> reset_contour_buffer_vec2 = (Contour_Buffer<Vec2[]> contour_buffer)-> {
+    contour_buffer.contour_length = 0;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Add_To_Contour_Buffer<int[]> add_to_contour_index = (Contour_Buffer<int[]> contour_buffer, int index, int x, int y)-> {
+    contour_buffer.contour[contour_buffer.contour_length] = index;
+    contour_buffer.contour_length += 1;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+static public Reset_Contour_Buffer<int[]> reset_contour_buffer_index = (Contour_Buffer<int[]> contour_buffer)-> {
+    contour_buffer.contour_length = 0;
+};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 }
 /**
 revision history:
 
+    0.51  (2025-05-12) cw/ccw option for walk_contour
+                       + added Contour_Context
+                       + minor improvements
     0.50  (2022-02-10) first numbered version
 
 */

@@ -1,4 +1,4 @@
-/** SFJL_Blobscanner_Example_Heightmap_Mask - v0.51
+/** SFJL_Blobscanner_Example_Heightmap_Mask - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -9,9 +9,9 @@ REVISION HISTORY:
 */
 package sfjl_examples;
 import processing.core.*;
-import sfjl.SFJL_Blobscanner.Contour_Buffer;
-import sfjl.SFJL_Math.Vec2;
+import static sfjl.SFJL_Math.*;
 import static sfjl.SFJL_Blobscanner.*;
+
 public class SFJL_Blobscanner_Example_Heightmap_Mask extends PApplet {    
 public static void main(String[] args) {
     PApplet.main(SFJL_Blobscanner_Example_Heightmap_Mask.class, args);
@@ -19,8 +19,11 @@ public static void main(String[] args) {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 PImage noise;
-Blobscanner_Settings blobscanner_context;
 PGraphics mask;
+
+Blobscanner_Context<Vec2[]> blobscanner_context;
+Add_To_Contour_Buffer<Vec2[]> add_to_contour_buffer_with_mask_check;
+Process_Contour<Vec2[]> process_contour;
 
 int white = color(255);
 
@@ -30,16 +33,41 @@ public void settings() {
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void setup() {
+
+    add_to_contour_buffer_with_mask_check = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y) -> {
+
+        // The mask is breaking up the contour we are currenlty making
+        // so we process what we had so far and start a new contour from there
+        if (mask.pixels[index] != white) {
+            if (contour_buffer.contour_length >= 2) {
+                process_contour.exe(contour_buffer);                
+            }
+            reset_contour_buffer_vec2.exe(contour_buffer);
+        }
+        else {
+            contour_buffer.contour[contour_buffer.contour_length].x = x;
+            contour_buffer.contour[contour_buffer.contour_length].y = y;
+            contour_buffer.contour_length += 1;
+        }
+    };
+
+    
     noiseSeed(0);
     noise = createImage(250, 250, RGB);
     noise.loadPixels();
 
-    blobscanner_context = new Blobscanner_Settings();
+    blobscanner_context = new Blobscanner_Context<Vec2[]>();
     blobscanner_context.threshold = 128;
     blobscanner_context.threshold_checker = (clr, threshold)-> { return (clr & 0xff) > threshold;};
-    blobscanner_context.y_increment = 1;
+    blobscanner_context.y_increment = 16;
     blobscanner_context.border_color = color(0);
-    blobscanner_context.contour_settings = Contour_Settings.ALL_PIXELS;
+
+    Contour_Context<Vec2[]> contour_ctx = new Contour_Context<>();
+    contour_ctx.store_settings = Contour_Store_Settings.ALL_PIXELS;
+    contour_ctx.reset_contour_buffer = reset_contour_buffer_vec2;
+    contour_ctx.add_to_contour_buffer = add_to_contour_buffer_with_mask_check;
+
+    blobscanner_context.contour_ctx = contour_ctx;
 
     mask = createGraphics(250, 250, P2D);
     mask.beginDraw();
@@ -55,19 +83,6 @@ public void setup() {
     mask.rect(8, 250-8, 8+64, 250-8-64);
     mask.endDraw();
     mask.loadPixels();
-
-    // 
-    add_to_contour_vec2 = (Contour_Buffer<Vec2[]> contour_buffer, int index, int x, int y, Process_Contour<Vec2[]> process_contour) -> {
-        if (mask.pixels[index] != white) {
-            process_contour.exe(contour_buffer);
-            reset_contour_buffer_vec2.exe(contour_buffer);
-        }
-        else {
-            contour_buffer.contour[contour_buffer.contour_length].x = x;
-            contour_buffer.contour[contour_buffer.contour_length].y = y;
-            contour_buffer.contour_length += 1;
-        }
-    };
     
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -99,17 +114,17 @@ public void draw() {
     int levels = 255;
     float scale = 3;
 
-    blobscanner_context.y_increment = 16;
+    blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
     
     for (int l = 0; l < levels; l++) {
         
         noFill();
         stroke(l, 50, 50);
         float z = map(l, 0, levels-1, 0, 250) * scale;
-        blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
         blobscanner_context.threshold = l;
         colorMode(HSB, 255, 1, 1);
-        find_blobs_vec2(blobscanner_context, noise.pixels, noise.width, noise.height, (c)-> {
+
+        find_blobs_vec2(blobscanner_context, noise.pixels, noise.width, noise.height, process_contour = (c)-> {
             beginShape();
             noFill();
             stroke(blobscanner_context.threshold, 1, 1);
@@ -121,12 +136,10 @@ public void draw() {
                 v.x *= scale;
                 v.y *= scale;
                 vertex(v.x, v.y, z);
-
-                
             }
             endShape();
         });
-        
+        // prevent replacing the border with another color 255 times each frame
         blobscanner_context.border_handling = Border_Handling.DONT_BORDER;
     }
 
@@ -138,6 +151,7 @@ public void draw() {
 /**
 revision history:
 
+    0.52  (2025-05-12) minor improvements
     0.51  (2023-08-10) createGraphics using P2D now (reason: https://github.com/processing/processing4/issues/768)
     0.50  (2020-08-12) first numbered version
 

@@ -1,4 +1,4 @@
-/** SFJL_Blobscanner_Example - v0.5
+/** SFJL_Blobscanner_Example - v0.51
  
 LICENSE:
     See end of file for license information.
@@ -10,17 +10,17 @@ REVISION HISTORY:
 package sfjl_examples;
 import processing.core.*;
 import processing.opengl.*;
-import sfjl.SFJL_Math.Vec2;
+import java.util.HashMap;
+import static sfjl.SFJL_Math.*;
 import static sfjl.SFJL_Blobscanner.*;
 
-import java.util.HashMap;
 public class SFJL_Blobscanner_Example extends PApplet {    
 public static void main(String[] args) {
     PApplet.main(SFJL_Blobscanner_Example.class, args);
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 PImage input;
-Blobscanner_Settings blobscanner_context;
+Blobscanner_Context<Vec2[]> blobscanner_context;
 
 
 static class Blur_Pass {
@@ -72,13 +72,19 @@ public void settings() {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 public void setup() {
 
-    blobscanner_context = new Blobscanner_Settings();
+    blobscanner_context = new Blobscanner_Context<Vec2[]>();
     blobscanner_context.threshold = 128;
     blobscanner_context.threshold_checker = (clr, threshold)-> {return (clr & 0xff) > threshold;};
     blobscanner_context.y_increment = 16;
     blobscanner_context.border_color = color(0);
     blobscanner_context.border_handling = Border_Handling.REPLACE_BORDER;
 
+    Contour_Context<Vec2[]> contour_ctx = new Contour_Context<>();
+    contour_ctx.reset_contour_buffer = reset_contour_buffer_vec2;
+    contour_ctx.add_to_contour_buffer = add_to_contour_vec2;
+
+    blobscanner_context.contour_ctx = contour_ctx;
+    
     input = loadImage("sketch_01.png");
 
     Blur_Pass.s_blur = loadShader("shaders/blur_frag.glsl", "shaders/blur_vert.glsl");
@@ -89,6 +95,8 @@ public void setup() {
 
     Threshold_Pass.s_threshold = loadShader("shaders/threshold_frag.glsl", "shaders/threshold_vert.glsl");
     Threshold_Pass.pg_threshold = createGraphics(width, height, P2D);
+
+
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -245,7 +253,8 @@ public void keyPressed() {
 /**
 revision history:
 
-   0.50  (2020-08-12) first numbered version
+    0.51  (2025-05-12) conforming to library changes
+    0.50  (2020-08-12) first numbered version
 
 */
 
