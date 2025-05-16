@@ -1,4 +1,4 @@
-/** SFJL_Blobscanner - v0.51
+/** SFJL_Blobscanner - v0.52
  
 LICENSE:
     See end of file for license information.
@@ -281,8 +281,8 @@ static public <T> void _find_blobs(Blobscanner_Context<T> ctx, int[] pixels, int
             if (current_is_walkable && !prev_is_walkable) {
                 boolean has_not_been_walked = ctx.contour_ctx.contour_exist_map.pixels[index] != ctx.contour_ctx.contour_exist_map.write_index;
                 if (has_not_been_walked) {
-                    walk_contour(ctx, pixels, w, h, x, y, ctx.threshold_checker, ctx.threshold, false);
-                    process_contour.exe(ctx.contour_ctx.buffer);
+                    boolean ok = walk_contour(ctx, pixels, w, h, x, y, ctx.threshold_checker, ctx.threshold, false);
+                    if (ok) process_contour.exe(ctx.contour_ctx.buffer);
                 }
             }
             prev_is_walkable = current_is_walkable;
@@ -303,7 +303,7 @@ static public <T> void _find_blobs(Blobscanner_Context<T> ctx, int[] pixels, int
 
 }
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-static public <T> void walk_contour(Blobscanner_Context<T> ctx, int[] pixels, int w, int h, int x, int y, Threshold_Checker threshold_checker, float threshold, boolean ccw) {
+static public <T> boolean walk_contour(Blobscanner_Context<T> ctx, int[] pixels, int w, int h, int x, int y, Threshold_Checker threshold_checker, float threshold, boolean ccw) {
 
     var contour_ctx = ctx.contour_ctx;
     var contour_exist_map = contour_ctx.contour_exist_map;
@@ -323,7 +323,7 @@ static public <T> void walk_contour(Blobscanner_Context<T> ctx, int[] pixels, in
     boolean down_walkable  = threshold_checker.is_walkable(pixels[current + DOWN], threshold);
 
     if (!(left_walkable || right_walkable || up_walkable || down_walkable)) {
-        return; // single pixel
+        return false; // single pixel
     }
 
     int[] move_dirs;
@@ -402,6 +402,7 @@ static public <T> void walk_contour(Blobscanner_Context<T> ctx, int[] pixels, in
             break;
         }
     }
+    return true;
 }
 //
 // Default implementations
@@ -431,6 +432,7 @@ static public Reset_Contour_Buffer<int[]> reset_contour_buffer_index = (Contour_
 /**
 revision history:
 
+    0.52  (2025-05-13) minor bug fix
     0.51  (2025-05-12) cw/ccw option for walk_contour
                        + added Contour_Context
                        + minor improvements
