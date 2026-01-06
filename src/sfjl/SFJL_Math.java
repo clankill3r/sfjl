@@ -82,6 +82,15 @@ static public Mat3 make_mat3(float m00, float m01, float m02,
     return m;
 }
 
+static public Mat3 make_mat3(Mat3 m) {
+    Mat3 result = new Mat3();
+    result.m[0][0] = m.m[0][0]; result.m[0][1] = m.m[0][1]; result.m[0][2] = m.m[0][2];
+    result.m[1][0] = m.m[1][0]; result.m[1][1] = m.m[1][1]; result.m[1][2] = m.m[1][2];
+    result.m[2][0] = m.m[2][0]; result.m[2][1] = m.m[2][1]; result.m[2][2] = m.m[2][2];
+    return result;
+}
+
+
 //
 // Overrides
 //
@@ -591,7 +600,7 @@ static public final boolean point_in_triangle (float tx, float ty, float x1, flo
 }
 
 static public final boolean point_in_triangle (float tx, float ty, Vec2 a, Vec2 b, Vec2 c) {
-    return point_in_triangle(tx, ty, a, b, c);
+    return point_in_triangle(tx, ty, a.x, a.y, b.x, b.y, c.x, c.y);
 }
 
 
