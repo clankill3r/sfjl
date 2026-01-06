@@ -78,7 +78,7 @@ I feel very aligned with this philosophy, hence the quote. I do however have a h
 | **[SFJL_Blobscanner][SFJL_Blobscanner]**         | v0.51          | graphics / utility | 328  | contour scanner based on a threshold |
 | **[SFJL_Keystone][SFJL_Keystone]**               | v0.50          | graphics / utility | 489  | keystone usefull for projection correction / projection mapping  |
 | **[SFJL_Doeke][SFJL_Doeke]**                     | v0.53          | misc               | 92   | collection of functions that do not need their own file, mostly snippets I use in multiple files                                |
-|                                                  |                | **sum**            | 4284 |                                                                                                                                 |
+|                                                  |                | **sum**            | 4773 |                                                                                                                                 |
 
 [fnv_link]: http://www.isthe.com/chongo/tech/comp/fnv/
 
