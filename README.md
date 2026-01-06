@@ -127,7 +127,7 @@ SFJL_Keystone seemed like the better solution. (And who uses this besides me any
 ![](data/screenshots/SFJL_Tween_Example.png)
 
 **[SFJL_Keystone_Example][SFJL_Keystone_Ex]**  
-![](data/screenshots/SFJL_Keystone_Example.gif.png)
+![](data/screenshots/SFJL_Keystone_Example.gif)
 
 
 # Never Asked FAQ
